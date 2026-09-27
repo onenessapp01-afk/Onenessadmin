@@ -6,14 +6,14 @@
 <script>
 (async()=>{
 
-const response=await fetch(new URL('auth.html',location.href),{cache:'no-cache'});
-if(!response.ok)throw Error('Keep auth.html in the same folder as this page.');
+const response=await fetch(new URL('index.html',location.href),{cache:'no-cache'});
+if(!response.ok)throw Error('Keep index.html in the same folder as this page.');
 const shared=new DOMParser().parseFromString(await response.text(),'text/html');
 for(const id of ['oneness-config','oneness-theme']){
- const node=shared.getElementById(id);if(!node)throw Error('auth.html is incomplete.');
+ const node=shared.getElementById(id);if(!node)throw Error('index.html is incomplete.');
  document.head.append(node.cloneNode(true));
 }
-const source=shared.getElementById('oneness-core');if(!source)throw Error('auth.html is incomplete.');
+const source=shared.getElementById('oneness-core');if(!source)throw Error('index.html is incomplete.');
 const runtime=document.createElement('script');runtime.textContent=source.textContent;document.body.append(runtime);
 const A=await App.init('users',['users']),{$,esc,money}=A;let users=[],orders=[],shown=[],page=1;
 $('view').innerHTML=A.header('People & permissions','Approve retail partners and manage your team.','<button id="refresh">Refresh</button><button id="export">Export CSV</button>')+`<div class="filters"><label>Search<input id="search" placeholder="Name, shop, email or phone"></label><label>Account type<select id="type"><option value="retailer">Retailers</option><option value="staff">Admin staff</option><option value="">All accounts</option></select></label>${A.dateFields()}<label>Status<select id="status"><option value="">All statuses</option><option>pending</option><option>active</option><option>blocked</option></select></label></div><p class="muted" id="count"></p><div id="list"></div><div class="row" style="margin-top:18px"><button id="prev">Previous</button><span id="page"></span><button id="next">Next</button></div>`;
