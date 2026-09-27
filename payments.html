@@ -6,14 +6,14 @@
 <script>
 (async()=>{
 
-const response=await fetch(new URL('auth.html',location.href),{cache:'no-cache'});
-if(!response.ok)throw Error('Keep auth.html in the same folder as this page.');
+const response=await fetch(new URL('index.html',location.href),{cache:'no-cache'});
+if(!response.ok)throw Error('Keep index.html in the same folder as this page.');
 const shared=new DOMParser().parseFromString(await response.text(),'text/html');
 for(const id of ['oneness-config','oneness-theme']){
- const node=shared.getElementById(id);if(!node)throw Error('auth.html is incomplete.');
+ const node=shared.getElementById(id);if(!node)throw Error('index.html is incomplete.');
  document.head.append(node.cloneNode(true));
 }
-const source=shared.getElementById('oneness-core');if(!source)throw Error('auth.html is incomplete.');
+const source=shared.getElementById('oneness-core');if(!source)throw Error('index.html is incomplete.');
 const runtime=document.createElement('script');runtime.textContent=source.textContent;document.body.append(runtime);
 const A=await App.init('payments',['finance','orders']),{$,esc,money}=A;let orders=[],users=[],shown=[],page=1;
 $('view').innerHTML=A.header('Cash collections','Keep delivered orders and collected cash clearly reconciled.','<button id="refresh">Refresh</button><button id="export">Export CSV</button>')+`<div class="filters"><label>Collection status<select id="type"><option value="due">Delivered · unpaid</option><option value="collected">Collected</option><option value="transit">Awaiting delivery</option></select></label><label>Search<input id="search" placeholder="Order or retailer"></label>${A.dateFields()}</div><p class="muted" id="basis"></p><div id="numbers"></div><div id="list"></div><div class="row" style="margin-top:18px"><button id="prev">Previous</button><span id="page"></span><button id="next">Next</button></div>`;$('from').value='';$('to').value='';$('period').value='all';
