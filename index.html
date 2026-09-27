@@ -77,36 +77,105 @@ window.App=(()=>{
 <script>
 (async()=>{
 const runtime=document.createElement("script");runtime.textContent=document.getElementById("oneness-core").textContent;document.body.append(runtime);
-let recovery=new URLSearchParams(location.search).get('mode')==='reset'||new URLSearchParams(location.hash.slice(1)).get('type')==='recovery';
-const callbackError=new URLSearchParams(location.hash.slice(1)).get('error_description');
+const initialHash=new URLSearchParams(location.hash.slice(1));
+const callbackError=initialHash.get('error_description');
+let recovery=initialHash.get('type')==='recovery';
 const A=await App.init('index'),{$,esc}=A;
-let mode='login',entering=false,recoverySession=false;
+const OTP_KEY='oneness-otp',RESEND_DELAY=60000;
+let mode='login',entering=false,authBusy=false,recoverySession=false,appSessionStarted=false,otp=null,timer=null;
 function message(text,bad=false){const el=$('auth-message');if(!el){A.toast(text);return;}el.textContent=text;el.className='notice'+(bad?' error':'');el.hidden=false;}
-async function signout(){try{await A.api('session.end');}catch{}await A.client.auth.signOut({scope:'local'});recovery=false;recoverySession=false;history.replaceState({},'',location.pathname);render('login');}
+function stopTimer(){if(timer)clearInterval(timer);timer=null;}
+function saveOtp(){try{if(otp)sessionStorage.setItem(OTP_KEY,JSON.stringify(otp));else sessionStorage.removeItem(OTP_KEY);}catch{}}
+function clearOtp(){otp=null;saveOtp();stopTimer();}
+function readOtp(){try{const p=JSON.parse(sessionStorage.getItem(OTP_KEY)||'null');if(p&&['signup','recovery'].includes(p.purpose)&&typeof p.email==='string'&&p.email.length<=254&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(p.email)&&Number.isFinite(p.requestedAt)&&Date.now()-p.requestedAt<86400000&&Number.isFinite(p.nextResend))return p;}catch{}return null;}
+function beginOtp(email,purpose,sent=true){otp={email:email.trim(),purpose,requestedAt:Date.now(),nextResend:sent?Date.now()+RESEND_DELAY:0};saveOtp();renderOtp();}
+function tick(){const button=$('resend-otp');if(!button||!otp)return;const seconds=Math.max(0,Math.ceil((otp.nextResend-Date.now())/1000));button.disabled=authBusy||seconds>0;button.textContent=seconds?`Resend in ${seconds}s`:'Resend code';}
+async function requestCode(p){
+ const result=p.purpose==='recovery'?await A.client.auth.resetPasswordForEmail(p.email):await A.client.auth.resend({type:'signup',email:p.email});
+ if(result.error)throw result.error;
+}
+async function resendCode(){
+ if(!otp||authBusy||otp.nextResend>Date.now())return;
+ const current=otp;authBusy=true;current.nextResend=Date.now()+RESEND_DELAY;saveOtp();tick();$('verify-otp').disabled=true;
+ try{await requestCode(current);current.requestedAt=Date.now();saveOtp();message('If this email has an eligible account, a new code will arrive. Use the newest code.');}
+ catch(e){message(e.message||'The code could not be sent. Please try again.',true);}
+ finally{authBusy=false;if($('verify-otp'))$('verify-otp').disabled=false;tick();}
+}
+function renderOtp(){
+ stopTimer();mode='otp';
+ $('auth-box').innerHTML=`<a class="brand" href="index.html">ONeness</a><p class="eyebrow">${otp.purpose==='recovery'?'Password recovery':'Email verification'}</p><h1>Enter your code</h1><p class="muted">Enter the code sent to <strong>${esc(otp.email)}</strong>.</p><form id="otp-form"><label for="otp-code">Email verification code</label><input id="otp-code" name="otp" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,10}" minlength="6" maxlength="10" required aria-describedby="otp-help" style="font-size:26px;letter-spacing:.2em;text-align:center;width:100%;margin:8px 0 12px"><p class="muted" id="otp-help">Use the newest email. Codes expire and can only be used once.</p><button class="primary" id="verify-otp">Verify code</button><p class="notice" id="auth-message" role="status" hidden></p></form><div class="row" style="margin-top:22px"><button class="small" id="resend-otp">Resend code</button><button class="small" id="otp-back">Back to sign in</button></div><p class="muted" style="font-size:13px;margin-top:22px">${otp.purpose==='signup'?'Email verification is the first step. Your admin account will still need backend approval.':'After verification, you can choose a new password.'}</p>`;
+ $('otp-code').oninput=e=>{e.target.value=e.target.value.replace(/\D/g,'').slice(0,10);};
+ $('resend-otp').onclick=resendCode;
+ $('otp-back').onclick=()=>{if(authBusy)return;clearOtp();recovery=false;recoverySession=false;render('login');};
+ $('otp-form').onsubmit=async event=>{
+  event.preventDefault();if(authBusy||!otp)return;
+  const token=$('otp-code').value.trim();if(!/^\d{6,10}$/.test(token)){message('Enter the numeric code from your email.',true);return;}
+  const current=otp;authBusy=true;$('verify-otp').disabled=true;$('otp-back').disabled=true;tick();
+  try{
+   const result=await A.client.auth.verifyOtp({email:current.email,token,type:current.purpose==='recovery'?'recovery':'email'});
+   if(result.error)throw result.error;
+   if(!result.data?.session)throw Error('Verification did not create a session. Request a new code.');
+   clearOtp();history.replaceState({},'',location.pathname);
+   if(current.purpose==='recovery'){recovery=true;recoverySession=true;render('reset');}
+   else{recovery=false;await enter();}
+  }catch(e){message(e.code==='otp_expired'?'That code is invalid or expired. Use the newest email or request another code.':e.message||'Verification failed.',true);if($('otp-code')){$('otp-code').value='';$('otp-code').focus();}}
+  finally{authBusy=false;if($('verify-otp'))$('verify-otp').disabled=false;if($('otp-back'))$('otp-back').disabled=false;tick();}
+ };
+ tick();timer=setInterval(tick,1000);$('otp-code').focus();
+}
+async function signout(scope='local'){if(appSessionStarted){try{await A.api('session.end');}catch{}}const r=await A.client.auth.signOut({scope});if(r.error)throw r.error;appSessionStarted=false;clearOtp();recovery=false;recoverySession=false;history.replaceState({},'',location.pathname);render('login');}
 function waiting(p,signedIn=true){
- mode='waiting';const blocked=p.status==='blocked',confirmed=p.email_confirmed===true,verified=p.status==='verified';
+ stopTimer();mode='waiting';const blocked=p.status==='blocked',confirmed=p.email_confirmed===true,verified=p.status==='verified';
  const title=blocked?'Account blocked':!confirmed?'Confirm your email':verified?'Verification complete':'Unverified';
- $('auth-box').innerHTML=`<a class="brand" href="index.html">ONeness</a><p class="eyebrow">Admin access</p><h1>${title}</h1><p class="muted">${esc(p.email||'')}</p><section class="approval-card"><span class="badge ${blocked?'blocked':verified?'verified':'unverified'} approval-state">${blocked?'Blocked':verified?'Verified':'Unverified'}</span><ol><li>Email confirmation: <b>${confirmed?'Complete':'Required'}</b></li><li>Admin verification: <b>${blocked?'Blocked':verified?'Approved':'Awaiting approval'}</b></li></ol><p>${blocked?'Contact the store owner about this account.':!confirmed?'Open the confirmation link in your email. Admin approval is required separately.':'Your email is confirmed. The backend administrator must verify your account before you can open the dashboard.'}</p></section><p class="notice" id="auth-message" role="status" hidden></p><div class="row" style="margin-top:24px">${signedIn?'<button class="primary" id="check-approval">Check verification</button><button id="waiting-signout">Sign out</button>':'<button class="primary" id="back-login">Sign in after email confirmation</button>'}</div>`;
+ $('auth-box').innerHTML=`<a class="brand" href="index.html">ONeness</a><p class="eyebrow">Admin access</p><h1>${title}</h1><p class="muted">${esc(p.email||'')}</p><section class="approval-card"><span class="badge ${blocked?'blocked':verified?'verified':'unverified'} approval-state">${blocked?'Blocked':verified?'Verified':'Unverified'}</span><ol><li>Email confirmation: <b>${confirmed?'Complete':'Required'}</b></li><li>Admin verification: <b>${blocked?'Blocked':verified?'Approved':'Awaiting approval'}</b></li></ol><p>${blocked?'Contact the store owner about this account.':!confirmed?'Request a code and verify your email here. Admin approval is required separately.':'Your email is confirmed. The backend administrator must verify your account before you can open the dashboard.'}</p></section><p class="notice" id="auth-message" role="status" hidden></p><div class="row" style="margin-top:24px">${!confirmed&&!blocked?'<button class="primary" id="waiting-code">Send verification code</button>':''}${signedIn?'<button id="check-approval">Check verification</button><button id="waiting-signout">Sign out</button>':'<button id="back-login">Back to sign in</button>'}</div>`;
+ if($('waiting-code'))$('waiting-code').onclick=()=>{beginOtp(p.email,'signup',false);resendCode();};
  if(signedIn){$('check-approval').onclick=async()=>{if(entering)return;entering=true;$('check-approval').disabled=true;try{const next=await A.api('session.me');if(A.approved(next)){location.replace('dashboard.html');return;}waiting(next);message(next.status==='unverified'?'Your account is still unverified. Please wait for approval.':'Access requirements have not been completed.');}catch(e){message(e.message,true);}finally{entering=false;if($('check-approval'))$('check-approval').disabled=false;}};$('waiting-signout').onclick=()=>signout().catch(A.error);}else $('back-login').onclick=()=>render('login');
 }
-function denied(text){mode='denied';$('auth-box').innerHTML=`<a class="brand" href="index.html">ONeness</a><h1>Admin access required</h1><p class="muted">${esc(text)}</p><p>This panel is available to verified administrators.</p><button class="primary" id="denied-signout">Use another account</button><p id="auth-message" role="status" hidden></p>`;$('denied-signout').onclick=()=>signout().catch(A.error);}
+function denied(text){stopTimer();mode='denied';$('auth-box').innerHTML=`<a class="brand" href="index.html">ONeness</a><h1>Admin access required</h1><p class="muted">${esc(text)}</p><p>This panel is available to verified administrators.</p><button class="primary" id="denied-signout">Use another account</button><p id="auth-message" role="status" hidden></p>`;$('denied-signout').onclick=()=>signout().catch(A.error);}
 function render(next){
- if(mode==='reset'&&next==='login'){recovery=false;recoverySession=false;history.replaceState({},'',location.pathname);}mode=next;
- const titles={login:['Admin sign in','Sign in to manage your ONeness store.'],signup:['Create an admin account','Confirm your email, then wait for backend verification.'],forgot:['Reset your password','We will email you a password-reset link.'],reset:['Choose a new password','Use at least 10 characters. Changing your password does not change verification status.']};const [title,description]=titles[mode];
- $('auth-box').innerHTML=`<a class="brand" href="index.html">ONeness</a><p class="eyebrow">Administration</p><h1>${title}</h1><p class="muted">${description}</p><form id="auth-form">${mode==='signup'?'<label>Your name<input name="name" required maxlength="120" autocomplete="name"></label><label>Team / department (optional)<input name="business_name" maxlength="180" autocomplete="organization"></label><label>Phone<input name="phone" type="tel" required maxlength="30" autocomplete="tel"></label>':''}${mode!=='reset'?'<label>Email<input name="email" type="email" required autocomplete="email"></label>':''}${mode!=='forgot'?`<label>Password<input name="password" type="password" minlength="${mode==='login'?1:10}" required autocomplete="${mode==='login'?'current-password':'new-password'}"></label>`:''}<button class="primary" id="submit-auth">${({login:'Sign in',signup:'Create admin account',forgot:'Send reset link',reset:'Save password'})[mode]}</button><p class="notice" id="auth-message" role="status" hidden></p></form><div class="row" style="margin-top:22px">${mode==='login'?'<button class="small" data-mode="signup">Create admin account</button><button class="small" data-mode="forgot">Forgot password?</button>':'<button class="small" data-mode="login">Back to sign in</button>'}</div>`;
- for(const b of document.querySelectorAll('[data-mode]'))b.onclick=()=>render(b.dataset.mode);
- $('auth-form').onsubmit=async event=>{event.preventDefault();const action=mode,values=Object.fromEntries(new FormData(event.currentTarget));$('submit-auth').disabled=true;$('auth-message').hidden=true;try{let r;
-  if(action==='login'){r=await A.client.auth.signInWithPassword({email:values.email,password:values.password});if(r.error)throw r.error;await enter();}
-  if(action==='signup'){r=await A.client.auth.signUp({email:values.email,password:values.password,options:{emailRedirectTo:new URL('index.html',location.href).href,data:{name:values.name,phone:values.phone,business_name:values.business_name}}});if(r.error)throw r.error;if(r.data.session)await enter();else waiting({email:values.email,role:'admin',status:'unverified',email_confirmed:false},false);}
-  if(action==='forgot'){r=await A.client.auth.resetPasswordForEmail(values.email,{redirectTo:new URL('index.html?mode=reset',location.href).href});if(r.error)throw r.error;message('If an account exists, a reset link will arrive in your email.');}
-  if(action==='reset'){const{data:{session}}=await A.client.auth.getSession();if(!session||!recoverySession)throw Error('Open a fresh password-reset link from your email.');r=await A.client.auth.updateUser({password:values.password});if(r.error)throw r.error;await A.client.auth.signOut({scope:'local'});recovery=false;recoverySession=false;history.replaceState({},'',location.pathname);render('login');message('Password saved. Sign in with your new password.');}
- }catch(e){message(e.message,true);}finally{if($('submit-auth'))$('submit-auth').disabled=false;}};
+ stopTimer();if(mode==='reset'&&next==='login'){recovery=false;recoverySession=false;history.replaceState({},'',location.pathname);}mode=next;
+ const titles={login:['Admin sign in','Sign in to manage your ONeness store.'],signup:['Create an admin account','Verify your email with a code, then wait for backend approval.'],verify:['Verify your email','Enter your registered email to request a new verification code.'],forgot:['Reset your password','We will email you a code to enter on this screen.'],reset:['Choose a new password','Use at least 10 characters. Changing your password does not change verification status.']};const [title,description]=titles[mode];
+ $('auth-box').innerHTML=`<a class="brand" href="index.html">ONeness</a><p class="eyebrow">Administration</p><h1>${title}</h1><p class="muted">${description}</p><form id="auth-form">${mode==='signup'?'<label>Your name<input name="name" required maxlength="120" autocomplete="name"></label><label>Team / department (optional)<input name="business_name" maxlength="180" autocomplete="organization"></label><label>Phone<input name="phone" type="tel" required maxlength="30" autocomplete="tel"></label>':''}${mode!=='reset'?'<label>Email<input name="email" type="email" required maxlength="254" autocomplete="email"></label>':''}${['login','signup','reset'].includes(mode)?`<label>Password<input name="password" type="password" minlength="${mode==='login'?1:10}" required autocomplete="${mode==='login'?'current-password':'new-password'}"></label>`:''}<button class="primary" id="submit-auth">${({login:'Sign in',signup:'Create admin account',verify:'Send verification code',forgot:'Send reset code',reset:'Save password'})[mode]}</button><p class="notice" id="auth-message" role="status" hidden></p></form><div class="row" style="margin-top:22px">${mode==='login'?'<button class="small" data-mode="signup">Create admin account</button><button class="small" data-mode="forgot">Forgot password?</button><button class="small" data-mode="verify">Verify email</button>':'<button class="small" data-mode="login">Back to sign in</button>'}</div>`;
+ for(const b of document.querySelectorAll('[data-mode]'))b.onclick=()=>{if(!authBusy)render(b.dataset.mode);};
+ $('auth-form').onsubmit=async event=>{
+  event.preventDefault();if(authBusy)return;
+  const action=mode,values=Object.fromEntries(new FormData(event.currentTarget));if(values.email)values.email=values.email.trim();authBusy=true;$('submit-auth').disabled=true;$('auth-message').hidden=true;
+  try{let r;
+   if(action==='login'){
+    r=await A.client.auth.signInWithPassword({email:values.email,password:values.password});
+    if(r.error){if(r.error.code==='email_not_confirmed'){beginOtp(values.email,'signup',false);message('Verify your email before signing in. Press Resend code to request one.');}else throw r.error;}
+    else{clearOtp();await enter();}
+   }
+   if(action==='signup'){
+    r=await A.client.auth.signUp({email:values.email,password:values.password,options:{data:{name:values.name,phone:values.phone,business_name:values.business_name}}});
+    if(r.error)throw r.error;
+    if(r.data.session){await A.client.auth.signOut({scope:'local'});throw Error('Email verification is unavailable. Please contact the store owner.');}
+    beginOtp(values.email,'signup');
+   }
+   if(action==='forgot'||action==='verify'){
+    const purpose=action==='forgot'?'recovery':'signup';await requestCode({email:values.email,purpose});beginOtp(values.email,purpose);
+    message('If this email has an eligible account, a code will arrive shortly.');
+   }
+   if(action==='reset'){
+    const{data:{session}}=await A.client.auth.getSession();if(!session||!recoverySession)throw Error('Verify a password-reset code before choosing a new password.');
+    r=await A.client.auth.updateUser({password:values.password});if(r.error)throw r.error;
+    await signout('global');message('Password saved. Sign in with your new password.');
+   }
+  }catch(e){message(e.message||'Please try again.',true);}finally{authBusy=false;if($('submit-auth'))$('submit-auth').disabled=false;tick();}
+ };
 }
-async function enter(){if(entering||recovery)return;entering=true;try{const p=await A.start();if(A.approved(p))location.replace('dashboard.html');else if(A.staff(p))waiting(p);else denied('This account is not an administrator.');}catch(e){if(e.code==='ADMIN_ONLY')denied('This account is registered as a retailer.');else message(e.message,true);}finally{entering=false;}}
-A.client.auth.onAuthStateChange((event,session)=>{if(event==='PASSWORD_RECOVERY'){recovery=true;recoverySession=true;render('reset');}else if(event==='SIGNED_IN'&&session&&!recovery)setTimeout(()=>enter(),0);});
-render(recovery?'reset':'login');
+async function enter(){if(entering||recovery)return;entering=true;try{const p=await A.start();appSessionStarted=true;if(A.approved(p))location.replace('dashboard.html');else if(A.staff(p))waiting(p);else denied('This account is not an administrator.');}catch(e){if(e.code==='ADMIN_ONLY')denied('This account is registered as a retailer.');else message(e.message,true);}finally{entering=false;}}
+A.client.auth.onAuthStateChange((event,session)=>{
+ // Never call another Auth method directly inside this callback.
+ if(event==='PASSWORD_RECOVERY'){recovery=true;recoverySession=true;if(!authBusy)setTimeout(()=>render('reset'),0);}
+ else if(event==='SIGNED_IN'&&session&&!authBusy&&!recovery&&mode!=='otp')setTimeout(()=>enter(),0);
+});
+render('login');
 const{data:{session}}=await A.client.auth.getSession();
-if(session&&recovery){recoverySession=true;render('reset');}else if(session)await enter();
+if(session&&recovery){recoverySession=true;render('reset');}
+else if(session)await enter();
+else if((otp=readOtp()))renderOtp();
+else if(new URLSearchParams(location.search).get('mode')==='reset')render('forgot');
 if(callbackError)message(callbackError,true);
 const notice=sessionStorage.getItem('oneness-message');if(notice){message(notice,true);sessionStorage.removeItem('oneness-message');}
 
