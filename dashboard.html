@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#173b32"><meta name="referrer" content="no-referrer"><title>ONeness · Dashboard</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2718%27 fill=%27%2317634c%27/%3E%3Ctext x=%2713%27 y=%2748%27 font-size=%2747%27 fill=%27white%27%3EO%3C/text%3E%3C/svg%3E">
+<style>body{margin:0;background:#f4f6f2;font-family:system-ui}#boot{padding:30px;color:#426052}</style>
+</head><body>
+<div id="app"><p id="boot">Opening ONeness…</p></div>
+<script>
+(async()=>{
+
+const response=await fetch(new URL('auth.html',location.href),{cache:'no-cache'});
+if(!response.ok)throw Error('Keep auth.html in the same folder as this page.');
+const shared=new DOMParser().parseFromString(await response.text(),'text/html');
+for(const id of ['oneness-config','oneness-theme']){
+ const node=shared.getElementById(id);if(!node)throw Error('auth.html is incomplete.');
+ document.head.append(node.cloneNode(true));
+}
+const source=shared.getElementById('oneness-core');if(!source)throw Error('auth.html is incomplete.');
+const runtime=document.createElement('script');runtime.textContent=source.textContent;document.body.append(runtime);
+const A=await App.init('dashboard'),{$,esc,money}=A;
+$('view').innerHTML=A.header('Your trade, at a glance','A clear view of orders, collections and what needs attention.',`<a class="button primary" href="${A.profile.role==='retailer'?'products':'orders'}.html">${A.profile.role==='retailer'?'Browse products':'Manage orders'} →</a>`)+`<div class="filters">${A.dateFields()}<button id="refresh">Refresh</button></div><p id="progress" class="muted">Loading your overview…</p><div id="numbers"></div><div class="two"><section class="card"><h2>Recent orders</h2><div id="recent"></div></section><section class="card"><h2>Needs attention</h2><div id="attention"></div></section></div>`;
+let orders=[],products=[],users=[];
+const readable=A.profile.role==='retailer'||A.can('orders');
+async function load(){try{$('refresh').disabled=true;if(readable)orders=await A.all('orders.list',{},n=>$('progress').textContent=`Loaded ${n} orders…`);if(A.can('catalog'))products=await A.all('products.list');if(A.can('users'))users=await A.all('admin.users');$('progress').textContent='Updated '+A.date(new Date());render();}catch(e){A.error(e);$('progress').textContent=e.message;}finally{$('refresh').disabled=false;}}
+function render(){try{const r=A.range(),selected=orders.filter(o=>A.inRange(o.created_at,r));const financial=A.profile.role==='retailer'||A.can('finance');const collected=orders.filter(o=>o.payment_status==='collected'&&A.inRange(o.collected_at,r)).reduce((n,o)=>n+o.total_paise,0);const outstanding=orders.filter(o=>o.status==='delivered'&&o.payment_status==='unpaid').reduce((n,o)=>n+o.total_paise,0);const metrics=[['Orders received',selected.length,'Created in selected period'],['Active orders',orders.filter(o=>['placed','confirmed','dispatched'].includes(o.status)).length,'Current status, all dates']];if(financial&&readable)metrics.push(['COD collected',money(collected),'By collection date'],['Outstanding COD',money(outstanding),'Delivered and unpaid, all dates']);$('numbers').innerHTML=A.cards(metrics);$('recent').innerHTML=A.table(['Order','Date','Status'],selected.slice(0,8).map(o=>[`<a href="orders.html?id=${o.id}">#${o.id}</a>`,esc(A.date(o.created_at)),A.badge(o.status)]));const bits=[];if(A.profile.status==='pending')bits.push('Your account is awaiting approval.');bits.push(`${orders.filter(o=>o.status==='syncing').length} orders are still saving.`);if(A.can('orders'))bits.push(`${orders.filter(o=>o.status==='placed').length} orders need confirmation.`);if(A.can('users'))bits.push(`${users.filter(u=>u.status==='pending').length} retailer accounts need approval.`);if(A.can('catalog'))bits.push(`${products.filter(p=>p.active&&p.stock<10).length} active products have fewer than 10 units.`);$('attention').innerHTML=bits.map(b=>`<p>${esc(b)}</p>`).join('');}catch(e){A.error(e);}}
+A.wireDates(render);$('refresh').onclick=load;await load();
+
+})().catch(e=>{if(window.App)App.fail(e);else{document.body.textContent="Could not load ONeness. Serve all HTML files together over HTTP/HTTPS. "+e.message;}});
+</script>
+</body></html>

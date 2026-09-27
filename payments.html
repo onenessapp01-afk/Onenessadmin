@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#173b32"><meta name="referrer" content="no-referrer"><title>ONeness · Payments</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2718%27 fill=%27%2317634c%27/%3E%3Ctext x=%2713%27 y=%2748%27 font-size=%2747%27 fill=%27white%27%3EO%3C/text%3E%3C/svg%3E">
+<style>body{margin:0;background:#f4f6f2;font-family:system-ui}#boot{padding:30px;color:#426052}</style>
+</head><body>
+<div id="app"><p id="boot">Opening ONeness…</p></div>
+<script>
+(async()=>{
+
+const response=await fetch(new URL('auth.html',location.href),{cache:'no-cache'});
+if(!response.ok)throw Error('Keep auth.html in the same folder as this page.');
+const shared=new DOMParser().parseFromString(await response.text(),'text/html');
+for(const id of ['oneness-config','oneness-theme']){
+ const node=shared.getElementById(id);if(!node)throw Error('auth.html is incomplete.');
+ document.head.append(node.cloneNode(true));
+}
+const source=shared.getElementById('oneness-core');if(!source)throw Error('auth.html is incomplete.');
+const runtime=document.createElement('script');runtime.textContent=source.textContent;document.body.append(runtime);
+const A=await App.init('payments',['finance','orders']),{$,esc,money}=A;let orders=[],users=[],shown=[],page=1;
+$('view').innerHTML=A.header('Cash collections','Keep delivered orders and collected cash clearly reconciled.','<button id="refresh">Refresh</button><button id="export">Export CSV</button>')+`<div class="filters"><label>Collection status<select id="type"><option value="due">Delivered · unpaid</option><option value="collected">Collected</option><option value="transit">Awaiting delivery</option></select></label><label>Search<input id="search" placeholder="Order or retailer"></label>${A.dateFields()}</div><p class="muted" id="basis"></p><div id="numbers"></div><div id="list"></div><div class="row" style="margin-top:18px"><button id="prev">Previous</button><span id="page"></span><button id="next">Next</button></div>`;$('from').value='';$('to').value='';$('period').value='all';
+const name=id=>users.find(u=>u.id===id)?.business_name||'Retailer #'+id;
+async function load(){orders=await A.all('orders.list');if(A.can('users'))users=await A.all('admin.users');render();}
+function filtered(){const t=$('type').value,r=A.range(),q=$('search').value.toLowerCase();return orders.filter(o=>(t==='collected'?o.payment_status==='collected':t==='due'?o.status==='delivered'&&o.payment_status==='unpaid':['placed','confirmed','dispatched'].includes(o.status)&&o.payment_status==='unpaid')&&A.inRange(t==='collected'?o.collected_at:o.created_at,r)&&(`${o.id} ${o.user_id} ${name(o.user_id)}`).toLowerCase().includes(q));}
+function render(){try{shown=filtered();page=Math.max(1,Math.min(page,Math.ceil(shown.length/25)));$('basis').textContent=$('type').value==='collected'?'Date filter uses cash collection date (IST).':'Date filter uses order creation date (IST).';$('numbers').innerHTML=A.cards([['Matching amount',money(shown.reduce((n,o)=>n+o.total_paise,0))],['Orders',shown.length]]);$('list').innerHTML=A.table(['Order','Retailer','Amount','Order status','Collected at',''],shown.slice((page-1)*25,page*25).map(o=>[`<a href="orders.html?id=${o.id}">#${o.id}</a>`,esc(name(o.user_id)),money(o.total_paise),A.badge(o.status),esc(A.date(o.collected_at)),o.status==='delivered'&&o.payment_status==='unpaid'?`<button class="small primary" data-collect="${o.id}">Record collection</button>`:A.badge(o.payment_status)]));for(const b of document.querySelectorAll('[data-collect]'))b.onclick=async()=>{const o=orders.find(x=>x.id===+b.dataset.collect);if(!confirm('Confirm '+money(o.total_paise)+' cash has been collected for order #'+o.id+'?'))return;b.disabled=true;try{await A.api('payment.collect',{id:o.id,expected_version:o.version});await load();A.toast('Collection recorded');}catch(e){A.error(e);b.disabled=false;}};$('page').textContent='Page '+page;$('prev').disabled=page===1;$('next').disabled=page*25>=shown.length;}catch(e){A.error(e);}}
+A.wireDates(()=>{page=1;render();});for(const id of ['type','search'])$(id).oninput=()=>{page=1;render();};$('prev').onclick=()=>{page--;render();};$('next').onclick=()=>{page++;render();};$('refresh').onclick=()=>load().catch(A.error);$('export').onclick=()=>{try{A.csv('COD payments',['Order ID','Retailer','Order created IST','Status','Total INR','Payment status','Collected IST'],filtered().map(o=>[o.id,name(o.user_id),A.date(o.created_at),o.status,o.total_paise/100,o.payment_status,A.date(o.collected_at)]),A.range().label+'; '+$('basis').textContent);}catch(e){A.error(e);}};await load();
+
+})().catch(e=>{if(window.App)App.fail(e);else{document.body.textContent="Could not load ONeness. Serve all HTML files together over HTTP/HTTPS. "+e.message;}});
+</script>
+</body></html>
