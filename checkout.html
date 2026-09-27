@@ -6,14 +6,14 @@
 <script>
 (async()=>{
 
-const response=await fetch(new URL('auth.html',location.href),{cache:'no-cache'});
-if(!response.ok)throw Error('Keep auth.html in the same folder as this page.');
+const response=await fetch(new URL('index.html',location.href),{cache:'no-cache'});
+if(!response.ok)throw Error('Keep index.html in the same folder as this page.');
 const shared=new DOMParser().parseFromString(await response.text(),'text/html');
 for(const id of ['oneness-config','oneness-theme']){
- const node=shared.getElementById(id);if(!node)throw Error('auth.html is incomplete.');
+ const node=shared.getElementById(id);if(!node)throw Error('index.html is incomplete.');
  document.head.append(node.cloneNode(true));
 }
-const source=shared.getElementById('oneness-core');if(!source)throw Error('auth.html is incomplete.');
+const source=shared.getElementById('oneness-core');if(!source)throw Error('index.html is incomplete.');
 const runtime=document.createElement('script');runtime.textContent=source.textContent;document.body.append(runtime);
 const A=await App.init('checkout'),{$,esc,money}=A;if(A.profile.role!=='retailer')throw Error('Use a retailer account to place an order.');
 let products=[],addresses=[],quote=null,quotedData='',busy=false;const pendingKey='oneness-pending-'+A.project+'-'+A.profile.id;
