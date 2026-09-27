@@ -84,6 +84,11 @@ const A=await App.init('index'),{$,esc}=A;
 const OTP_KEY='oneness-otp',RESEND_DELAY=60000;
 let mode='login',entering=false,authBusy=false,recoverySession=false,appSessionStarted=false,otp=null,timer=null;
 function message(text,bad=false){const el=$('auth-message');if(!el){A.toast(text);return;}el.textContent=text;el.className='notice'+(bad?' error':'');el.hidden=false;}
+function authFailure(e){
+ if(e.status===429||/rate.limit|too many/i.test(e.message||''))return 'Too many attempts. Please wait before requesting another code.';
+ if(/hook|email delivery|email service/i.test(e.message||''))return 'We could not complete your email request. Please try again later or contact the store owner.';
+ return e.message||'The request could not be completed.';
+}
 function stopTimer(){if(timer)clearInterval(timer);timer=null;}
 function saveOtp(){try{if(otp)sessionStorage.setItem(OTP_KEY,JSON.stringify(otp));else sessionStorage.removeItem(OTP_KEY);}catch{}}
 function clearOtp(){otp=null;saveOtp();stopTimer();}
@@ -98,7 +103,7 @@ async function resendCode(){
  if(!otp||authBusy||otp.nextResend>Date.now())return;
  const current=otp;authBusy=true;current.nextResend=Date.now()+RESEND_DELAY;saveOtp();tick();$('verify-otp').disabled=true;
  try{await requestCode(current);current.requestedAt=Date.now();saveOtp();message('If this email has an eligible account, a new code will arrive. Use the newest code.');}
- catch(e){message(e.message||'The code could not be sent. Please try again.',true);}
+ catch(e){message(authFailure(e),true);}
  finally{authBusy=false;if($('verify-otp'))$('verify-otp').disabled=false;tick();}
 }
 function renderOtp(){
@@ -161,7 +166,7 @@ function render(next){
     r=await A.client.auth.updateUser({password:values.password});if(r.error)throw r.error;
     await signout('global');message('Password saved. Sign in with your new password.');
    }
-  }catch(e){message(e.message||'Please try again.',true);}finally{authBusy=false;if($('submit-auth'))$('submit-auth').disabled=false;tick();}
+  }catch(e){message(authFailure(e),true);}finally{authBusy=false;if($('submit-auth'))$('submit-auth').disabled=false;tick();}
  };
 }
 async function enter(){if(entering||recovery)return;entering=true;try{const p=await A.start();appSessionStarted=true;if(A.approved(p))location.replace('dashboard.html');else if(A.staff(p))waiting(p);else denied('This account is not an administrator.');}catch(e){if(e.code==='ADMIN_ONLY')denied('This account is registered as a retailer.');else message(e.message,true);}finally{entering=false;}}
