@@ -5,12 +5,13 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#173b32">
 <meta name="referrer" content="no-referrer">
-<title>ONeness · Orders</title>
+<title>ONeness · Products & Inventory</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2718%27 fill=%27%2317634c%27/%3E%3Ctext x=%2713%27 y=%2748%27 font-size=%2747%27 fill=%27white%27%3EO%3C/text%3E%3C/svg%3E">
 <style>body{margin:0;background:#f4f6f2;font-family:system-ui}#boot{padding:30px;color:#426052}</style>
 </head>
 <body>
-<div id="app"><p id="boot">Opening ONeness orders…</p></div>
+<div id="app"><p id="boot">Opening ONeness products & inventory…</p></div>
+
 <script>
 (async()=>{
 const response=await fetch(new URL('index.html',location.href),{cache:'no-cache'});
@@ -22,138 +23,694 @@ for(const id of ['oneness-config','oneness-theme']){
 }
 const source=shared.getElementById('oneness-core');
 if(!source)throw Error('index.html is incomplete.');
-const runtime=document.createElement('script');runtime.textContent=source.textContent;document.body.append(runtime);
+const runtime=document.createElement('script');
+runtime.textContent=source.textContent;
+document.body.append(runtime);
 
-const style=document.createElement('style');
-style.textContent=`
-:root{--og:#17634c;--ink:#14251f;--muted:#6f7d75;--line:#dfe6e1;--bg:#f4f6f2;--red:#b23b30;--amber:#9a661f}
-/* full width, spreadsheet-style workspace */
-#view{max-width:none!important;width:100%!important;padding-left:16px!important;padding-right:16px!important;box-sizing:border-box}
-.orders-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:12px}.orders-head h1{margin:0;font-size:26px;letter-spacing:-.7px}.orders-head p{margin:4px 0 0;color:var(--muted);font-size:12px}.head-actions{display:flex;gap:7px;flex-wrap:wrap}.head-actions button{min-height:36px;font-size:12px}
-.summary-strip{display:grid;grid-template-columns:repeat(7,minmax(90px,1fr));gap:7px;margin-bottom:10px}.summary-box{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 10px;cursor:pointer}.summary-box span{display:block;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}.summary-box strong{display:block;font-size:17px;margin-top:3px}.summary-box.active{outline:2px solid #b9d0c2;background:#eef5ef}.summary-box.warn{background:#fff7e8}.summary-box.good{background:#edf7ee}.summary-box.bad{background:#fff1ee}
-.filters{position:sticky;top:0;z-index:20;background:rgba(244,246,242,.97);backdrop-filter:blur(12px);padding:8px 0 9px;border-bottom:1px solid #e7ebe7;margin-bottom:8px}.filter-row{display:grid;grid-template-columns:minmax(240px,2fr) repeat(5,minmax(112px,.85fr)) auto;gap:7px;align-items:end}.filter-row label{margin:0;font-size:10px}.filter-row input,.filter-row select{min-height:37px;padding:6px 8px;font-size:12px;border-radius:8px}.filter-buttons{display:flex;gap:6px;align-items:end}.filter-buttons button{min-height:37px;padding:6px 10px;font-size:11px}.quick-row{display:flex;gap:6px;overflow:auto;margin-top:7px;scrollbar-width:none}.quick-row::-webkit-scrollbar{display:none}.chip{flex:0 0 auto;min-height:30px;padding:5px 9px;border-radius:999px;font-size:10px}.chip.on{background:#173b32;color:#fff;border-color:#173b32}
-.smart-workspace{min-width:0}.workspace-bar{display:none;align-items:center;justify-content:space-between;gap:10px;padding:7px 9px;background:#173b32;color:#fff;border-radius:9px 9px 0 0}.workspace-title{display:flex;align-items:center;gap:9px;min-width:0}.workspace-title strong{font-size:13px}.workspace-title span{display:block;font-size:9px;color:#c8dbd2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.workspace-actions{display:flex;gap:5px;flex-wrap:wrap}.workspace-actions button{min-height:30px;padding:5px 8px;font-size:9px;background:#fff;color:#173b32;border-color:#fff}.workspace-actions .exit-sheet{background:#dff2a8;border-color:#dff2a8}.sheet{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;min-width:0}.order-table{width:100%;border-collapse:collapse;table-layout:fixed}.order-table thead{display:table-header-group}.order-table tbody{display:table-row-group}.order-table th{background:#f8faf7;color:#69776f;font-size:9px;text-transform:uppercase;letter-spacing:.45px;text-align:left;padding:8px 7px;border-bottom:1px solid var(--line);position:static;top:auto;z-index:5}.order-table td{padding:8px 7px;border-bottom:1px solid #ebefeb;vertical-align:middle;font-size:11px;overflow:hidden;text-overflow:ellipsis}.order-table tr:hover td{background:#fbfcfa}.order-table tr:last-child td{border-bottom:0}.col-order{width:7%}.col-customer{width:19%}.col-date{width:10%}.col-items{width:8%}.col-amount{width:8%}.col-payment{width:9%}.col-status{width:15%}.col-assigned{width:10%}.col-actions{width:14%}.oid{font-weight:850;color:#173b32}.new{display:inline-block;margin-left:4px;padding:2px 5px;border-radius:999px;background:#fff1d8;color:#95611c;font-size:8px;font-weight:850}.customer-name{display:block;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.customer-sub{display:block;color:var(--muted);font-size:9px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cell-money{font-weight:800}.payment-pill{display:inline-block;padding:4px 6px;border-radius:999px;background:#eef2ed;font-size:9px}.staff{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-body.sheet-lock{overflow:hidden}.smart-workspace.fullscreen-sheet{position:fixed;inset:0;z-index:9999;background:#f4f6f2;padding:8px;display:flex;flex-direction:column;overflow:hidden}.smart-workspace.fullscreen-sheet .workspace-bar{display:flex;flex:0 0 auto}.smart-workspace.fullscreen-sheet .filters{position:relative;top:auto;flex:0 0 auto;margin:0;padding:6px 0;border-bottom:1px solid #dfe6e1}.smart-workspace.fullscreen-sheet .quick-row{margin-top:5px}.smart-workspace.fullscreen-sheet #count{margin:5px 0 6px;font-size:10px;flex:0 0 auto}.smart-workspace.fullscreen-sheet .sheet{flex:1 1 auto;min-height:0;overflow:auto;border-radius:0}.smart-workspace.fullscreen-sheet .order-table th{position:sticky;top:0;z-index:8;box-shadow:0 1px 0 #dfe6e1}.smart-workspace.fullscreen-sheet .footer-bar{flex:0 0 auto;margin-top:6px}.smart-workspace.fullscreen-sheet .mobile-list{overflow:auto;min-height:0}.smart-workspace.fullscreen-sheet.dense .order-table th{padding:6px 6px;font-size:8px}.smart-workspace.fullscreen-sheet.dense .order-table td{padding:5px 6px;font-size:10px}.smart-workspace.fullscreen-sheet.dense .status-select{height:29px;min-height:29px!important;font-size:9px!important}.smart-workspace.fullscreen-sheet.dense .actions button{min-height:27px;padding:3px 6px;font-size:8px}
-#smartWorkspace:fullscreen{background:#f4f6f2;padding:8px;display:flex;flex-direction:column;overflow:hidden}#smartWorkspace:fullscreen .workspace-bar{display:flex}#smartWorkspace:fullscreen .filters{position:relative;top:auto;margin:0;padding:6px 0}#smartWorkspace:fullscreen .sheet{flex:1 1 auto;min-height:0;overflow:auto;border-radius:0}#smartWorkspace:fullscreen .order-table th{position:sticky;top:0;z-index:8}#smartWorkspace:fullscreen .footer-bar{flex:0 0 auto;margin-top:6px}
-.status-select{width:100%;min-height:33px!important;height:33px;padding:4px 7px!important;border-radius:7px!important;border:1px solid transparent!important;font-size:10px!important;font-weight:800!important;cursor:pointer}.st-syncing{background:#eef1ef!important;color:#6f7d75!important}.st-placed{background:#fff3da!important;color:#8a5b1b!important}.st-confirmed{background:#eaf0ff!important;color:#4f64a5!important}.st-packed{background:#f0eaff!important;color:#6752a2!important}.st-dispatched{background:#fff0d9!important;color:#915b18!important}.st-delivered{background:#e6f3e8!important;color:#34714a!important}.st-cancelled{background:#fff0ed!important;color:#a13c30!important}
-.actions{display:flex;gap:4px;white-space:nowrap}.actions button{min-height:30px;padding:4px 7px;font-size:9px;border-radius:7px}.view-btn{background:#173b32!important;color:#fff!important;border-color:#173b32!important}.print-btn{background:#eef5ef!important;color:#17634c!important;border-color:#cdded2!important}
-.mobile-list{display:none;gap:8px}.m-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px}.m-top{display:flex;justify-content:space-between;gap:8px}.m-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin:9px 0}.m-grid div{background:#f7f9f6;padding:7px;border-radius:8px}.m-grid span{display:block;font-size:8px;color:var(--muted)}.m-grid strong{display:block;font-size:11px;margin-top:2px}.m-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-top:8px}.m-actions button{font-size:10px}
-.footer-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;color:var(--muted);font-size:11px}.pager{display:flex;align-items:center;gap:6px}.pager button,.pager select{min-height:32px;font-size:10px}
-.full-modal{width:min(1060px,96vw);max-width:96vw;height:min(900px,94vh);max-height:94vh;border:0;border-radius:16px;padding:0;box-shadow:0 28px 90px rgba(12,35,27,.28);color:var(--ink)}.full-modal::backdrop,.small-modal::backdrop{background:rgba(11,35,26,.6)}.modal-head{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);padding:13px 15px;display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.modal-head h2{margin:0;font-size:18px}.modal-head p{margin:3px 0 0;font-size:10px;color:var(--muted)}.x{width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:#fff;font-size:18px}.modal-body{padding:14px 15px 26px;overflow:auto}.detail-layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(290px,.65fr);gap:10px}.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:9px}.card h3{margin:0 0 9px;font-size:13px}.hero{background:linear-gradient(135deg,#143d31,#17634c);color:#fff;border:0}.hero-top{display:flex;justify-content:space-between;gap:12px}.hero span{font-size:9px;color:#c8ddd2}.hero strong{display:block;font-size:25px;margin-top:3px}.hero-profit{display:flex;justify-content:space-between;gap:10px;margin-top:9px;padding:8px;background:rgba(255,255,255,.08);border-radius:9px;font-size:10px}.hero-profit b{color:#dff2a8}.info{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}.info div{padding:8px;background:#f7f9f6;border-radius:8px}.info span{display:block;font-size:8px;color:var(--muted)}.info strong{display:block;font-size:10px;margin-top:2px;overflow-wrap:anywhere}.addr,.note{background:#f7f9f6;padding:9px;border-radius:9px;font-size:10px;line-height:1.5;white-space:pre-wrap}.note.admin{background:#fff6e8}.mini-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}.mini-actions button,.mini-actions a{padding:6px 8px;border:1px solid var(--line);background:#fff;border-radius:7px;font-size:9px;color:var(--ink)}
-.items{width:100%;border-collapse:collapse}.items th,.items td{padding:7px 5px;border-bottom:1px solid #edf0eb;text-align:left;font-size:9px}.items th{font-size:8px;color:var(--muted);text-transform:uppercase}.items td:last-child,.items th:last-child{text-align:right}.profit{color:#17634c;font-weight:800}.fin{background:#173b32;color:#fff;border-radius:11px;padding:10px}.fr{display:flex;justify-content:space-between;gap:10px;padding:5px 0;font-size:9px;color:#d7e5de}.fr.total{font-size:13px;color:#fff;border-top:1px solid rgba(255,255,255,.17);margin-top:4px;padding-top:8px}.fr.profit{color:#dff2a8}.timeline{display:grid;grid-template-columns:repeat(5,1fr);position:relative}.timeline:before{content:"";position:absolute;left:9%;right:9%;top:9px;height:2px;background:#e1e7e2}.ts{position:relative;z-index:2;text-align:center}.tdot{width:19px;height:19px;border-radius:50%;background:#e5e9e6;margin:auto}.ts.done .tdot,.ts.current .tdot{background:#17634c}.ts.current .tdot{box-shadow:0 0 0 3px #e8f3ea}.ts span{display:block;font-size:6px;color:var(--muted);margin-top:4px}.events{display:grid;gap:7px}.event{display:grid;grid-template-columns:26px minmax(0,1fr);gap:7px}.eicon{width:26px;height:26px;border-radius:8px;background:#eef3ee;display:grid;place-items:center;font-size:11px}.event strong{font-size:9px}.event span{display:block;font-size:8px;color:var(--muted);margin-top:2px}.doc-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.doc-grid button{font-size:9px}.small-modal{width:min(470px,94vw);border:0;border-radius:14px;padding:0;box-shadow:0 25px 80px rgba(12,35,27,.3)}.small-body{padding:13px}.small-body label{display:block;margin-bottom:9px}.small-body input,.small-body select,.small-body textarea{width:100%;box-sizing:border-box}.small-foot{display:flex;justify-content:flex-end;gap:6px;padding:10px 13px;border-top:1px solid var(--line)}
-@media(max-width:1200px){.summary-strip{grid-template-columns:repeat(7,minmax(95px,1fr))}.filter-row{grid-template-columns:minmax(220px,2fr) repeat(3,minmax(105px,1fr)) auto}.filter-row .less{display:none}.col-assigned{display:none}.order-table th.col-assigned,.order-table td.col-assigned{display:none}.col-customer{width:22%}.col-actions{width:15%}}
-@media(max-width:850px){#view{padding-left:10px!important;padding-right:10px!important}.summary-strip{display:flex;overflow:auto}.summary-box{min-width:105px}.filter-row{grid-template-columns:1fr 1fr}.filter-row .search{grid-column:1/-1}.desktop{display:none}.mobile-list{display:grid}.filters{position:static}.detail-layout{grid-template-columns:1fr}.full-modal{width:100vw;max-width:100vw;height:96vh;max-height:96vh;margin:auto 0 0 0;border-radius:16px 16px 0 0}.info{grid-template-columns:1fr}.orders-head{flex-direction:column}.head-actions{width:100%}.head-actions button{flex:1}.footer-bar{flex-direction:column;align-items:stretch}.pager{justify-content:center}}
-@media(max-width:520px){.filter-row{grid-template-columns:1fr}.filter-row .search{grid-column:auto}.m-actions{grid-template-columns:1fr 1fr}.doc-grid{grid-template-columns:1fr}.workspace-bar{align-items:flex-start}.workspace-actions{justify-content:flex-end}.smart-workspace.fullscreen-sheet{padding:5px}}
+const css=document.createElement('style');
+css.textContent=`
+.erp-tabs{display:flex;gap:7px;margin-bottom:18px;overflow:auto}.erp-tab{white-space:nowrap}.erp-tab.active{background:#173b32;color:#fff;border-color:#173b32}
+.erp-kpis{display:grid;grid-template-columns:repeat(6,minmax(135px,1fr));gap:10px;margin-bottom:18px;overflow:auto}
+.erp-kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px;min-width:135px}.erp-kpi span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.55px;color:var(--muted)}.erp-kpi strong{display:block;font-size:22px;margin-top:5px;letter-spacing:-.6px}.erp-kpi small{display:block;margin-top:3px;font-size:10px}.erp-kpi.accent{background:#e7f0df}.erp-kpi.warn{background:#fff1df}.erp-kpi.bad{background:#fff0ed}
+.erp-toolbar{background:#fff;border:1px solid var(--line);border-radius:15px;padding:13px;margin-bottom:14px}.erp-filter-grid{display:grid;grid-template-columns:minmax(220px,1.4fr) repeat(3,minmax(130px,.7fr)) auto;gap:9px;align-items:end}.erp-filter-grid label{margin:0}.erp-filter-grid input,.erp-filter-grid select{min-height:40px;font-size:14px}
+.toolbar-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.stock-in{background:#e5f2e7!important;color:#17634c!important;border-color:#bcd6c2!important}.stock-out{background:#fff0ed!important;color:#a33824!important;border-color:#ecc8c0!important}
+.erp-table-wrap{overflow:auto;background:#fff;border:1px solid var(--line);border-radius:15px}.erp-table{width:100%;border-collapse:collapse;white-space:nowrap}.erp-table th{position:sticky;top:0;background:#fafbf8;z-index:2;font-size:10px;text-transform:uppercase;letter-spacing:.65px;color:var(--muted)}.erp-table td,.erp-table th{padding:11px 12px;border-bottom:1px solid #edf0eb;vertical-align:middle}.erp-table tr:hover td{background:#fbfcf9}
+.product-cell{display:grid;grid-template-columns:44px minmax(150px,1fr);gap:9px;align-items:center}.product-thumb{width:44px;height:44px;border-radius:9px;object-fit:contain;background:#f0f3ee}.product-placeholder{width:44px;height:44px;border-radius:9px;background:#eef1eb;display:grid;place-items:center;color:#91a097}.product-title{display:block;font-weight:750}.product-desc{display:block;color:var(--muted);font-size:11px;max-width:260px;overflow:hidden;text-overflow:ellipsis}
+.stock-number{font-size:16px;font-weight:800}.stock-number.low{color:#a4681d}.stock-number.out{color:#a33824}.stock-unit{display:block;color:var(--muted);font-size:10px}.slab-chip{display:inline-flex;margin:2px;padding:4px 6px;border-radius:999px;background:#eef4ec;color:#32614d;font-size:10px}
+.erp-actions{display:flex;gap:5px}.erp-actions button{font-size:11px;min-height:32px;padding:5px 8px}
+.mobile-products{display:none;gap:9px}.mobile-product{background:#fff;border:1px solid var(--line);border-radius:15px;padding:12px}.mobile-product-head{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:9px}.mobile-product .product-thumb,.mobile-product .product-placeholder{width:52px;height:52px}.mobile-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0}.mobile-metric{background:#f7f9f6;border-radius:9px;padding:8px}.mobile-metric span{display:block;font-size:9px;color:var(--muted)}.mobile-metric strong{font-size:12px}
+
+.inventory-layout{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:13px;align-items:start}.inventory-side{position:sticky;top:18px}.inventory-summary{display:grid;gap:8px}.summary-card{background:#fff;border:1px solid var(--line);border-radius:13px;padding:12px}.summary-card span{font-size:10px;color:var(--muted)}.summary-card strong{display:block;font-size:20px;margin-top:3px}.summary-card.in strong{color:#17634c}.summary-card.out strong{color:#a33824}
+.movement-in{color:#17634c;font-weight:800}.movement-out{color:#a33824;font-weight:800}.movement-type{display:inline-flex;padding:4px 6px;border-radius:999px;background:#f0f3ef;font-size:10px;text-transform:capitalize}.movement-ref{font-size:11px;color:#51675b}.movement-note{white-space:normal;max-width:260px;font-size:11px;color:#5f6d66}
+.ledger-empty{padding:40px 18px;text-align:center;color:var(--muted)}
+
+.editor-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.editor-section{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}.editor-section.full{grid-column:1/-1}.editor-section h3{margin:0 0 12px}.editor-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}.editor-fields .full{grid-column:1/-1}.read-stock{padding:11px;border-radius:10px;background:#f4f7f3}.read-stock span{display:block;font-size:10px;color:var(--muted)}.read-stock strong{display:block;font-size:20px;margin-top:3px}
+.slab-list{display:grid;gap:10px}.slab-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:9px;align-items:end;padding:12px;border:1px solid #e2e8e3;border-radius:13px;background:#f8faf7}.slab-row label{margin:0}.slab-top{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:8px}.slab-number{font-size:11px;font-weight:850;color:#173b32}.slab-math{grid-column:1/-1;font-size:10px;color:#607069;padding:7px 9px;border-radius:9px;background:#eef4ec}.remove-slab{min-height:40px;color:#a33824}.add-slab{margin-top:9px}
+.image-drop{display:flex;align-items:center;justify-content:center;min-height:96px;border:1.5px dashed #b9c7bf;border-radius:13px;background:#f8faf7;text-align:center;padding:14px;cursor:pointer}.image-drop:hover{border-color:#17634c;background:#f2f7f3}.image-drop b{display:block;color:#173b32}.image-drop span{display:block;color:#6b796f;font-size:11px;margin-top:3px}.image-preview{display:grid;grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:9px;margin-top:10px}.image-card{position:relative;border:1px solid #e0e6e1;border-radius:12px;background:#fff;overflow:hidden}.image-card img{width:100%;height:118px;object-fit:contain;background:#f5f7f4}.image-card-info{padding:7px 8px;border-top:1px solid #edf0ec}.image-card-info small{display:block;color:#6d7a73;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.image-card-actions{display:flex;gap:5px;margin-top:6px}.image-card-actions button{min-height:28px;padding:4px 7px;font-size:10px;flex:1}.primary-image{position:absolute;top:7px;left:7px;padding:4px 6px;border-radius:999px;background:#173b32;color:#fff;font-size:9px;font-weight:800}.image-status{position:absolute;top:7px;right:7px;padding:4px 6px;border-radius:999px;background:#fff8e8;color:#8a5b19;font-size:9px;font-weight:800}.image-status.saved{background:#e7f3e8;color:#397149}.image-status.error{background:#fff0ed;color:#a33824}.image-empty{grid-column:1/-1;padding:18px;border-radius:12px;background:#f7f9f6;color:#6d7a73;text-align:center;font-size:11px}
+
+#productEditor,#stockVoucher{width:min(920px,95vw);max-height:92vh;padding:0;border:0;border-radius:18px;box-shadow:0 30px 100px #10241940;color:var(--ink)}#productEditor::backdrop,#stockVoucher::backdrop{background:#10291e9c}.modal-head-sticky{position:sticky;top:0;z-index:4;background:#fff;border-bottom:1px solid var(--line);padding:15px 18px;display:flex;justify-content:space-between;gap:10px}.modal-body-pad{padding:16px 18px 22px}.modal-footer{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);padding:12px 18px;display:flex;justify-content:flex-end;gap:8px}
+.voucher-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.voucher-grid .full{grid-column:1/-1}.stock-preview{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;text-align:center;padding:12px;border-radius:12px;background:#f5f8f4}.stock-preview div{padding:8px}.stock-preview span{display:block;font-size:10px;color:var(--muted)}.stock-preview strong{display:block;font-size:21px;margin-top:3px}.stock-arrow{font-size:20px;color:#84938b}
+.quick-date{display:flex;gap:6px;overflow:auto;margin-top:9px}.quick-date button{white-space:nowrap;min-height:32px;padding:5px 9px;font-size:11px}
+.statement-title{font-weight:800;margin-bottom:2px}.statement-sub{font-size:11px;color:var(--muted)}
+
+
+.sheet-bar{position:fixed;inset:0 0 auto 0;height:52px;z-index:3002;background:#173b32;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 14px;box-shadow:0 2px 12px #10241926}.sheet-bar strong{font-size:14px}.sheet-bar small{color:#cce0d6;margin-left:7px}.sheet-bar .row{gap:6px}.sheet-bar button{min-height:34px;padding:5px 9px;border-color:#ffffff2c;background:#ffffff12;color:#fff}.sheet-bar button.active{background:#fff;color:#173b32}
+body.erp-sheet-mode{overflow:hidden}.sheet-active{position:fixed!important;z-index:3001!important;top:52px;left:0;right:0;bottom:0;background:#f4f6f2;padding:10px 12px 12px;overflow:auto}.sheet-active #catalogue-kpis{display:none}.sheet-active .erp-toolbar{position:sticky;top:0;z-index:12;margin-bottom:8px;padding:8px;border-radius:10px}.sheet-active #product-count{margin:6px 2px}.sheet-active .erp-table-wrap{height:calc(100vh - 200px);overflow-y:auto;overflow-x:hidden;border-radius:10px}.sheet-active .erp-table{table-layout:fixed;white-space:normal;font-size:11px}.sheet-active .erp-table th,.sheet-active .erp-table td{padding:7px 8px}.sheet-active .erp-table th:nth-child(1){width:5%}.sheet-active .erp-table th:nth-child(2){width:20%}.sheet-active .erp-table th:nth-child(3){width:10%}.sheet-active .erp-table th:nth-child(4){width:12%}.sheet-active .erp-table th:nth-child(5){width:8%}.sheet-active .erp-table th:nth-child(6){width:6%}.sheet-active .erp-table th:nth-child(7){width:18%}.sheet-active .erp-table th:nth-child(8){width:8%}.sheet-active .erp-table th:nth-child(9){width:13%}.sheet-active .product-desc{max-width:100%}.sheet-active .erp-actions{flex-wrap:wrap}.sheet-active .erp-actions button{min-height:28px;padding:4px 6px;font-size:10px}.sheet-active .slab-chip{font-size:9px;padding:3px 5px}.sheet-active#inventory-view .erp-table-wrap{height:calc(100vh - 235px)}.sheet-active#inventory-view .inventory-side{display:none}.sheet-active#inventory-view .inventory-layout{grid-template-columns:1fr}.sheet-active#inventory-view .erp-filter-grid{grid-template-columns:minmax(220px,1.5fr) repeat(4,minmax(120px,.7fr))}
+
+@media(max-width:1150px){.erp-kpis{grid-template-columns:repeat(6,135px)}.erp-filter-grid{grid-template-columns:repeat(3,1fr)}.erp-filter-grid .wide{grid-column:span 2}.inventory-layout{grid-template-columns:1fr}.inventory-side{position:static}.inventory-summary{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:760px){.desktop-products{display:none}.mobile-products{display:grid}.erp-filter-grid{grid-template-columns:1fr 1fr}.erp-filter-grid .wide{grid-column:1/-1}.editor-grid,.editor-fields,.voucher-grid{grid-template-columns:1fr}.editor-section.full,.editor-fields .full,.voucher-grid .full{grid-column:auto}.inventory-summary{grid-template-columns:1fr 1fr}.slab-row{grid-template-columns:1fr 1fr}.slab-top,.slab-math{grid-column:1/-1}.remove-slab{grid-column:1/-1}.erp-kpi strong{font-size:19px}}
+@media(max-width:480px){.erp-filter-grid{grid-template-columns:1fr}.erp-filter-grid .wide{grid-column:auto}.mobile-metrics{grid-template-columns:1fr 1fr}.inventory-summary{grid-template-columns:1fr 1fr}}
 `;
-document.head.append(style);
+document.head.append(css);
 
-const A=await App.init('orders',['orders']);
+const A=await App.init('products',['products.view']);
 const {$,esc,money}=A;
-const owner=A.profile?.role==='owner';
-const amountOK=owner||A.can('orders.view_amounts');
-const contactOK=owner||A.can('customers.contact');
-const printOK=owner||A.can('orders.print');
-const collectOK=owner||A.can('payments.cod_collect');
-const PERM={placed:'orders.confirm',confirmed:'orders.confirm',packed:'orders.pack',dispatched:'orders.dispatch',delivered:'orders.deliver',cancelled:'orders.cancel'};
-let orders=[],staff=[],page=1,pageSize=50,activeStatus='',current=null,lastDetail=null,sheetMode=false,denseMode=false,lastLoadedAt=null;
 
-const statusLabel=s=>({syncing:'Processing',placed:'Placed',confirmed:'Confirmed',packed:'Packed',dispatched:'Dispatched',delivered:'Delivered',cancelled:'Cancelled'})[s]||String(s||'—');
-const statusClass=s=>'st-'+String(s||'syncing').replace(/[^a-z_]/g,'');
-const date=v=>v?new Date(v).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',day:'2-digit',month:'short',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
-const can=s=>owner||A.can(PERM[s]);
-const validNext=s=>({syncing:['placed'],placed:['confirmed','cancelled'],confirmed:['packed','dispatched','cancelled'],packed:['dispatched','cancelled'],dispatched:['delivered'],delivered:[],cancelled:[]}[s]||[]).filter(can);
-const customer=o=>o.business_name||o.customer_name||`Retailer #${o.user_id}`;
-const customerSub=o=>[o.customer_name&&o.customer_name!==o.business_name?o.customer_name:'',contactOK?o.customer_phone:''].filter(Boolean).join(' · ');
-const fullAddress=a=>a&&typeof a==='object'?[a.contact_name,a.business_name,a.address_line1,a.address_line2,a.landmark?`Near ${a.landmark}`:'',a.city,a.taluka,a.district,a.state,a.pincode,a.phone?`Mobile: ${a.phone}`:''].filter(Boolean).join(', '):'Address unavailable';
-const pct=(a,b)=>b?`${(a*100/b).toFixed((a*100/b)%1?1:0)}%`:'0%';
+const isOwner=A.profile?.role==='owner';
+const canCreate=isOwner||A.can('products.create');
+const canEdit=isOwner||A.can('products.edit');
+const canPrice=isOwner||A.can('products.price');
+const canStock=isOwner||A.can('products.stock');
+const canDeactivate=isOwner||A.can('products.deactivate');
+const canExport=isOwner||A.can('products.export');
+const canCategories=isOwner||A.can('products.edit');
 
-$('view').innerHTML=`
-<div class="orders-head">
- <div><h1>Orders</h1><p>Full-screen order register · update status directly like a spreadsheet.</p></div>
- <div class="head-actions"><button id="full-screen" class="primary">⛶ Sheet View</button><button id="refresh">Refresh</button><button id="export">Export CSV</button><button id="print-list">Print list</button></div>
-</div>
-<div id="summary" class="summary-strip"></div>
-<section id="smartWorkspace" class="smart-workspace">
- <div class="workspace-bar">
-  <div class="workspace-title"><span style="font-size:18px">▦</span><div><strong>ONeness Order Register</strong><span id="sheet-meta">Spreadsheet view · live order operations</span></div></div>
-  <div class="workspace-actions"><button id="sheet-density">Compact rows</button><button id="sheet-refresh">Refresh</button><button id="sheet-export">Export CSV</button><button id="sheet-print">Print list</button><button id="exit-sheet" class="exit-sheet">Exit Sheet View</button></div>
+let products=[],categories=[],ledger=[],tab='catalogue',editing=null,voucherDirection='in',editorImages=[],sheetMode=false;
+
+$('view').innerHTML=A.header(
+  'Products & Inventory',
+  'Catalogue, pricing, stock control and inventory statements in one ERP-style workspace.',
+  `<div class="row">
+    ${canCategories?'<button id="categories-btn">Categories</button>':''}
+    ${canStock?'<button id="stock-in-top" class="stock-in">+ Stock In</button><button id="stock-out-top" class="stock-out">− Stock Out</button>':''}
+    <button id="sheet-view-top">⛶ Sheet View</button>${canCreate?'<button id="new-product" class="primary">+ Add product</button>':''}
+  </div>`
+)+`
+<div id="erp-sheet-bar" class="sheet-bar" hidden><div><strong>ONeness Products</strong><small id="sheet-context">Catalogue sheet</small></div><div class="row"><button id="sheet-catalogue">Catalogue</button><button id="sheet-inventory">Inventory</button><button id="sheet-exit">Exit Sheet View</button></div></div>
+<nav class="erp-tabs">
+ <button class="erp-tab active" data-tab="catalogue">Product Catalogue</button>
+ <button class="erp-tab" data-tab="inventory">Inventory Ledger</button>
+</nav>
+
+<section id="catalogue-view">
+ <div id="catalogue-kpis" class="erp-kpis"></div>
+ <div class="erp-toolbar">
+   <div class="erp-filter-grid">
+    <label class="wide">Search products<input id="product-search" placeholder="Product name, description or ID"></label>
+    <label>Category<select id="product-category"><option value="">All categories</option></select></label>
+    <label>Stock status<select id="stock-filter"><option value="">All products</option><option value="in">In stock</option><option value="low">Low stock (≤10)</option><option value="out">Out of stock</option><option value="inactive">Inactive</option></select></label>
+    <label>Sort<select id="product-sort"><option value="new">Newest first</option><option value="name">Name A–Z</option><option value="stock-low">Stock low → high</option><option value="stock-high">Stock high → low</option><option value="price">Wholesale price ↑</option></select></label>
+    ${canExport?'<button id="product-export">Export Products</button>':''}
+   </div>
+   <div class="toolbar-actions">
+     ${canStock?'<button id="stock-in-toolbar" class="stock-in">+ Purchase / Stock In</button><button id="stock-out-toolbar" class="stock-out">− Damage / Stock Out</button>':''}
+     <button id="open-ledger">Inventory Statement</button><button id="sheet-view-toolbar">⛶ Sheet View</button>
+   </div>
  </div>
- <section class="filters">
-  <div class="filter-row">
-   <label class="search">Search<input id="search" placeholder="Order, shop, customer, mobile, product, tracking, PIN"></label>
-   <label>Status<select id="status"><option value="">All statuses</option>${['syncing','placed','confirmed','packed','dispatched','delivered','cancelled'].map(s=>`<option value="${s}">${statusLabel(s)}</option>`).join('')}</select></label>
-   <label>Payment<select id="payment"><option value="">All payments</option><option value="cod">COD</option><option value="online">Online</option></select></label>
-   <label>Assignment<select id="assignment"><option value="">All visible</option><option value="mine">Assigned to me</option><option value="unassigned">Unassigned</option><option value="assigned">Assigned</option></select></label>
-   <label class="less">From<input id="from" type="date"></label>
-   <label class="less">Through<input id="to" type="date"></label>
-   <div class="filter-buttons"><button id="clear">Clear</button></div>
-  </div>
-  <div id="quick" class="quick-row"></div>
- </section>
- <p id="count" class="muted"></p>
- <div class="sheet desktop">
-  <table class="order-table">
-   <thead><tr>
-    <th class="col-order">Order</th><th class="col-customer">Customer / Shop</th><th class="col-date">Date</th><th class="col-items">Items</th>${amountOK?'<th class="col-amount">Amount</th>':''}<th class="col-payment">Payment</th><th class="col-status">Status</th><th class="col-assigned">Assigned</th><th class="col-actions">Actions</th>
-   </tr></thead><tbody id="body"></tbody>
-  </table>
+ <p id="product-count" class="muted">Loading products…</p>
+
+ <div class="desktop-products">
+   <div class="erp-table-wrap">
+    <table class="erp-table">
+     <thead><tr><th>ID</th><th>Product</th><th>Category</th><th>Wholesale / MRP</th><th>Stock</th><th>MOQ</th><th>Bulk price slabs</th><th>Status</th><th>Actions</th></tr></thead>
+     <tbody id="product-body"></tbody>
+    </table>
+   </div>
  </div>
- <div id="mobile" class="mobile-list"></div>
- <div class="footer-bar"><span id="page-info"></span><div class="pager"><select id="page-size"><option>25</option><option selected>50</option><option>100</option></select><button id="prev">Previous</button><button id="next">Next</button></div></div>
+ <div id="mobile-products" class="mobile-products"></div>
 </section>
 
-<dialog id="detailModal" class="full-modal"><div class="modal-head"><div><h2 id="detail-title">Order</h2><p id="detail-sub">Details</p></div><button id="detail-x" class="x">×</button></div><div id="detail-body" class="modal-body"></div></dialog>
-<dialog id="actionModal" class="small-modal"><div class="modal-head"><div><h2 id="action-title">Update order</h2><p id="action-sub"></p></div><button id="action-x" class="x">×</button></div><form id="action-form"><div id="action-body" class="small-body"></div><div class="small-foot"><button type="button" id="action-cancel">Cancel</button><button type="submit" class="primary" id="action-save">Save</button></div></form></dialog>
+<section id="inventory-view" hidden>
+ <div class="erp-toolbar">
+  <div class="erp-filter-grid">
+   <label class="wide">Search statement<input id="ledger-search" placeholder="Product, reference or note"></label>
+   <label>Product<select id="ledger-product"><option value="">All products</option></select></label>
+   <label>Movement<select id="ledger-type"><option value="">All movements</option><option value="opening">Opening balance</option><option value="purchase">Purchase / Stock In</option><option value="return_in">Return In</option><option value="adjustment_in">Adjustment In</option><option value="adjustment_out">Adjustment Out</option><option value="damage">Damage / Loss</option><option value="correction">Correction</option><option value="order_reserved">Order Reserved</option><option value="order_cancelled">Order Cancelled / Restored</option><option value="product_edit">Legacy product edit</option></select></label>
+   <label>From<input id="ledger-from" type="date"></label>
+   <label>Through<input id="ledger-to" type="date"></label>
+  </div>
+  <div class="quick-date">
+    <button data-period="today">Today</button><button data-period="7">Last 7 days</button><button data-period="month">This month</button><button data-period="all">All dates</button>
+  </div>
+  <div class="toolbar-actions">
+    <button id="ledger-refresh" class="primary">Run Statement</button>
+    ${canStock?'<button id="ledger-stock-in" class="stock-in">+ Stock In</button><button id="ledger-stock-out" class="stock-out">− Stock Out</button>':''}
+    <button id="ledger-export">Export Statement</button><button id="ledger-print">Print Statement</button>
+  </div>
+ </div>
+
+ <div class="inventory-layout">
+  <div>
+   <div class="row between" style="margin-bottom:9px"><div><div id="statement-title" class="statement-title">Inventory Statement · All Products</div><div id="statement-sub" class="statement-sub">All recorded movements</div></div><span id="ledger-count" class="muted"></span></div>
+   <div class="erp-table-wrap">
+    <table class="erp-table">
+     <thead><tr><th>Date</th><th>Product</th><th>Type</th><th>Reference</th><th>Opening</th><th>In</th><th>Out</th><th>Closing</th><th>Staff / Source</th><th>Note</th></tr></thead>
+     <tbody id="ledger-body"></tbody>
+    </table>
+    <div id="ledger-empty" class="ledger-empty" hidden>No inventory movements match this statement.</div>
+   </div>
+  </div>
+
+  <aside class="inventory-side">
+   <div class="inventory-summary">
+    <div class="summary-card"><span>Transactions</span><strong id="sum-transactions">0</strong></div>
+    <div class="summary-card in"><span>Stock In</span><strong id="sum-in">0</strong></div>
+    <div class="summary-card out"><span>Stock Out</span><strong id="sum-out">0</strong></div>
+    <div class="summary-card"><span>Net movement</span><strong id="sum-net">0</strong></div>
+    <div id="period-opening-card" class="summary-card" hidden><span>Opening balance</span><strong id="sum-opening">0</strong></div>
+    <div id="period-closing-card" class="summary-card accent" hidden><span>Closing balance</span><strong id="sum-closing">0</strong></div>
+   </div>
+   <p class="muted" style="font-size:11px;margin-top:10px">Opening balances mark the point inventory tracking was enabled. Earlier historical stock movements are not reconstructed.</p>
+  </aside>
+ </div>
+</section>
+
+<dialog id="productEditor">
+ <div class="modal-head-sticky"><div><h2 id="editor-title" style="margin:0">Product</h2><small id="editor-subtitle"></small></div><button id="editor-close">×</button></div>
+ <form id="product-form">
+  <div class="modal-body-pad">
+   <div class="editor-grid">
+    <section class="editor-section">
+     <h3>Product details</h3>
+     <div class="editor-fields">
+      <label class="full">Product name<input id="ed-title" required maxlength="180"></label>
+      <label>Category<select id="ed-category" required></select></label>
+      <label>Unit<input id="ed-unit" required maxlength="30" placeholder="piece"></label>
+      <label class="full">Description<textarea id="ed-description" maxlength="2000"></textarea></label>
+     </div>
+    </section>
+
+    <section class="editor-section">
+     <h3>Pricing & order quantity</h3>
+     <div class="editor-fields">
+      <label>MRP (₹)<input id="ed-mrp" type="number" min="0" step="0.01" required ${canPrice?'':'disabled'}></label>
+      <label>Wholesale price (₹)<input id="ed-price" type="number" min="0" step="0.01" required ${canPrice?'':'disabled'}></label>
+      <label>Minimum quantity<input id="ed-min" type="number" min="1" step="1" required></label>
+      <div class="full read-stock"><span id="stock-caption">Stock</span><strong id="ed-stock-display">0</strong><small id="stock-help">Existing stock is changed only through Inventory Vouchers.</small></div>
+      <label id="opening-stock-wrap" class="full">Opening stock<input id="ed-opening-stock" type="number" min="0" step="1" value="0"></label>
+     </div>
+    </section>
+
+    <section class="editor-section full">
+     <div class="row between"><div><h3 style="margin-bottom:3px">Bulk pricing slabs</h3><small>Each slab is a separate rule. No more typing formats such as 30:50.</small></div><button type="button" id="add-slab">+ Add slab</button></div>
+     <div id="slab-list" class="slab-list" style="margin-top:11px"></div>
+    </section>
+
+    <section class="editor-section full">
+     <div class="row between"><div><h3 style="margin-bottom:3px">Product images</h3><small>Up to 6 images. The first image is used as the primary catalogue image.</small></div><span id="image-count" class="muted">0 / 6</span></div>
+     <label class="image-drop" for="ed-upload"><div><b>+ Add product images</b><span>JPG, PNG or WebP · large images are optimized before upload</span></div></label>
+     <input id="ed-upload" type="file" accept="image/png,image/jpeg,image/webp" multiple hidden>
+     <div id="image-preview" class="image-preview"></div>
+    </section>
+
+    <section class="editor-section full">
+     <h3>Availability & audit</h3>
+     <label><input id="ed-active" type="checkbox" style="width:auto;min-height:auto" ${canDeactivate?'':'disabled'}> Available for ordering</label>
+     <label id="reason-wrap">Reason for change<input id="ed-reason" maxlength="500" placeholder="Example: price revision / catalogue correction"></label>
+    </section>
+   </div>
+   <p id="editor-error" class="notice error" hidden></p>
+  </div>
+  <div class="modal-footer"><button type="button" id="editor-cancel">Cancel</button><button class="primary" id="editor-save" type="submit">Save product</button></div>
+ </form>
+</dialog>
+
+<dialog id="stockVoucher">
+ <div class="modal-head-sticky"><div><h2 id="voucher-title" style="margin:0">Stock In</h2><small>Inventory voucher · every change is recorded in the ledger</small></div><button id="voucher-close">×</button></div>
+ <form id="voucher-form">
+  <div class="modal-body-pad">
+   <div class="voucher-grid">
+    <label class="full">Find product<input id="voucher-search" placeholder="Search product name or ID"></label>
+    <label class="full">Product<select id="voucher-product" required></select></label>
+    <label>Movement type<select id="voucher-type" required></select></label>
+    <label>Quantity<input id="voucher-qty" type="number" min="1" step="1" required value="1"></label>
+    <label>Transaction date & time<input id="voucher-date" type="datetime-local"></label>
+    <label>Reference / Invoice No.<input id="voucher-reference" maxlength="120" placeholder="PO-125 / INV-44 / optional"></label>
+    <label class="full">Narration / Note<textarea id="voucher-note" maxlength="1000" placeholder="Supplier receipt, damage reason, physical count correction, etc."></textarea></label>
+    <div class="full stock-preview">
+      <div><span>Current stock</span><strong id="voucher-current">0</strong></div>
+      <div class="stock-arrow">→</div>
+      <div><span>Closing stock</span><strong id="voucher-closing">0</strong></div>
+    </div>
+   </div>
+   <p id="voucher-error" class="notice error" hidden></p>
+  </div>
+  <div class="modal-footer"><button type="button" id="voucher-cancel">Cancel</button><button id="voucher-save" class="primary" type="submit">Post Inventory Voucher</button></div>
+ </form>
+</dialog>
 `;
 
-function counts(){return ['syncing','placed','confirmed','packed','dispatched','delivered','cancelled'].reduce((a,s)=>(a[s]=orders.filter(o=>o.status===s).length,a),{all:orders.length})}
-function renderSummary(){const c=counts(),rows=[['','All',c.all,''],['placed','Placed',c.placed,'warn'],['confirmed','Confirmed',c.confirmed,''],['packed','Packed',c.packed,''],['dispatched','Dispatched',c.dispatched,'warn'],['delivered','Delivered',c.delivered,'good'],['cancelled','Cancelled',c.cancelled,'bad']];$('summary').innerHTML=rows.map(([v,l,n,cl])=>`<div class="summary-box ${cl} ${activeStatus===v?'active':''}" data-summary="${v}"><span>${l}</span><strong>${n}</strong></div>`).join('');$('quick').innerHTML=rows.map(([v,l,n])=>`<button class="chip ${activeStatus===v?'on':''}" data-quick="${v}">${l} · ${n}</button>`).join('');for(const el of document.querySelectorAll('[data-summary],[data-quick]'))el.onclick=()=>{activeStatus=el.dataset.summary??el.dataset.quick;$('status').value=activeStatus;page=1;render()}}
-function filtered(){let r=[...orders];const q=$('search').value.trim().toLowerCase(),st=$('status').value,pay=$('payment').value,as=$('assignment').value,from=$('from').value,to=$('to').value;if(st)r=r.filter(o=>o.status===st);if(pay)r=r.filter(o=>o.payment_method===pay);if(as==='mine')r=r.filter(o=>+o.assigned_to_profile_id===+A.profile.id);if(as==='unassigned')r=r.filter(o=>!o.assigned_to_profile_id);if(as==='assigned')r=r.filter(o=>!!o.assigned_to_profile_id);if(from){const t=new Date(from+'T00:00:00+05:30');r=r.filter(o=>new Date(o.created_at)>=t)}if(to){const t=new Date(to+'T23:59:59+05:30');r=r.filter(o=>new Date(o.created_at)<=t)}if(q)r=r.filter(o=>`${o.id} ${o.user_id} ${o.customer_name||''} ${o.business_name||''} ${o.customer_phone||''} ${o.customer_email||''} ${(o.product_titles||[]).join(' ')} ${o.tracking||''} ${o.delivery_pincode||''} ${o.delivery_city||''} ${o.internal_note||''}`.toLowerCase().includes(q));return r.sort((a,b)=>+b.id-+a.id)}
-function statusSelect(o){const next=validNext(o.status);const disabled=!next.length;return `<select class="status-select ${statusClass(o.status)}" data-status-id="${o.id}" ${disabled?'disabled':''}><option value="">${esc(statusLabel(o.status))}</option>${next.map(s=>`<option value="${s}">${s==='cancelled'?'Cancel Order':'→ '+statusLabel(s)}</option>`).join('')}</select>`}
-function render(){renderSummary();const all=filtered(),pages=Math.max(1,Math.ceil(all.length/pageSize));page=Math.max(1,Math.min(page,pages));const rows=all.slice((page-1)*pageSize,page*pageSize);$('count').textContent=`${all.length} matching orders · ${orders.length} total visible to your account`;$('page-info').textContent=`Page ${page} of ${pages}`;$('prev').disabled=page<=1;$('next').disabled=page>=pages;
-$('body').innerHTML=rows.map(o=>`<tr><td><span class="oid">#ON${o.id}</span>${o.status==='placed'?'<span class="new">NEW</span>':''}</td><td><span class="customer-name">${esc(customer(o))}</span><span class="customer-sub">${esc(customerSub(o)||`Retailer #${o.user_id}`)}</span></td><td>${esc(date(o.created_at))}</td><td><b>${Number(o.item_count||0)}</b> products<span class="customer-sub">${Number(o.unit_count||0)} units</span></td>${amountOK?`<td class="cell-money">${money(o.total_paise)}</td>`:''}<td><span class="payment-pill">${esc((o.payment_method||'—').toUpperCase())}</span><span class="customer-sub">${esc(o.payment_status||'—')}</span></td><td>${statusSelect(o)}</td><td class="col-assigned"><span class="staff">${esc(o.assigned_to_name||'Unassigned')}</span></td><td><div class="actions"><button class="view-btn" data-view="${o.id}">View</button><button class="print-btn" data-print="${o.id}">Print</button><button data-note="${o.id}">Note</button></div></td></tr>`).join('');
-$('mobile').innerHTML=rows.map(o=>`<article class="m-card"><div class="m-top"><div><span class="oid">#ON${o.id}</span><span class="customer-sub">${esc(date(o.created_at))}</span></div><span class="payment-pill">${esc((o.payment_method||'—').toUpperCase())}</span></div><div style="margin-top:7px"><span class="customer-name">${esc(customer(o))}</span><span class="customer-sub">${Number(o.unit_count||0)} units · ${Number(o.item_count||0)} products${amountOK?' · '+money(o.total_paise):''}</span></div><div class="m-grid"><div><span>Payment</span><strong>${esc(o.payment_status||'—')}</strong></div><div><span>Assigned</span><strong>${esc(o.assigned_to_name||'Unassigned')}</strong></div></div>${statusSelect(o)}<div class="m-actions"><button class="view-btn" data-view="${o.id}">View</button><button class="print-btn" data-print="${o.id}">Print</button><button data-note="${o.id}">Note</button></div></article>`).join('');wireRows();updateSheetMeta()}
-function wireRows(){for(const s of document.querySelectorAll('[data-status-id]'))s.onchange=async()=>{const next=s.value,id=+s.dataset.statusId;s.value='';if(next)openStatusAction(id,next)};for(const b of document.querySelectorAll('[data-view]'))b.onclick=()=>openDetail(+b.dataset.view);for(const b of document.querySelectorAll('[data-print]'))b.onclick=()=>printOne(+b.dataset.print);for(const b of document.querySelectorAll('[data-note]'))b.onclick=()=>editNote(+b.dataset.note)}
-async function load(){ $('count').textContent='Loading orders…';orders=await A.all('orders.list',{},n=>$('count').textContent=`Loaded ${n} orders…`);if(owner){try{const u=await A.all('admin.users');staff=u.filter(x=>x.role==='admin'&&x.status==='verified')}catch{staff=[]}}lastLoadedAt=new Date();render();updateSheetMeta()}
+const productEditor=$('productEditor'),stockVoucher=$('stockVoucher');
 
-function updateSheetMeta(){const el=$('sheet-meta');if(!el)return;const stamp=lastLoadedAt?lastLoadedAt.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}):'—';el.textContent=`${filtered().length} matching · ${orders.length} visible · updated ${stamp}`}
-function syncSheetButtons(){const b=$('sheet-density');if(b)b.textContent=denseMode?'Comfortable rows':'Compact rows';const top=$('full-screen');if(top)top.textContent=sheetMode?'⛶ Exit Sheet View':'⛶ Sheet View'}
-async function enterSheetMode(){const ws=$('smartWorkspace');sheetMode=true;ws.classList.add('fullscreen-sheet');document.body.classList.add('sheet-lock');syncSheetButtons();updateSheetMeta();try{if(ws.requestFullscreen&&!document.fullscreenElement)await ws.requestFullscreen()}catch{/* fixed full-screen fallback stays active */}}
-async function exitSheetMode(){const ws=$('smartWorkspace');sheetMode=false;ws.classList.remove('fullscreen-sheet');document.body.classList.remove('sheet-lock');syncSheetButtons();try{if(document.fullscreenElement)await document.exitFullscreen()}catch{}}
-function toggleSheetMode(){return sheetMode?exitSheetMode():enterSheetMode()}
-function toggleDensity(){denseMode=!denseMode;$('smartWorkspace').classList.toggle('dense',denseMode);syncSheetButtons()}
-function modalForm(title,sub,fields,onSave){$('action-title').textContent=title;$('action-sub').textContent=sub||'';$('action-body').innerHTML=fields;$('action-form').onsubmit=async e=>{e.preventDefault();const btn=$('action-save');btn.disabled=true;try{await onSave(new FormData(e.currentTarget));$('actionModal').close()}catch(err){A.error(err)}finally{btn.disabled=false}};$('actionModal').showModal()}
-function openStatusAction(id,next){const o=orders.find(x=>+x.id===+id);if(!o)return;let fields='';if(next==='dispatched')fields=`<label>Tracking / dispatch reference<input name="tracking" value="${esc(o.tracking||'')}" placeholder="LR / courier / vehicle / tracking"></label>`;if(next==='cancelled')fields=`<label>Cancellation reason<select name="reason"><option>Customer requested cancellation</option><option>Out of stock</option><option>Duplicate order</option><option>Wrong order</option><option>Wrong address</option><option>Payment issue</option><option>Other</option></select></label><label>Additional reason<textarea name="other" placeholder="Optional details"></textarea></label>`;fields+=`<label>Internal note<textarea name="note" placeholder="Optional admin note"></textarea></label>`;modalForm(next==='cancelled'?`Cancel #ON${id}`:`Mark #ON${id} ${statusLabel(next)}`,'The retailer will receive an order notification after this status change.',fields,async fd=>{const reason=next==='cancelled'?[fd.get('reason'),fd.get('other')].filter(Boolean).join(' · '):undefined;await A.api('order.status',{id,status:next,expected_version:o.version,...(next==='dispatched'?{tracking:String(fd.get('tracking')||'')}:{}),...(reason?{reason}:{}),note:String(fd.get('note')||'')});A.toast(`Order #ON${id} updated to ${statusLabel(next)}`);await load();if(current?.order?.id===id)await openDetail(id)})}
-function editNote(id){const o=orders.find(x=>+x.id===+id);if(!o)return;modalForm(`Internal note · #ON${id}`,'This note is visible only to authorized admins.',`<label>Internal note<textarea name="note">${esc(o.internal_note||'')}</textarea></label>`,async fd=>{await A.api('order.status',{id,status:o.status,operation:'note',expected_version:o.version,note:String(fd.get('note')||'')});A.toast('Internal note saved');await load();if(current?.order?.id===id)await openDetail(id)})}
-function assignOrder(id){if(!owner)return;const o=orders.find(x=>+x.id===+id);if(!o)return;const opts=`<option value="">Unassigned</option>`+staff.map(s=>`<option value="${s.id}" ${+o.assigned_to_profile_id===+s.id?'selected':''}>${esc(s.name||s.email)}</option>`).join('');modalForm(`Assign #ON${id}`,'Owner-only operational assignment.',`<label>Assign to<select name="staff">${opts}</select></label><label>Reason<input name="reason" required minlength="3" value="Order fulfilment assignment"></label>`,async fd=>{await A.api('order.status',{id,status:o.status,operation:'assign',expected_version:o.version,staff_id:String(fd.get('staff')||''),reason:String(fd.get('reason')||'')});A.toast('Assignment updated');await load();if(current?.order?.id===id)await openDetail(id)})}
+function categoryName(id){return categories.find(c=>+c.id===+id)?.name||'Uncategorised'}
+function movementLabel(t){return ({opening:'Opening Balance',purchase:'Purchase / Stock In',return_in:'Return In',adjustment_in:'Adjustment In',adjustment_out:'Adjustment Out',damage:'Damage / Loss',correction:'Correction',order_reserved:'Order Reserved',order_cancelled:'Order Cancelled / Restored',product_edit:'Product Edit'})[t]||String(t||'—').replaceAll('_',' ')}
+function formatDate(v){return v?new Date(v).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',dateStyle:'medium',timeStyle:'short'}):'—'}
+function rupeeInput(p){return Number(p||0)/100}
+function thumb(p){return p.images?.[0]?`<img class="product-thumb" loading="lazy" src="${esc(p.images[0])}" alt="">`:'<div class="product-placeholder">◇</div>'}
+async function uploadProductImage(base64,name){
+ const {data,error}=await A.client.functions.invoke('product-image-upload',{body:{base64,name}});
+ if(error){
+   let message=error.message||'Image upload failed.';
+   try{const body=await error.context?.json?.();message=body?.error?.message||message}catch{}
+   throw Error(message);
+ }
+ if(data?.ok!==true||!data?.data?.url)throw Error(data?.error?.message||'Image upload was not confirmed.');
+ return data.data;
+}
+async function inventoryAdjust(data){
+ const {data:result,error}=await A.client.rpc('admin_inventory_adjust',{p_data:data});
+ if(error)throw error;return result;
+}
+async function inventoryAll(data){
+ const list=[];let before=null;
+ for(let i=0;i<100;i++){
+   const payload={...data,limit:250,...(before?{before_id:before}:{})};
+   const {data:result,error}=await A.client.rpc('admin_inventory_statement',{p_data:payload});
+   if(error)throw error;
+   const batch=Array.isArray(result?.items)?result.items:[];list.push(...batch);
+   const next=result?.next_before_id;if(!next||!batch.length)break;before=next;
+ }
+ return list;
+}
 
-async function detail(id){return await A.api('order.details',{id})}
-async function openDetail(id){$('detail-title').textContent=`Order #ON${id}`;$('detail-sub').textContent='Loading complete order information…';$('detail-body').innerHTML='<p>Loading…</p>';$('detailModal').showModal();try{const d=await detail(id);current=d;lastDetail=d;renderDetail(d)}catch(err){$('detail-body').innerHTML=`<div class="notice error">${esc(err.message||'Could not open order')}</div>`}}
-function timeline(status){if(status==='cancelled')return `<div class="notice error">This order was cancelled.</div>`;const steps=['placed','confirmed','packed','dispatched','delivered'],cur=steps.indexOf(status);return `<div class="timeline">${steps.map((s,i)=>`<div class="ts ${i<cur?'done':i===cur?'current':''}"><div class="tdot"></div><span>${statusLabel(s)}</span></div>`).join('')}</div>`}
-function renderDetail(d){const o=d.order||{},c=d.customer||{},items=d.items||[],events=d.events||[],profit=Number(o.potential_profit_paise||0),mrp=Number(o.mrp_total_paise||0);$('detail-sub').textContent=`${date(o.created_at)} · ${statusLabel(o.status)} · ${(o.payment_method||'—').toUpperCase()}`;const productRows=items.length?items.map(i=>{const q=Number(i.qty||0),u=Number(i.unit_price_paise||0),m=Number(i.mrp_paise||0),line=q*u,lp=Math.max(0,q*(m-u));return `<tr><td><b>${esc(i.title||'Product')}</b><br><small>${esc(i.unit||'unit')}</small></td><td>${q}</td>${d.show_amounts?`<td>${money(u)}</td><td>${money(m)}</td><td>${money(line)}</td><td class="profit">${money(lp)} (${pct(lp,q*m)})</td>`:''}</tr>`}).join(''):'<tr><td colspan="6">No item snapshot available.</td></tr>';const eventHtml=events.length?events.map(e=>`<div class="event"><div class="eicon">${e.type==='status'?'↗':e.type==='payment'?'₹':e.type==='assignment'?'👤':e.type==='note'?'✎':'•'}</div><div><strong>${esc((e.type||'update').replaceAll('_',' '))}${e.to_status?' · '+statusLabel(e.to_status):''}</strong><span>${esc(e.note||'')}${e.actor_name?' · '+esc(e.actor_name):''}</span><span>${esc(date(e.created_at))}</span></div></div>`).join(''):'<span class="muted">No recorded activity yet.</span>';
-$('detail-body').innerHTML=`<div class="detail-layout"><div>
-<section class="card hero"><div class="hero-top"><div><span>Order total</span><strong>${d.show_amounts?money(o.total_paise):'Financials hidden'}</strong></div><select id="detail-status" class="status-select ${statusClass(o.status)}" ${validNext(o.status).length?'':'disabled'}><option value="">${esc(statusLabel(o.status))}</option>${validNext(o.status).map(s=>`<option value="${s}">${s==='cancelled'?'Cancel Order':'→ '+statusLabel(s)}</option>`).join('')}</select></div>${d.show_amounts?`<div class="hero-profit"><span>Retailer potential profit</span><b>${money(profit)} (${pct(profit,mrp)})</b></div>`:''}</section>
-<section class="card"><h3>Order progress</h3>${timeline(o.status)}</section>
-<section class="card"><h3>Customer & delivery</h3><div class="info"><div><span>Business</span><strong>${esc(c.business_name||'—')}</strong></div><div><span>Customer</span><strong>${esc(c.name||'—')}</strong></div>${d.show_contact?`<div><span>Mobile</span><strong>${esc(c.phone||'—')}</strong></div><div><span>Email</span><strong>${esc(c.email||'—')}</strong></div>`:''}</div>${d.show_contact?`<div class="addr" style="margin-top:8px">${esc(fullAddress(d.address))}</div><div class="mini-actions">${c.phone?`<a href="tel:${esc(c.phone)}">Call</a><a target="_blank" rel="noopener" href="https://wa.me/91${esc(String(c.phone).replace(/\D/g,''))}">WhatsApp</a>`:''}<button id="copy-address">Copy address</button><button id="customer-history">Show this retailer only</button></div>`:''}</section>
-<section class="card"><h3>Products · ${items.reduce((n,i)=>n+Number(i.qty||0),0)} units</h3><table class="items"><thead><tr><th>Product</th><th>Qty</th>${d.show_amounts?'<th>Wholesale</th><th>MRP</th><th>Amount</th><th>Potential</th>':''}</tr></thead><tbody>${productRows}</tbody></table></section>
-<section class="card"><h3>Notes</h3><b style="font-size:9px">Customer note</b><div class="note">${esc(d.customer_note||'No customer note.')}</div><b style="font-size:9px;display:block;margin-top:8px">Internal admin note</b><div class="note admin">${esc(d.internal_note||'No internal note.')}</div><div class="mini-actions"><button id="detail-note">Add / edit internal note</button></div></section>
-</div><aside>
-<section class="card"><h3>Operations</h3><div class="info"><div><span>Payment</span><strong>${esc((o.payment_method||'—').toUpperCase())} · ${esc(o.payment_status||'—')}</strong></div><div><span>Assigned</span><strong>${esc(d.assigned_to?.name||'Unassigned')}</strong></div><div><span>Tracking</span><strong>${esc(o.tracking||'Not dispatched')}</strong></div><div><span>Updated</span><strong>${esc(date(o.updated_at))}</strong></div></div><div class="mini-actions">${owner?'<button id="detail-assign">Assign staff</button>':''}${collectOK&&o.status==='delivered'&&o.payment_status==='unpaid'?'<button id="collect-cod">Record COD collected</button>':''}</div></section>
-${d.show_amounts?`<section class="card"><h3>Financial summary</h3><div class="fin"><div class="fr"><span>Subtotal</span><b>${money(d.subtotal_paise)}</b></div><div class="fr"><span>Coupon ${d.coupon_code?esc(d.coupon_code):''}</span><b>− ${money(o.discount_paise||0)}</b></div><div class="fr"><span>Delivery</span><b>${Number(o.shipping_paise||0)?money(o.shipping_paise):'Free'}</b></div><div class="fr total"><span>Total</span><b>${money(o.total_paise)}</b></div><div class="fr"><span>MRP retail value</span><b>${money(o.mrp_total_paise)}</b></div><div class="fr profit"><span>Potential profit</span><b>${money(profit)} (${pct(profit,mrp)})</b></div></div></section>`:''}
-<section class="card"><h3>Print & documents</h3><div class="doc-grid"><button id="doc-summary">Order Summary</button>${d.show_amounts?'<button id="doc-receipt">Customer Receipt</button>':''}<button id="doc-pack">Packing Slip</button><button id="doc-label">Dispatch Label</button></div></section>
-<section class="card"><h3>Activity timeline</h3><div class="events">${eventHtml}</div></section>
-</aside></div>`;
-const ds=$('detail-status');if(ds)ds.onchange=()=>{const n=ds.value;ds.value='';if(n)openStatusAction(o.id,n)};if($('detail-note'))$('detail-note').onclick=()=>editNote(o.id);if($('detail-assign'))$('detail-assign').onclick=()=>assignOrder(o.id);if($('copy-address'))$('copy-address').onclick=async()=>{await navigator.clipboard.writeText(fullAddress(d.address));A.toast('Address copied')};if($('customer-history'))$('customer-history').onclick=()=>{$('detailModal').close();$('search').value=String(o.user_id);render()};if($('collect-cod'))$('collect-cod').onclick=async()=>{if(!confirm(`Confirm COD collection for #ON${o.id}?`))return;await A.api('payment.collect',{id:o.id,expected_version:o.version});A.toast('COD collection recorded');await load();await openDetail(o.id)};if($('doc-summary'))$('doc-summary').onclick=()=>printDoc(d,'summary');if($('doc-receipt'))$('doc-receipt').onclick=()=>printDoc(d,'receipt');if($('doc-pack'))$('doc-pack').onclick=()=>printDoc(d,'packing');if($('doc-label'))$('doc-label').onclick=()=>printDoc(d,'label')}
+async function loadProducts(){
+ products=await A.all('products.list',{},n=>$('product-count').textContent=`Loaded ${n} products…`);
+ categories=await A.api('categories.list');
+ const opts='<option value="">All categories</option>'+categories.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+ $('product-category').innerHTML=opts;
+ $('ledger-product').innerHTML='<option value="">All products</option>'+products.slice().sort((a,b)=>a.title.localeCompare(b.title)).map(p=>`<option value="${p.id}">#${p.id} · ${esc(p.title)}</option>`).join('');
+ renderCatalogue();
+}
 
-function docHtml(d,type){const o=d.order||{},c=d.customer||{},items=d.items||[],addr=fullAddress(d.address),rows=items.map(i=>`<tr><td>${esc(i.title||'Product')}</td><td>${Number(i.qty||0)}</td>${type==='packing'?'':d.show_amounts?`<td>${money(i.unit_price_paise)}</td><td>${money(Number(i.qty||0)*Number(i.unit_price_paise||0))}</td>`:''}</tr>`).join('');const head=`<div style="font-family:Arial,sans-serif;color:#14251f;max-width:850px;margin:auto"><div style="display:flex;justify-content:space-between;border-bottom:2px solid #17634c;padding-bottom:10px"><div><h1 style="margin:0;color:#17634c">ONeness</h1><small>${type==='packing'?'Packing Slip':type==='label'?'Dispatch Label':type==='receipt'?'Customer Receipt':'Order Summary'}</small></div><div style="text-align:right"><b style="font-size:18px">#ON${o.id}</b><br><small>${date(o.created_at)}</small></div></div>`;if(type==='label')return `${head}<div style="border:3px solid #14251f;padding:18px;margin-top:18px"><h2>${esc(c.business_name||c.name||'Retailer')}</h2><p style="font-size:17px;line-height:1.5">${esc(addr)}</p>${d.show_contact&&c.phone?`<p><b>Mobile:</b> ${esc(c.phone)}</p>`:''}${d.show_amounts&&o.payment_method==='cod'?`<h2>COD ${money(o.total_paise)}</h2>`:''}</div></div>`;return `${head}<p><b>${esc(c.business_name||c.name||'Retailer')}</b>${d.show_contact&&c.phone?'<br>'+esc(c.phone):''}<br>${esc(addr)}</p><table style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left;padding:7px;border-bottom:1px solid #ccc">Product</th><th style="padding:7px;border-bottom:1px solid #ccc">Qty</th>${type==='packing'?'':d.show_amounts?'<th style="padding:7px;border-bottom:1px solid #ccc">Rate</th><th style="padding:7px;border-bottom:1px solid #ccc">Amount</th>':''}</tr></thead><tbody>${rows}</tbody></table>${type==='packing'?'<p style="margin-top:25px">☐ Quantity checked<br><br>☐ Packed securely<br><br>Packed by: __________________</p>':d.show_amounts?`<div style="width:320px;max-width:100%;margin-left:auto;margin-top:15px"><p>Subtotal <b style="float:right">${money(d.subtotal_paise)}</b></p><p>Discount <b style="float:right">− ${money(o.discount_paise||0)}</b></p><p>Delivery <b style="float:right">${Number(o.shipping_paise||0)?money(o.shipping_paise):'Free'}</b></p><hr><h2>Total <span style="float:right">${money(o.total_paise)}</span></h2><p>Payment <b style="float:right">${esc((o.payment_method||'').toUpperCase())} · ${esc(o.payment_status||'')}</b></p></div>`:''}<p style="margin-top:25px;font-size:11px;color:#69776f">Order status: ${esc(statusLabel(o.status))}${type==='receipt'?'. This is an order receipt, not a GST tax invoice.':''}</p></div>`}
-function printDoc(d,type){A.print(`Order #ON${d.order.id}`,docHtml(d,type))}
-async function printOne(id){try{const d=await detail(id);printDoc(d,'summary')}catch(err){A.error(err)}}
-function printFiltered(){const r=filtered(),rows=r.map(o=>`<tr><td>#ON${o.id}</td><td>${esc(customer(o))}</td><td>${esc(date(o.created_at))}</td><td>${Number(o.unit_count||0)}</td>${amountOK?`<td>${money(o.total_paise)}</td>`:''}<td>${esc((o.payment_method||'').toUpperCase())}</td><td>${esc(statusLabel(o.status))}</td></tr>`).join('');A.print('Orders',`<h2>ONeness · Filtered Orders</h2><table><thead><tr><th>Order</th><th>Retailer</th><th>Date</th><th>Units</th>${amountOK?'<th>Amount</th>':''}<th>Payment</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>`)}
-function exportCsv(){const r=filtered(),headers=['Order ID','Retailer','Customer','Mobile','Created IST','Products','Units',...(amountOK?['Amount INR']:[]),'Payment Method','Payment Status','Status','Assigned','PIN','Tracking','Internal Note'],rows=r.map(o=>[o.id,o.business_name||'',o.customer_name||'',contactOK?o.customer_phone||'':'',date(o.created_at),o.item_count||0,o.unit_count||0,...(amountOK?[Number(o.total_paise||0)/100]:[]),o.payment_method,o.payment_status,o.status,o.assigned_to_name||'',o.delivery_pincode||'',o.tracking||'',o.internal_note||'']);A.csv('Orders',headers,rows,'Filtered ONeness orders')}
+function productRows(){
+ let rows=[...products];
+ const q=$('product-search').value.trim().toLowerCase();
+ if(q)rows=rows.filter(p=>`${p.id} ${p.title} ${p.description||''}`.toLowerCase().includes(q));
+ if($('product-category').value)rows=rows.filter(p=>+p.category_id===+$('product-category').value);
+ const f=$('stock-filter').value;
+ if(f==='in')rows=rows.filter(p=>p.active&&p.stock>0);
+ if(f==='low')rows=rows.filter(p=>p.active&&p.stock>0&&p.stock<=10);
+ if(f==='out')rows=rows.filter(p=>p.stock===0);
+ if(f==='inactive')rows=rows.filter(p=>!p.active);
+ const s=$('product-sort').value;
+ if(s==='name')rows.sort((a,b)=>a.title.localeCompare(b.title));
+ else if(s==='stock-low')rows.sort((a,b)=>a.stock-b.stock);
+ else if(s==='stock-high')rows.sort((a,b)=>b.stock-a.stock);
+ else if(s==='price')rows.sort((a,b)=>a.price_paise-b.price_paise);
+ else rows.sort((a,b)=>b.id-a.id);
+ return rows;
+}
 
-$('detail-x').onclick=()=>$('detailModal').close();$('action-x').onclick=$('action-cancel').onclick=()=>$('actionModal').close();$('refresh').onclick=()=>load().catch(A.error);$('export').onclick=()=>{try{exportCsv()}catch(e){A.error(e)}};$('print-list').onclick=()=>{try{printFiltered()}catch(e){A.error(e)}};$('full-screen').onclick=()=>toggleSheetMode();$('exit-sheet').onclick=()=>exitSheetMode();$('sheet-density').onclick=toggleDensity;$('sheet-refresh').onclick=()=>load().catch(A.error);$('sheet-export').onclick=()=>{try{exportCsv()}catch(e){A.error(e)}};$('sheet-print').onclick=()=>{try{printFiltered()}catch(e){A.error(e)}};$('clear').onclick=()=>{for(const id of ['search','status','payment','assignment','from','to'])$(id).value='';activeStatus='';page=1;render()};for(const id of ['search','status','payment','assignment','from','to'])$(id).oninput=()=>{if(id==='status')activeStatus=$('status').value;page=1;render()};$('page-size').onchange=()=>{pageSize=+$('page-size').value;page=1;render()};$('prev').onclick=()=>{page--;render()};$('next').onclick=()=>{page++;render()};document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&sheetMode){sheetMode=false;$('smartWorkspace').classList.remove('fullscreen-sheet');document.body.classList.remove('sheet-lock');syncSheetButtons()}});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sheetMode&&!$('detailModal').open&&!$('actionModal').open)exitSheetMode();if(e.key==='/'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName||'')){e.preventDefault();$('search').focus()}});
-await load();const qid=+new URLSearchParams(location.search).get('id');if(qid)await openDetail(qid);
-})().catch(e=>{if(window.App)App.fail(e);else document.body.textContent='Could not load ONeness. '+e.message});
+function renderCatalogue(){
+ const rows=productRows();
+ const totalUnits=products.reduce((a,p)=>a+Number(p.stock||0),0);
+ const low=products.filter(p=>p.active&&p.stock>0&&p.stock<=10).length;
+ const out=products.filter(p=>p.stock===0).length;
+ const wholesaleValue=products.reduce((a,p)=>a+Number(p.stock||0)*Number(p.price_paise||0),0);
+ const mrpValue=products.reduce((a,p)=>a+Number(p.stock||0)*Number(p.mrp_paise||0),0);
+
+ $('catalogue-kpis').innerHTML=[
+  ['Total SKUs',products.length,'Catalogue products','accent'],
+  ['Active',products.filter(p=>p.active).length,'Available for ordering',''],
+  ['Units on hand',totalUnits,'Current physical stock',''],
+  ['Low stock',low,'10 units or less','warn'],
+  ['Out of stock',out,'Needs replenishment','bad'],
+  ['Stock value',money(wholesaleValue),`MRP value ${money(mrpValue)}`,'']
+ ].map(([l,v,h,c])=>`<article class="erp-kpi ${c}"><span>${l}</span><strong>${esc(v)}</strong><small>${esc(h)}</small></article>`).join('');
+
+ $('product-count').textContent=`${rows.length} matching products · ${totalUnits} total units on hand`;
+
+ $('product-body').innerHTML=rows.map(p=>`
+  <tr>
+   <td><b>#${p.id}</b></td>
+   <td><div class="product-cell">${thumb(p)}<div><span class="product-title">${esc(p.title)}</span><span class="product-desc">${esc(p.description||'')}</span></div></div></td>
+   <td>${esc(categoryName(p.category_id))}</td>
+   <td><b>${money(p.price_paise)}</b><span class="stock-unit">MRP ${money(p.mrp_paise)}</span></td>
+   <td><span class="stock-number ${p.stock===0?'out':p.stock<=10?'low':''}">${p.stock}</span><span class="stock-unit">${esc(p.unit)}</span></td>
+   <td><b>${p.min_qty}</b><span class="stock-unit">minimum</span></td>
+   <td>${(p.bulk_rules||[]).map(t=>`<span class="slab-chip">${t.min_qty}+ · ${money(t.price_paise)}</span>`).join('')||'<span class="muted">Standard price</span>'}</td>
+   <td>${A.badge(p.active?'active':'inactive')}</td>
+   <td><div class="erp-actions">
+    <button data-view="${p.id}">Details</button>
+    ${canStock?`<button data-stock="${p.id}" class="stock-in">Stock</button>`:''}
+    <button data-statement="${p.id}">Statement</button>
+    ${canEdit?`<button data-edit="${p.id}" class="primary">Edit</button>`:''}
+   </div></td>
+  </tr>`).join('');
+
+ $('mobile-products').innerHTML=rows.map(p=>`
+  <article class="mobile-product">
+   <div class="mobile-product-head">${thumb(p)}<div><b>${esc(p.title)}</b><span class="stock-unit">#${p.id} · ${esc(categoryName(p.category_id))}</span></div>${A.badge(p.active?'active':'inactive')}</div>
+   <div class="mobile-metrics">
+    <div class="mobile-metric"><span>Wholesale</span><strong>${money(p.price_paise)}</strong></div>
+    <div class="mobile-metric"><span>MRP</span><strong>${money(p.mrp_paise)}</strong></div>
+    <div class="mobile-metric"><span>Stock</span><strong>${p.stock} ${esc(p.unit)}</strong></div>
+   </div>
+   <div>${(p.bulk_rules||[]).map(t=>`<span class="slab-chip">${t.min_qty}+ · ${money(t.price_paise)}</span>`).join('')}</div>
+   <div class="toolbar-actions"><button data-view="${p.id}">Details</button>${canStock?`<button data-stock="${p.id}" class="stock-in">Stock</button>`:''}<button data-statement="${p.id}">Statement</button>${canEdit?`<button data-edit="${p.id}" class="primary">Edit</button>`:''}</div>
+  </article>`).join('')||'<div class="card empty">No products match your filters.</div>';
+
+ wireProductActions();
+}
+
+function wireProductActions(){
+ for(const b of document.querySelectorAll('[data-view]'))b.onclick=()=>showDetails(products.find(p=>p.id===+b.dataset.view));
+ for(const b of document.querySelectorAll('[data-edit]'))b.onclick=()=>openEditor(products.find(p=>p.id===+b.dataset.edit));
+ for(const b of document.querySelectorAll('[data-stock]'))b.onclick=()=>openVoucher('in',+b.dataset.stock);
+ for(const b of document.querySelectorAll('[data-statement]'))b.onclick=()=>openProductStatement(+b.dataset.statement);
+}
+
+function showDetails(p){
+ const slabs=(p.bulk_rules||[]).length?A.table(['Minimum Qty','Wholesale Price'],p.bulk_rules.map(t=>[`${t.min_qty} ${p.unit}`,money(t.price_paise)])):'<p class="muted">No bulk pricing slabs.</p>';
+ const gallery=(p.images||[]).length?`<div class="image-preview" style="margin-bottom:14px">${p.images.map((u,i)=>`<div class="image-card"><img src="${esc(u)}" alt="">${i===0?'<span class="primary-image">Primary</span>':''}</div>`).join('')}</div>`:'';
+ A.modal(p.title,`
+  ${gallery}<div class="detail-grid">
+   <div class="card"><small>Current stock</small><h2>${p.stock} ${esc(p.unit)}</h2></div>
+   <div class="card"><small>Wholesale / MRP</small><h2>${money(p.price_paise)} / ${money(p.mrp_paise)}</h2></div>
+  </div>
+  <p>${esc(p.description||'No description')}</p>
+  <p>Category: <b>${esc(categoryName(p.category_id))}</b> · MOQ ${p.min_qty}</p>
+  <h3>Bulk pricing</h3>${slabs}
+  <div class="row" style="margin-top:18px">
+    ${canStock?`<button id="detail-stock-in" class="stock-in">+ Stock In</button><button id="detail-stock-out" class="stock-out">− Stock Out</button>`:''}
+    <button id="detail-statement">Inventory Statement</button>
+    ${canEdit?'<button id="detail-edit" class="primary">Edit Product</button>':''}
+    ${A.can('audit')?'<button id="product-log">Activity Log</button>':''}
+  </div>`);
+ if($('detail-stock-in'))$('detail-stock-in').onclick=()=>openVoucher('in',p.id);
+ if($('detail-stock-out'))$('detail-stock-out').onclick=()=>openVoucher('out',p.id);
+ $('detail-statement').onclick=()=>openProductStatement(p.id);
+ if($('detail-edit'))$('detail-edit').onclick=()=>openEditor(p);
+ if($('product-log'))$('product-log').onclick=()=>A.logs('product',p.id).catch(A.error);
+}
+
+function renumberSlabs(){
+ [...document.querySelectorAll('.slab-row')].forEach((row,i)=>{
+   const n=row.querySelector('.slab-number');if(n)n.textContent=`Price Block ${i+1}`;
+   updateSlabMath(row);
+ });
+}
+function updateSlabMath(row){
+ const q=Number(row.querySelector('.slab-qty')?.value||0),price=Number(row.querySelector('.slab-price')?.value||0);
+ const math=row.querySelector('.slab-math');if(!math)return;
+ math.textContent=q&&price?`From ${q} units, retailer pays ₹${price.toLocaleString('en-IN',{maximumFractionDigits:2})} per unit.`:'Enter the minimum quantity and special wholesale price for this block.';
+}
+function addSlabRow(rule={min_qty:'',price_paise:null}){
+ const row=document.createElement('div');row.className='slab-row';
+ row.innerHTML=`<div class="slab-top"><span class="slab-number">Price Block</span><small class="muted">Quantity-based wholesale offer</small></div>
+ <label>Minimum quantity<input class="slab-qty" type="number" min="1" step="1" value="${esc(rule.min_qty??'')}" required></label>
+ <label>Wholesale price (₹)<input class="slab-price" type="number" min="0" step="0.01" value="${rule.price_paise==null?'':esc(rupeeInput(rule.price_paise))}" required></label>
+ <button type="button" class="remove-slab">Remove block</button>
+ <div class="slab-math"></div>`;
+ row.querySelector('.remove-slab').onclick=()=>{row.remove();renumberSlabs()};
+ for(const input of row.querySelectorAll('input'))input.addEventListener('input',()=>updateSlabMath(row));
+ $('slab-list').append(row);renumberSlabs();
+}
+
+function cleanupEditorImages(){
+ for(const img of editorImages){if(img.localUrl)URL.revokeObjectURL(img.localUrl)}
+ editorImages=[];
+}
+function renderEditorImages(){
+ $('image-count').textContent=`${editorImages.length} / 6`;
+ if(!editorImages.length){$('image-preview').innerHTML='<div class="image-empty">No product images yet. Add clear front/product-pack images for the catalogue.</div>';return}
+ $('image-preview').innerHTML=editorImages.map((img,i)=>`<div class="image-card">
+   <img src="${esc(img.preview||img.url||'')}" alt="Product image ${i+1}">
+   ${i===0?'<span class="primary-image">Primary</span>':''}
+   <span class="image-status ${img.status==='saved'?'saved':img.status==='error'?'error':''}">${img.status==='saved'?'Saved':img.status==='uploading'?'Uploading…':img.status==='error'?'Retry':'Ready'}</span>
+   <div class="image-card-info"><small>${esc(img.name||`Image ${i+1}`)}</small><div class="image-card-actions">${i>0?`<button type="button" data-img-primary="${i}">Make primary</button>`:'<button type="button" disabled>Primary image</button>'}<button type="button" data-img-remove="${i}">Remove</button></div></div>
+ </div>`).join('');
+ for(const b of document.querySelectorAll('[data-img-remove]'))b.onclick=()=>{const i=+b.dataset.imgRemove;const [old]=editorImages.splice(i,1);if(old?.localUrl)URL.revokeObjectURL(old.localUrl);renderEditorImages()};
+ for(const b of document.querySelectorAll('[data-img-primary]'))b.onclick=()=>{const i=+b.dataset.imgPrimary;const [picked]=editorImages.splice(i,1);editorImages.unshift(picked);renderEditorImages()};
+}
+function addSelectedImages(fileList){
+ const files=[...fileList];
+ if(editorImages.length+files.length>6){A.toast('Use at most six product images.');return}
+ for(const file of files){
+   if(!/^image\/(jpeg|png|webp)$/.test(file.type)){A.toast(`${file.name}: use JPG, PNG or WebP.`);continue}
+   if(file.size>8*1024*1024){A.toast(`${file.name}: choose an image smaller than 8 MB.`);continue}
+   const localUrl=URL.createObjectURL(file);
+   editorImages.push({file,localUrl,preview:localUrl,name:file.name,status:'pending',url:null});
+ }
+ renderEditorImages();
+}
+async function imageToBase64(file){
+ const local=URL.createObjectURL(file);
+ try{
+   const img=await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(Error('Could not read this image.'));im.src=local});
+   let w=img.naturalWidth,h=img.naturalHeight;
+   const max=1800,scale=Math.min(1,max/Math.max(w,h));w=Math.max(1,Math.round(w*scale));h=Math.max(1,Math.round(h*scale));
+   const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,w,h);
+   let data=canvas.toDataURL('image/webp',.86);
+   if(data.length>2_600_000){data=canvas.toDataURL('image/webp',.72)}
+   if(data.length>2_600_000){const smaller=document.createElement('canvas');const s=Math.min(1,1200/Math.max(w,h));smaller.width=Math.max(1,Math.round(w*s));smaller.height=Math.max(1,Math.round(h*s));smaller.getContext('2d').drawImage(canvas,0,0,smaller.width,smaller.height);data=smaller.toDataURL('image/webp',.72)}
+   const base64=String(data).split(',')[1];
+   if(!base64||base64.length>2_800_000)throw Error('This image is still too large after optimization. Choose a smaller image.');
+   return base64;
+ }finally{URL.revokeObjectURL(local)}
+}
+async function uploadEditorImages(){
+ for(let i=0;i<editorImages.length;i++){
+   const img=editorImages[i];if(img.url)continue;
+   img.status='uploading';renderEditorImages();
+   try{
+     const base64=await imageToBase64(img.file);
+     let uploaded=null,lastErr=null;
+     for(let attempt=0;attempt<2&&!uploaded;attempt++){
+       try{uploaded=await uploadProductImage(base64,img.name||'product-image')}catch(e){lastErr=e;if(attempt===0)await new Promise(r=>setTimeout(r,900))}
+     }
+     if(!uploaded?.url)throw lastErr||Error('Image upload was not confirmed.');
+     if(img.localUrl)URL.revokeObjectURL(img.localUrl);
+     img.url=uploaded.url;img.preview=uploaded.thumbnail||uploaded.url;img.localUrl=null;img.file=null;img.status='saved';renderEditorImages();
+   }catch(e){img.status='error';renderEditorImages();throw Error(`Image ${i+1} (${img.name||'product image'}): ${e?.message||'upload failed'}`)}
+ }
+ return editorImages.map(x=>x.url).filter(Boolean);
+}
+function openEditor(p=null){
+ if(!categories.length){A.toast('Create a category first.');return}
+ cleanupEditorImages();editing=p;
+ editorImages=(p?.images||[]).map((url,i)=>({url,preview:url,file:null,localUrl:null,name:`Saved image ${i+1}`,status:'saved'}));
+ $('editor-title').textContent=p?'Edit Product':'Add Product';
+ $('editor-subtitle').textContent=p?`#${p.id} · stock is maintained through Inventory Vouchers`:'Create catalogue item and opening stock';
+ $('ed-category').innerHTML=categories.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+ $('ed-title').value=p?.title||'';$('ed-category').value=p?.category_id||categories[0].id;$('ed-unit').value=p?.unit||'piece';$('ed-description').value=p?.description||'';
+ $('ed-mrp').value=rupeeInput(p?.mrp_paise||0);$('ed-price').value=rupeeInput(p?.price_paise||0);$('ed-min').value=p?.min_qty||1;
+ $('ed-stock-display').textContent=p?`${p.stock} ${p.unit}`:'Opening stock will be recorded in the ledger';$('opening-stock-wrap').hidden=!!p;$('ed-opening-stock').value=0;
+ $('stock-help').textContent=p?'Use Stock In / Stock Out to change this quantity so every movement appears in the inventory statement.':'Opening stock will create the first inventory-ledger entry.';
+ $('ed-active').checked=p?.active??true;$('reason-wrap').hidden=!p;$('ed-reason').value='';$('editor-error').hidden=true;$('ed-upload').value='';
+ $('slab-list').innerHTML='';for(const r of p?.bulk_rules||[])addSlabRow(r);renderEditorImages();productEditor.showModal();
+}
+$('add-slab').onclick=()=>addSlabRow();
+$('ed-upload').onchange=e=>{addSelectedImages(e.target.files);e.target.value=''};
+$('editor-close').onclick=$('editor-cancel').onclick=()=>{cleanupEditorImages();productEditor.close()};
+
+$('product-form').onsubmit=async e=>{
+ e.preventDefault();
+ const save=$('editor-save');save.disabled=true;$('editor-error').hidden=true;
+ try{
+  const title=$('ed-title').value.trim(),unit=$('ed-unit').value.trim();
+  if(!title||!unit)throw Error('Product name and unit are required.');
+  const mrp=A.paise($('ed-mrp').value),price=A.paise($('ed-price').value);
+  if(price>mrp)throw Error('Wholesale price cannot be greater than MRP.');
+  const min=+$('ed-min').value;
+  if(!Number.isInteger(min)||min<1)throw Error('Minimum quantity must be a positive whole number.');
+
+  const tiers=[...document.querySelectorAll('.slab-row')].map(row=>{
+    const q=+row.querySelector('.slab-qty').value,pp=A.paise(row.querySelector('.slab-price').value);
+    if(!Number.isInteger(q)||q<min)throw Error(`Every slab quantity must be at least the MOQ (${min}).`);
+    if(pp>price)throw Error('A bulk slab price should not exceed the standard wholesale price.');
+    return {min_qty:q,price_paise:pp};
+  }).sort((a,b)=>a.min_qty-b.min_qty);
+  if(new Set(tiers.map(t=>t.min_qty)).size!==tiers.length)throw Error('Bulk slab quantities must be unique.');
+
+  const urls=await uploadEditorImages();
+  if(urls.length>6)throw Error('Use at most six images.');
+
+  const payload={
+    ...(editing?{id:editing.id,expected_version:editing.version}:{}),
+    title,description:$('ed-description').value.trim(),category_id:+$('ed-category').value,unit,
+    mrp_paise:mrp,price_paise:price,
+    stock:editing?editing.stock:Math.max(0,Math.trunc(+$('ed-opening-stock').value||0)),
+    min_qty:min,qty_step:1,bulk_rules:tiers,images:urls,
+    active:$('ed-active').checked,
+    reason:editing?$('ed-reason').value.trim():'Opening product creation'
+  };
+  if(editing&&!payload.reason)throw Error('Reason for change is required.');
+  await A.api('admin.product.put',payload);
+  cleanupEditorImages();productEditor.close();A.toast(editing?'Product updated':'Product created');
+  await loadProducts();
+ }catch(err){$('editor-error').textContent=A.error(err);$('editor-error').hidden=false}
+ finally{save.disabled=false}
+};
+
+function movementOptions(direction){
+ return direction==='in'
+ ?[['purchase','Purchase / Supplier Receipt'],['return_in','Sales Return / Stock Return In'],['adjustment_in','Adjustment In'],['correction','Physical Stock Correction']]
+ :[['damage','Damage / Loss'],['adjustment_out','Adjustment Out'],['correction','Physical Stock Correction']];
+}
+function updateVoucherProducts(){
+ const q=$('voucher-search').value.trim().toLowerCase();
+ const rows=products.filter(p=>!q||`${p.id} ${p.title}`.toLowerCase().includes(q)).sort((a,b)=>a.title.localeCompare(b.title));
+ const current=$('voucher-product').value;
+ $('voucher-product').innerHTML=rows.map(p=>`<option value="${p.id}">#${p.id} · ${esc(p.title)} · Stock ${p.stock} ${esc(p.unit)}</option>`).join('');
+ if(rows.some(p=>String(p.id)===current))$('voucher-product').value=current;
+ updateVoucherPreview();
+}
+function openVoucher(direction='in',productId=null){
+ voucherDirection=direction;
+ $('voucher-title').textContent=direction==='in'?'Stock In Voucher':'Stock Out Voucher';
+ $('voucher-type').innerHTML=movementOptions(direction).map(([v,l])=>`<option value="${v}">${l}</option>`).join('');
+ $('voucher-search').value='';
+ $('voucher-qty').value=1;
+ $('voucher-reference').value='';
+ $('voucher-note').value='';
+ $('voucher-error').hidden=true;
+ const now=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16);
+ $('voucher-date').value=now;
+ updateVoucherProducts();
+ if(productId&&products.some(p=>p.id===productId))$('voucher-product').value=productId;
+ updateVoucherPreview();
+ $('voucher-save').textContent=direction==='in'?'Post Stock In':'Post Stock Out';
+ $('voucher-save').className=direction==='in'?'primary':'danger';
+ stockVoucher.showModal();
+}
+function updateVoucherPreview(){
+ const p=products.find(x=>x.id===+$('voucher-product').value);
+ const qty=Math.max(0,Math.trunc(+$('voucher-qty').value||0));
+ const current=Number(p?.stock||0),closing=current+(voucherDirection==='in'?qty:-qty);
+ $('voucher-current').textContent=p?`${current} ${p.unit}`:'0';
+ $('voucher-closing').textContent=p?`${closing} ${p.unit}`:'0';
+ $('voucher-closing').style.color=closing<0?'#a33824':voucherDirection==='in'?'#17634c':'#14251f';
+}
+$('voucher-search').oninput=updateVoucherProducts;
+$('voucher-product').onchange=updateVoucherPreview;
+$('voucher-qty').oninput=updateVoucherPreview;
+$('voucher-close').onclick=$('voucher-cancel').onclick=()=>stockVoucher.close();
+
+$('voucher-form').onsubmit=async e=>{
+ e.preventDefault();const save=$('voucher-save');save.disabled=true;$('voucher-error').hidden=true;
+ try{
+  const p=products.find(x=>x.id===+$('voucher-product').value);
+  if(!p)throw Error('Choose a product.');
+  const qty=Math.trunc(+$('voucher-qty').value);
+  if(!Number.isInteger(qty)||qty<1)throw Error('Quantity must be a positive whole number.');
+  if(voucherDirection==='out'&&qty>p.stock)throw Error(`Only ${p.stock} ${p.unit} are currently available.`);
+  let occurred=null;
+  if($('voucher-date').value)occurred=new Date($('voucher-date').value).toISOString();
+  await inventoryAdjust({
+    product_id:p.id,direction:voucherDirection,movement_type:$('voucher-type').value,qty,
+    reference:$('voucher-reference').value.trim(),note:$('voucher-note').value.trim(),
+    ...(occurred?{occurred_at:occurred}:{})
+  });
+  stockVoucher.close();A.toast(`${voucherDirection==='in'?'Stock received':'Stock issued'} · ${qty} ${p.unit}`);
+  await loadProducts();
+  if(tab==='inventory')await loadLedger();
+ }catch(err){$('voucher-error').textContent=A.error(err);$('voucher-error').hidden=false}
+ finally{save.disabled=false}
+};
+
+async function loadLedger(){
+ $('ledger-count').textContent='Loading statement…';
+ const data={
+  ...(+$('ledger-product').value?{product_id:+$('ledger-product').value}:{}),
+  ...($('ledger-type').value?{movement_type:$('ledger-type').value}:{}),
+  ...($('ledger-search').value.trim()?{search:$('ledger-search').value.trim()}:{}),
+ };
+ if($('ledger-from').value)data.from=new Date($('ledger-from').value+'T00:00:00+05:30').toISOString();
+ if($('ledger-to').value)data.to=new Date(new Date($('ledger-to').value+'T00:00:00+05:30').getTime()+86400000).toISOString();
+
+ ledger=await inventoryAll(data);
+ $('ledger-count').textContent=`Loaded ${ledger.length} movements…`;
+ renderLedger();
+}
+function renderLedger(){
+ const selected=products.find(p=>p.id===+$('ledger-product').value);
+ const totalIn=ledger.filter(x=>x.quantity_delta>0).reduce((a,x)=>a+x.quantity_delta,0);
+ const totalOut=ledger.filter(x=>x.quantity_delta<0).reduce((a,x)=>a+Math.abs(x.quantity_delta),0);
+ $('sum-transactions').textContent=ledger.length;$('sum-in').textContent='+'+totalIn;$('sum-out').textContent='−'+totalOut;$('sum-net').textContent=(totalIn-totalOut>=0?'+':'')+(totalIn-totalOut);
+ $('statement-title').textContent=selected?`Inventory Statement · ${selected.title}`:'Inventory Statement · All Products';
+ $('statement-sub').textContent=`${$('ledger-from').value||'Beginning'} through ${$('ledger-to').value||'Today'} · ${$('ledger-type').selectedOptions[0].text}`;
+ $('ledger-count').textContent=`${ledger.length} movement${ledger.length===1?'':'s'}`;
+
+ if(selected&&ledger.length){
+   const chronological=[...ledger].sort((a,b)=>new Date(a.occurred_at)-new Date(b.occurred_at)||a.id-b.id);
+   $('period-opening-card').hidden=false;$('period-closing-card').hidden=false;
+   $('sum-opening').textContent=`${chronological[0].stock_before} ${selected.unit}`;
+   $('sum-closing').textContent=`${chronological.at(-1).stock_after} ${selected.unit}`;
+ }else{
+   $('period-opening-card').hidden=true;$('period-closing-card').hidden=true;
+ }
+
+ $('ledger-body').innerHTML=ledger.map(x=>`
+  <tr>
+   <td>${esc(formatDate(x.occurred_at))}</td>
+   <td><b>${esc(x.product_title)}</b><span class="stock-unit">#${x.product_id}</span></td>
+   <td><span class="movement-type">${esc(movementLabel(x.movement_type))}</span></td>
+   <td><span class="movement-ref">${esc(x.reference_id||'—')}</span></td>
+   <td>${x.stock_before}</td>
+   <td class="movement-in">${x.quantity_delta>0?'+'+x.quantity_delta:'—'}</td>
+   <td class="movement-out">${x.quantity_delta<0?'−'+Math.abs(x.quantity_delta):'—'}</td>
+   <td><b>${x.stock_after}</b></td>
+   <td>${esc(x.actor_name||x.actor_role||'System')}</td>
+   <td class="movement-note">${esc(x.note||'—')}</td>
+  </tr>`).join('');
+ $('ledger-empty').hidden=ledger.length>0;
+}
+
+function syncSheetActive(){
+ for(const id of ['catalogue-view','inventory-view'])$(id)?.classList.remove('sheet-active');
+ if(sheetMode){const active=$(tab==='inventory'?'inventory-view':'catalogue-view');active?.classList.add('sheet-active');$('sheet-context').textContent=tab==='inventory'?'Inventory ledger sheet':'Product catalogue sheet';$('sheet-catalogue').classList.toggle('active',tab==='catalogue');$('sheet-inventory').classList.toggle('active',tab==='inventory')}
+}
+function enterSheetView(){sheetMode=true;document.body.classList.add('erp-sheet-mode');$('erp-sheet-bar').hidden=false;syncSheetActive()}
+function exitSheetView(){sheetMode=false;document.body.classList.remove('erp-sheet-mode');$('erp-sheet-bar').hidden=true;for(const id of ['catalogue-view','inventory-view'])$(id)?.classList.remove('sheet-active')}
+function showTab(next){
+ tab=next;
+ for(const b of document.querySelectorAll('[data-tab]'))b.classList.toggle('active',b.dataset.tab===tab);
+ $('catalogue-view').hidden=tab!=='catalogue';$('inventory-view').hidden=tab!=='inventory';
+ if(tab==='inventory')loadLedger().catch(A.error);
+ syncSheetActive();
+}
+async function openProductStatement(id){
+ $('ledger-product').value=id;showTab('inventory');
+ document.querySelector('[data-tab="inventory"]').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function exportProducts(){
+ const rows=productRows();
+ A.csv('Products',['ID','Product','Category','Unit','MRP INR','Wholesale INR','Stock','MOQ','Bulk Slabs','Active'],
+ rows.map(p=>[p.id,p.title,categoryName(p.category_id),p.unit,p.mrp_paise/100,p.price_paise/100,p.stock,p.min_qty,(p.bulk_rules||[]).map(t=>`${t.min_qty}+ @ ₹${t.price_paise/100}`).join(' | '),p.active]),
+ 'Current product catalogue; filters applied');
+}
+function exportLedger(){
+ A.csv('Inventory Statement',['Date IST','Product ID','Product','Type','Reference','Opening','Stock In','Stock Out','Closing','Staff / Source','Note'],
+ ledger.map(x=>[formatDate(x.occurred_at),x.product_id,x.product_title,movementLabel(x.movement_type),x.reference_id||'',x.stock_before,x.quantity_delta>0?x.quantity_delta:'',x.quantity_delta<0?Math.abs(x.quantity_delta):'',x.stock_after,x.actor_name||x.actor_role||'System',x.note||'']),
+ $('statement-sub').textContent);
+}
+function printLedger(){
+ const selected=products.find(p=>p.id===+$('ledger-product').value);
+ const rows=ledger.map(x=>`<tr><td>${esc(formatDate(x.occurred_at))}</td><td>${esc(x.product_title)}</td><td>${esc(movementLabel(x.movement_type))}</td><td>${esc(x.reference_id||'')}</td><td>${x.stock_before}</td><td>${x.quantity_delta>0?x.quantity_delta:''}</td><td>${x.quantity_delta<0?Math.abs(x.quantity_delta):''}</td><td>${x.stock_after}</td><td>${esc(x.note||'')}</td></tr>`).join('');
+ A.print(selected?`Inventory Statement · ${selected.title}`:'Inventory Statement · All Products',
+ `<p>${esc($('statement-sub').textContent)}</p><table><thead><tr><th>Date</th><th>Product</th><th>Type</th><th>Reference</th><th>Opening</th><th>In</th><th>Out</th><th>Closing</th><th>Narration</th></tr></thead><tbody>${rows}</tbody></table>`);
+}
+
+async function categoryManager(){
+ A.modal('Categories',A.table(['Name','Status',''],categories.map(c=>[esc(c.name),A.badge(c.active?'active':'inactive'),`<button data-category-edit="${c.id}">Edit</button>`]))+'<button id="add-category" class="primary" style="margin-top:18px">Add category</button>');
+ const open=c=>A.form(c?'Edit category':'Add category',[['name','Name','text',[],true],['active','Active','checkbox']],c||{active:true},async v=>{await A.api('admin.category.put',{...v,...(c?{id:c.id,expected_version:c.version}:{})});await loadProducts();});
+ $('add-category').onclick=()=>open();
+ for(const b of document.querySelectorAll('[data-category-edit]'))b.onclick=()=>open(categories.find(c=>c.id===+b.dataset.categoryEdit));
+}
+
+for(const b of document.querySelectorAll('[data-tab]'))b.onclick=()=>showTab(b.dataset.tab);
+for(const id of ['product-search','product-category','stock-filter','product-sort'])$(id).addEventListener('input',renderCatalogue);
+
+$('sheet-view-top').onclick=$('sheet-view-toolbar').onclick=enterSheetView;
+$('sheet-exit').onclick=exitSheetView;$('sheet-catalogue').onclick=()=>showTab('catalogue');$('sheet-inventory').onclick=()=>showTab('inventory');
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sheetMode&&!productEditor.open&&!stockVoucher.open)exitSheetView()});
+if($('new-product'))$('new-product').onclick=()=>openEditor();
+if($('categories-btn'))$('categories-btn').onclick=()=>categoryManager().catch(A.error);
+for(const id of ['stock-in-top','stock-in-toolbar','ledger-stock-in'])if($(id))$(id).onclick=()=>openVoucher('in');
+for(const id of ['stock-out-top','stock-out-toolbar','ledger-stock-out'])if($(id))$(id).onclick=()=>openVoucher('out');
+$('open-ledger').onclick=()=>showTab('inventory');
+if($('product-export'))$('product-export').onclick=exportProducts;
+
+$('ledger-refresh').onclick=()=>loadLedger().catch(A.error);
+$('ledger-export').onclick=exportLedger;$('ledger-print').onclick=printLedger;
+for(const b of document.querySelectorAll('[data-period]'))b.onclick=()=>{
+ const today=new Date(Date.now()+19800000).toISOString().slice(0,10);
+ if(b.dataset.period==='all'){$('ledger-from').value='';$('ledger-to').value=''}
+ if(b.dataset.period==='today'){$('ledger-from').value=today;$('ledger-to').value=today}
+ if(b.dataset.period==='7'){const d=new Date(today+'T00:00:00Z');$('ledger-from').value=new Date(d-6*86400000).toISOString().slice(0,10);$('ledger-to').value=today}
+ if(b.dataset.period==='month'){$('ledger-from').value=today.slice(0,8)+'01';$('ledger-to').value=today}
+ loadLedger().catch(A.error);
+};
+
+await loadProducts();
+
+})().catch(e=>{
+ if(window.App)App.fail(e);
+ else document.body.textContent="Could not load ONeness. Serve all HTML files together over HTTP/HTTPS. "+e.message;
+});
 </script>
 </body>
 </html>
