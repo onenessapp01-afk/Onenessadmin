@@ -1,35 +1,716 @@
 <!doctype html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#173b32"><meta name="referrer" content="no-referrer"><title>ONeness · Products</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2718%27 fill=%27%2317634c%27/%3E%3Ctext x=%2713%27 y=%2748%27 font-size=%2747%27 fill=%27white%27%3EO%3C/text%3E%3C/svg%3E">
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#173b32">
+<meta name="referrer" content="no-referrer">
+<title>ONeness · Products & Inventory</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2718%27 fill=%27%2317634c%27/%3E%3Ctext x=%2713%27 y=%2748%27 font-size=%2747%27 fill=%27white%27%3EO%3C/text%3E%3C/svg%3E">
 <style>body{margin:0;background:#f4f6f2;font-family:system-ui}#boot{padding:30px;color:#426052}</style>
-</head><body>
-<div id="app"><p id="boot">Opening ONeness…</p></div>
+</head>
+<body>
+<div id="app"><p id="boot">Opening ONeness products & inventory…</p></div>
+
 <script>
 (async()=>{
-
 const response=await fetch(new URL('index.html',location.href),{cache:'no-cache'});
 if(!response.ok)throw Error('Keep index.html in the same folder as this page.');
 const shared=new DOMParser().parseFromString(await response.text(),'text/html');
 for(const id of ['oneness-config','oneness-theme']){
- const node=shared.getElementById(id);if(!node)throw Error('index.html is incomplete.');
- document.head.append(node.cloneNode(true));
+  const node=shared.getElementById(id);if(!node)throw Error('index.html is incomplete.');
+  document.head.append(node.cloneNode(true));
 }
-const source=shared.getElementById('oneness-core');if(!source)throw Error('index.html is incomplete.');
-const runtime=document.createElement('script');runtime.textContent=source.textContent;document.body.append(runtime);
-const A=await App.init('products',['products.view']),{$,esc,money}=A;
-const manage=A.can('catalog');let products=[],categories=[];
-$('view').innerHTML=A.header('Product catalogue','Manage wholesale prices, stock, categories and quantity offers.',manage?'<button id="categories">Categories</button><button class="primary" id="new-product">+ Add product</button>':'')+`<div class="filters"><label>Search<input id="search" placeholder="Product name"></label><label>Category<select id="category"><option value="">All categories</option></select></label><label>Availability<select id="availability"><option value="">All products</option><option value="stock">In stock</option><option value="out">Out of stock</option>${manage?'<option value="inactive">Inactive</option>':''}</select></label><label>Sort<select id="sort"><option value="new">Newest</option><option value="price">Wholesale price ↑</option><option value="name">Name A–Z</option></select></label><button id="export">Export CSV</button></div><p class="muted" id="count">Loading products…</p><div class="products" id="products"></div>`;
-async function load(){products=await A.all('products.list',{},n=>$('count').textContent=`Loaded ${n} products…`);categories=await A.api('categories.list');$('category').innerHTML='<option value="">All categories</option>'+categories.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');render();}
-function filtered(){let rows=products.filter(p=>(p.title+' '+p.description).toLowerCase().includes($('search').value.toLowerCase())&&(!$('category').value||p.category_id===Number($('category').value)));const f=$('availability').value;if(f==='stock')rows=rows.filter(p=>p.active&&p.stock>0);if(f==='out')rows=rows.filter(p=>p.stock===0);if(f==='inactive')rows=rows.filter(p=>!p.active);return rows.sort($('sort').value==='price'?(a,b)=>a.price_paise-b.price_paise:$('sort').value==='name'?(a,b)=>a.title.localeCompare(b.title):(a,b)=>b.id-a.id);}
-function render(){const rows=filtered();$('count').textContent=`${rows.length} products · Prices shown per unit`;$('products').innerHTML=rows.map(p=>`<article class="product"><div class="photo">${p.images[0]?`<img loading="lazy" src="${esc(p.images[0])}" alt="${esc(p.title)}">`:'◇'}</div><div class="body"><div class="row between"><small>${esc(categories.find(c=>c.id===p.category_id)?.name||'')}</small>${A.badge(p.active?'active':'inactive')}</div><h3 style="margin:9px 0 3px">${esc(p.title)}</h3><small>${p.stock} ${esc(p.unit)} available · Min ${p.min_qty}</small><div class="price">${money(p.price_paise)}<del>${money(p.mrp_paise)}</del></div><div class="bulk">${p.bulk_rules.map(t=>`${t.min_qty}+ at ${money(t.price_paise)}`).join(' · ')||'Standard wholesale price'}</div><div class="row"><button class="small" data-detail="${p.id}">Details</button>${manage?`<button class="small primary" data-edit="${p.id}">Edit</button>`:''}</div></div></article>`).join('')||'<div class="card empty">No products match your filters.</div>';for(const b of document.querySelectorAll('[data-edit]'))b.onclick=()=>edit(products.find(p=>p.id===+b.dataset.edit));for(const b of document.querySelectorAll('[data-detail]'))b.onclick=()=>detail(products.find(p=>p.id===+b.dataset.detail));}
-function detail(p){A.modal(p.title,`<p>${esc(p.description)}</p><p>MRP ${money(p.mrp_paise)} · Wholesale ${money(p.price_paise)} / ${esc(p.unit)}</p><p>Minimum ${p.min_qty}, increments of ${p.qty_step}. Available: ${p.stock}.</p>${A.table(['Minimum quantity','Price'],p.bulk_rules.map(t=>[t.min_qty,money(t.price_paise)]))}${A.can('audit')?'<button id="product-log" style="margin-top:20px">Activity log</button>':''}`);if($('product-log'))$('product-log').onclick=()=>A.logs('product',p.id).catch(A.error);}
-function edit(p){if(!categories.length){A.toast('Create a category first.');return;}const values=p?{...p,mrp:p.mrp_paise/100,price:p.price_paise/100,images:p.images.join('\n'),tiers:p.bulk_rules.map(t=>`${t.min_qty}:${t.price_paise/100}`).join('\n')}:{category_id:categories[0].id,unit:'piece',min_qty:1,qty_step:1,stock:0,active:true};A.form(p?'Edit product':'New product',[
- ['title','Product name','text',[],true],['category_id','Category','select',categories.map(c=>[c.id,c.name])],['description','Description','textarea'],['unit','Unit','text',[],true],['mrp','MRP (₹)','number',[],true],['price','Wholesale price (₹)','number',[],true],['stock','Stock','number',[],true],['min_qty','Minimum quantity','number',[],true],['qty_step','Quantity increment','number',[],true],['tiers','Bulk tiers: minimum quantity:price in ₹, one per line','textarea'],['images','Image URLs, one per line','textarea'],['upload','Upload images, max 2 MiB each','file'],['active','Available for ordering','checkbox'],['reason','Reason for change','text',[],!!p]
- ],values,async(v,f)=>{const urls=v.images.split(/\s+/).filter(Boolean);f.uploadedFiles=f.uploadedFiles||new Set();for(const file of f.elements.upload.files){if(f.uploadedFiles.has(file))continue;if(file.size>2*1024*1024)throw Error('Each image must be 2 MiB or smaller.');const base64=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result).split(',')[1]);r.onerror=reject;r.readAsDataURL(file);});const image=await A.api('image.upload',{base64});urls.push(image.url);f.uploadedFiles.add(file);f.elements.images.value=urls.join('\n');}f.elements.upload.value='';if(urls.length>6)throw Error('Use at most six images.');const tiers=v.tiers.trim()?v.tiers.trim().split(/\n/).map(line=>{const[q,price]=line.split(':');if(!q||!price)throw Error('Use bulk tier format 10:110.');return{min_qty:Number(q),price_paise:A.paise(price)};}):[];await A.api('admin.product.put',{...(p?{id:p.id,expected_version:p.version}:{}),title:v.title,description:v.description,category_id:+v.category_id,unit:v.unit,mrp_paise:A.paise(v.mrp),price_paise:A.paise(v.price),stock:+v.stock,min_qty:+v.min_qty,qty_step:+v.qty_step,bulk_rules:tiers,images:urls,active:v.active,reason:v.reason});await load();});}
-async function categoryManager(){A.modal('Categories',A.table(['Name','Status',''],categories.map(c=>[esc(c.name),A.badge(c.active?'active':'inactive'),`<button data-category-edit="${c.id}">Edit</button>`]))+'<button id="add-category" class="primary" style="margin-top:18px">Add category</button>');const open=c=>A.form(c?'Edit category':'Add category',[['name','Name','text',[],true],['active','Active','checkbox']],c||{active:true},async v=>{await A.api('admin.category.put',{...v,...(c?{id:c.id,expected_version:c.version}:{})});await load();});$('add-category').onclick=()=>open();for(const b of document.querySelectorAll('[data-category-edit]'))b.onclick=()=>open(categories.find(c=>c.id===+b.dataset.categoryEdit));}
-for(const id of ['search','category','availability','sort'])$(id).addEventListener('input',render);
-$('export').onclick=()=>A.csv('Products',['ID','Product','Category','MRP INR','Wholesale INR','Stock','Unit','Active'],filtered().map(p=>[p.id,p.title,categories.find(c=>c.id===p.category_id)?.name,p.mrp_paise/100,p.price_paise/100,p.stock,p.unit,p.active]),'Current catalogue; active filters applied');
-if(manage){$('new-product').onclick=()=>edit();$('categories').onclick=categoryManager;}await load();
+const source=shared.getElementById('oneness-core');
+if(!source)throw Error('index.html is incomplete.');
+const runtime=document.createElement('script');
+runtime.textContent=source.textContent;
+document.body.append(runtime);
 
-})().catch(e=>{if(window.App)App.fail(e);else{document.body.textContent="Could not load ONeness. Serve all HTML files together over HTTP/HTTPS. "+e.message;}});
+const css=document.createElement('style');
+css.textContent=`
+.erp-tabs{display:flex;gap:7px;margin-bottom:18px;overflow:auto}.erp-tab{white-space:nowrap}.erp-tab.active{background:#173b32;color:#fff;border-color:#173b32}
+.erp-kpis{display:grid;grid-template-columns:repeat(6,minmax(135px,1fr));gap:10px;margin-bottom:18px;overflow:auto}
+.erp-kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px;min-width:135px}.erp-kpi span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.55px;color:var(--muted)}.erp-kpi strong{display:block;font-size:22px;margin-top:5px;letter-spacing:-.6px}.erp-kpi small{display:block;margin-top:3px;font-size:10px}.erp-kpi.accent{background:#e7f0df}.erp-kpi.warn{background:#fff1df}.erp-kpi.bad{background:#fff0ed}
+.erp-toolbar{background:#fff;border:1px solid var(--line);border-radius:15px;padding:13px;margin-bottom:14px}.erp-filter-grid{display:grid;grid-template-columns:minmax(220px,1.4fr) repeat(3,minmax(130px,.7fr)) auto;gap:9px;align-items:end}.erp-filter-grid label{margin:0}.erp-filter-grid input,.erp-filter-grid select{min-height:40px;font-size:14px}
+.toolbar-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.stock-in{background:#e5f2e7!important;color:#17634c!important;border-color:#bcd6c2!important}.stock-out{background:#fff0ed!important;color:#a33824!important;border-color:#ecc8c0!important}
+.erp-table-wrap{overflow:auto;background:#fff;border:1px solid var(--line);border-radius:15px}.erp-table{width:100%;border-collapse:collapse;white-space:nowrap}.erp-table th{position:sticky;top:0;background:#fafbf8;z-index:2;font-size:10px;text-transform:uppercase;letter-spacing:.65px;color:var(--muted)}.erp-table td,.erp-table th{padding:11px 12px;border-bottom:1px solid #edf0eb;vertical-align:middle}.erp-table tr:hover td{background:#fbfcf9}
+.product-cell{display:grid;grid-template-columns:44px minmax(150px,1fr);gap:9px;align-items:center}.product-thumb{width:44px;height:44px;border-radius:9px;object-fit:contain;background:#f0f3ee}.product-placeholder{width:44px;height:44px;border-radius:9px;background:#eef1eb;display:grid;place-items:center;color:#91a097}.product-title{display:block;font-weight:750}.product-desc{display:block;color:var(--muted);font-size:11px;max-width:260px;overflow:hidden;text-overflow:ellipsis}
+.stock-number{font-size:16px;font-weight:800}.stock-number.low{color:#a4681d}.stock-number.out{color:#a33824}.stock-unit{display:block;color:var(--muted);font-size:10px}.slab-chip{display:inline-flex;margin:2px;padding:4px 6px;border-radius:999px;background:#eef4ec;color:#32614d;font-size:10px}
+.erp-actions{display:flex;gap:5px}.erp-actions button{font-size:11px;min-height:32px;padding:5px 8px}
+.mobile-products{display:none;gap:9px}.mobile-product{background:#fff;border:1px solid var(--line);border-radius:15px;padding:12px}.mobile-product-head{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:9px}.mobile-product .product-thumb,.mobile-product .product-placeholder{width:52px;height:52px}.mobile-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0}.mobile-metric{background:#f7f9f6;border-radius:9px;padding:8px}.mobile-metric span{display:block;font-size:9px;color:var(--muted)}.mobile-metric strong{font-size:12px}
+
+.inventory-layout{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:13px;align-items:start}.inventory-side{position:sticky;top:18px}.inventory-summary{display:grid;gap:8px}.summary-card{background:#fff;border:1px solid var(--line);border-radius:13px;padding:12px}.summary-card span{font-size:10px;color:var(--muted)}.summary-card strong{display:block;font-size:20px;margin-top:3px}.summary-card.in strong{color:#17634c}.summary-card.out strong{color:#a33824}
+.movement-in{color:#17634c;font-weight:800}.movement-out{color:#a33824;font-weight:800}.movement-type{display:inline-flex;padding:4px 6px;border-radius:999px;background:#f0f3ef;font-size:10px;text-transform:capitalize}.movement-ref{font-size:11px;color:#51675b}.movement-note{white-space:normal;max-width:260px;font-size:11px;color:#5f6d66}
+.ledger-empty{padding:40px 18px;text-align:center;color:var(--muted)}
+
+.editor-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.editor-section{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}.editor-section.full{grid-column:1/-1}.editor-section h3{margin:0 0 12px}.editor-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}.editor-fields .full{grid-column:1/-1}.read-stock{padding:11px;border-radius:10px;background:#f4f7f3}.read-stock span{display:block;font-size:10px;color:var(--muted)}.read-stock strong{display:block;font-size:20px;margin-top:3px}
+.slab-list{display:grid;gap:10px}.slab-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:9px;align-items:end;padding:12px;border:1px solid #e2e8e3;border-radius:13px;background:#f8faf7}.slab-row label{margin:0}.slab-top{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:8px}.slab-number{font-size:11px;font-weight:850;color:#173b32}.slab-math{grid-column:1/-1;font-size:10px;color:#607069;padding:7px 9px;border-radius:9px;background:#eef4ec}.remove-slab{min-height:40px;color:#a33824}.add-slab{margin-top:9px}
+.image-drop{display:flex;align-items:center;justify-content:center;min-height:96px;border:1.5px dashed #b9c7bf;border-radius:13px;background:#f8faf7;text-align:center;padding:14px;cursor:pointer}.image-drop:hover{border-color:#17634c;background:#f2f7f3}.image-drop b{display:block;color:#173b32}.image-drop span{display:block;color:#6b796f;font-size:11px;margin-top:3px}.image-preview{display:grid;grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:9px;margin-top:10px}.image-card{position:relative;border:1px solid #e0e6e1;border-radius:12px;background:#fff;overflow:hidden}.image-card img{width:100%;height:118px;object-fit:contain;background:#f5f7f4}.image-card-info{padding:7px 8px;border-top:1px solid #edf0ec}.image-card-info small{display:block;color:#6d7a73;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.image-card-actions{display:flex;gap:5px;margin-top:6px}.image-card-actions button{min-height:28px;padding:4px 7px;font-size:10px;flex:1}.primary-image{position:absolute;top:7px;left:7px;padding:4px 6px;border-radius:999px;background:#173b32;color:#fff;font-size:9px;font-weight:800}.image-status{position:absolute;top:7px;right:7px;padding:4px 6px;border-radius:999px;background:#fff8e8;color:#8a5b19;font-size:9px;font-weight:800}.image-status.saved{background:#e7f3e8;color:#397149}.image-status.error{background:#fff0ed;color:#a33824}.image-empty{grid-column:1/-1;padding:18px;border-radius:12px;background:#f7f9f6;color:#6d7a73;text-align:center;font-size:11px}
+
+#productEditor,#stockVoucher{width:min(920px,95vw);max-height:92vh;padding:0;border:0;border-radius:18px;box-shadow:0 30px 100px #10241940;color:var(--ink)}#productEditor::backdrop,#stockVoucher::backdrop{background:#10291e9c}.modal-head-sticky{position:sticky;top:0;z-index:4;background:#fff;border-bottom:1px solid var(--line);padding:15px 18px;display:flex;justify-content:space-between;gap:10px}.modal-body-pad{padding:16px 18px 22px}.modal-footer{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);padding:12px 18px;display:flex;justify-content:flex-end;gap:8px}
+.voucher-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.voucher-grid .full{grid-column:1/-1}.stock-preview{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;text-align:center;padding:12px;border-radius:12px;background:#f5f8f4}.stock-preview div{padding:8px}.stock-preview span{display:block;font-size:10px;color:var(--muted)}.stock-preview strong{display:block;font-size:21px;margin-top:3px}.stock-arrow{font-size:20px;color:#84938b}
+.quick-date{display:flex;gap:6px;overflow:auto;margin-top:9px}.quick-date button{white-space:nowrap;min-height:32px;padding:5px 9px;font-size:11px}
+.statement-title{font-weight:800;margin-bottom:2px}.statement-sub{font-size:11px;color:var(--muted)}
+
+
+.sheet-bar{position:fixed;inset:0 0 auto 0;height:52px;z-index:3002;background:#173b32;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 14px;box-shadow:0 2px 12px #10241926}.sheet-bar strong{font-size:14px}.sheet-bar small{color:#cce0d6;margin-left:7px}.sheet-bar .row{gap:6px}.sheet-bar button{min-height:34px;padding:5px 9px;border-color:#ffffff2c;background:#ffffff12;color:#fff}.sheet-bar button.active{background:#fff;color:#173b32}
+body.erp-sheet-mode{overflow:hidden}.sheet-active{position:fixed!important;z-index:3001!important;top:52px;left:0;right:0;bottom:0;background:#f4f6f2;padding:10px 12px 12px;overflow:auto}.sheet-active #catalogue-kpis{display:none}.sheet-active .erp-toolbar{position:sticky;top:0;z-index:12;margin-bottom:8px;padding:8px;border-radius:10px}.sheet-active #product-count{margin:6px 2px}.sheet-active .erp-table-wrap{height:calc(100vh - 200px);overflow-y:auto;overflow-x:hidden;border-radius:10px}.sheet-active .erp-table{table-layout:fixed;white-space:normal;font-size:11px}.sheet-active .erp-table th,.sheet-active .erp-table td{padding:7px 8px}.sheet-active .erp-table th:nth-child(1){width:5%}.sheet-active .erp-table th:nth-child(2){width:20%}.sheet-active .erp-table th:nth-child(3){width:10%}.sheet-active .erp-table th:nth-child(4){width:12%}.sheet-active .erp-table th:nth-child(5){width:8%}.sheet-active .erp-table th:nth-child(6){width:6%}.sheet-active .erp-table th:nth-child(7){width:18%}.sheet-active .erp-table th:nth-child(8){width:8%}.sheet-active .erp-table th:nth-child(9){width:13%}.sheet-active .product-desc{max-width:100%}.sheet-active .erp-actions{flex-wrap:wrap}.sheet-active .erp-actions button{min-height:28px;padding:4px 6px;font-size:10px}.sheet-active .slab-chip{font-size:9px;padding:3px 5px}.sheet-active#inventory-view .erp-table-wrap{height:calc(100vh - 235px)}.sheet-active#inventory-view .inventory-side{display:none}.sheet-active#inventory-view .inventory-layout{grid-template-columns:1fr}.sheet-active#inventory-view .erp-filter-grid{grid-template-columns:minmax(220px,1.5fr) repeat(4,minmax(120px,.7fr))}
+
+@media(max-width:1150px){.erp-kpis{grid-template-columns:repeat(6,135px)}.erp-filter-grid{grid-template-columns:repeat(3,1fr)}.erp-filter-grid .wide{grid-column:span 2}.inventory-layout{grid-template-columns:1fr}.inventory-side{position:static}.inventory-summary{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:760px){.desktop-products{display:none}.mobile-products{display:grid}.erp-filter-grid{grid-template-columns:1fr 1fr}.erp-filter-grid .wide{grid-column:1/-1}.editor-grid,.editor-fields,.voucher-grid{grid-template-columns:1fr}.editor-section.full,.editor-fields .full,.voucher-grid .full{grid-column:auto}.inventory-summary{grid-template-columns:1fr 1fr}.slab-row{grid-template-columns:1fr 1fr}.slab-top,.slab-math{grid-column:1/-1}.remove-slab{grid-column:1/-1}.erp-kpi strong{font-size:19px}}
+@media(max-width:480px){.erp-filter-grid{grid-template-columns:1fr}.erp-filter-grid .wide{grid-column:auto}.mobile-metrics{grid-template-columns:1fr 1fr}.inventory-summary{grid-template-columns:1fr 1fr}}
+`;
+document.head.append(css);
+
+const A=await App.init('products',['products.view']);
+const {$,esc,money}=A;
+
+const isOwner=A.profile?.role==='owner';
+const canCreate=isOwner||A.can('products.create');
+const canEdit=isOwner||A.can('products.edit');
+const canPrice=isOwner||A.can('products.price');
+const canStock=isOwner||A.can('products.stock');
+const canDeactivate=isOwner||A.can('products.deactivate');
+const canExport=isOwner||A.can('products.export');
+const canCategories=isOwner||A.can('products.edit');
+
+let products=[],categories=[],ledger=[],tab='catalogue',editing=null,voucherDirection='in',editorImages=[],sheetMode=false;
+
+$('view').innerHTML=A.header(
+  'Products & Inventory',
+  'Catalogue, pricing, stock control and inventory statements in one ERP-style workspace.',
+  `<div class="row">
+    ${canCategories?'<button id="categories-btn">Categories</button>':''}
+    ${canStock?'<button id="stock-in-top" class="stock-in">+ Stock In</button><button id="stock-out-top" class="stock-out">− Stock Out</button>':''}
+    <button id="sheet-view-top">⛶ Sheet View</button>${canCreate?'<button id="new-product" class="primary">+ Add product</button>':''}
+  </div>`
+)+`
+<div id="erp-sheet-bar" class="sheet-bar" hidden><div><strong>ONeness Products</strong><small id="sheet-context">Catalogue sheet</small></div><div class="row"><button id="sheet-catalogue">Catalogue</button><button id="sheet-inventory">Inventory</button><button id="sheet-exit">Exit Sheet View</button></div></div>
+<nav class="erp-tabs">
+ <button class="erp-tab active" data-tab="catalogue">Product Catalogue</button>
+ <button class="erp-tab" data-tab="inventory">Inventory Ledger</button>
+</nav>
+
+<section id="catalogue-view">
+ <div id="catalogue-kpis" class="erp-kpis"></div>
+ <div class="erp-toolbar">
+   <div class="erp-filter-grid">
+    <label class="wide">Search products<input id="product-search" placeholder="Product name, description or ID"></label>
+    <label>Category<select id="product-category"><option value="">All categories</option></select></label>
+    <label>Stock status<select id="stock-filter"><option value="">All products</option><option value="in">In stock</option><option value="low">Low stock (≤10)</option><option value="out">Out of stock</option><option value="inactive">Inactive</option></select></label>
+    <label>Sort<select id="product-sort"><option value="new">Newest first</option><option value="name">Name A–Z</option><option value="stock-low">Stock low → high</option><option value="stock-high">Stock high → low</option><option value="price">Wholesale price ↑</option></select></label>
+    ${canExport?'<button id="product-export">Export Products</button>':''}
+   </div>
+   <div class="toolbar-actions">
+     ${canStock?'<button id="stock-in-toolbar" class="stock-in">+ Purchase / Stock In</button><button id="stock-out-toolbar" class="stock-out">− Damage / Stock Out</button>':''}
+     <button id="open-ledger">Inventory Statement</button><button id="sheet-view-toolbar">⛶ Sheet View</button>
+   </div>
+ </div>
+ <p id="product-count" class="muted">Loading products…</p>
+
+ <div class="desktop-products">
+   <div class="erp-table-wrap">
+    <table class="erp-table">
+     <thead><tr><th>ID</th><th>Product</th><th>Category</th><th>Wholesale / MRP</th><th>Stock</th><th>MOQ</th><th>Bulk price slabs</th><th>Status</th><th>Actions</th></tr></thead>
+     <tbody id="product-body"></tbody>
+    </table>
+   </div>
+ </div>
+ <div id="mobile-products" class="mobile-products"></div>
+</section>
+
+<section id="inventory-view" hidden>
+ <div class="erp-toolbar">
+  <div class="erp-filter-grid">
+   <label class="wide">Search statement<input id="ledger-search" placeholder="Product, reference or note"></label>
+   <label>Product<select id="ledger-product"><option value="">All products</option></select></label>
+   <label>Movement<select id="ledger-type"><option value="">All movements</option><option value="opening">Opening balance</option><option value="purchase">Purchase / Stock In</option><option value="return_in">Return In</option><option value="adjustment_in">Adjustment In</option><option value="adjustment_out">Adjustment Out</option><option value="damage">Damage / Loss</option><option value="correction">Correction</option><option value="order_reserved">Order Reserved</option><option value="order_cancelled">Order Cancelled / Restored</option><option value="product_edit">Legacy product edit</option></select></label>
+   <label>From<input id="ledger-from" type="date"></label>
+   <label>Through<input id="ledger-to" type="date"></label>
+  </div>
+  <div class="quick-date">
+    <button data-period="today">Today</button><button data-period="7">Last 7 days</button><button data-period="month">This month</button><button data-period="all">All dates</button>
+  </div>
+  <div class="toolbar-actions">
+    <button id="ledger-refresh" class="primary">Run Statement</button>
+    ${canStock?'<button id="ledger-stock-in" class="stock-in">+ Stock In</button><button id="ledger-stock-out" class="stock-out">− Stock Out</button>':''}
+    <button id="ledger-export">Export Statement</button><button id="ledger-print">Print Statement</button>
+  </div>
+ </div>
+
+ <div class="inventory-layout">
+  <div>
+   <div class="row between" style="margin-bottom:9px"><div><div id="statement-title" class="statement-title">Inventory Statement · All Products</div><div id="statement-sub" class="statement-sub">All recorded movements</div></div><span id="ledger-count" class="muted"></span></div>
+   <div class="erp-table-wrap">
+    <table class="erp-table">
+     <thead><tr><th>Date</th><th>Product</th><th>Type</th><th>Reference</th><th>Opening</th><th>In</th><th>Out</th><th>Closing</th><th>Staff / Source</th><th>Note</th></tr></thead>
+     <tbody id="ledger-body"></tbody>
+    </table>
+    <div id="ledger-empty" class="ledger-empty" hidden>No inventory movements match this statement.</div>
+   </div>
+  </div>
+
+  <aside class="inventory-side">
+   <div class="inventory-summary">
+    <div class="summary-card"><span>Transactions</span><strong id="sum-transactions">0</strong></div>
+    <div class="summary-card in"><span>Stock In</span><strong id="sum-in">0</strong></div>
+    <div class="summary-card out"><span>Stock Out</span><strong id="sum-out">0</strong></div>
+    <div class="summary-card"><span>Net movement</span><strong id="sum-net">0</strong></div>
+    <div id="period-opening-card" class="summary-card" hidden><span>Opening balance</span><strong id="sum-opening">0</strong></div>
+    <div id="period-closing-card" class="summary-card accent" hidden><span>Closing balance</span><strong id="sum-closing">0</strong></div>
+   </div>
+   <p class="muted" style="font-size:11px;margin-top:10px">Opening balances mark the point inventory tracking was enabled. Earlier historical stock movements are not reconstructed.</p>
+  </aside>
+ </div>
+</section>
+
+<dialog id="productEditor">
+ <div class="modal-head-sticky"><div><h2 id="editor-title" style="margin:0">Product</h2><small id="editor-subtitle"></small></div><button id="editor-close">×</button></div>
+ <form id="product-form">
+  <div class="modal-body-pad">
+   <div class="editor-grid">
+    <section class="editor-section">
+     <h3>Product details</h3>
+     <div class="editor-fields">
+      <label class="full">Product name<input id="ed-title" required maxlength="180"></label>
+      <label>Category<select id="ed-category" required></select></label>
+      <label>Unit<input id="ed-unit" required maxlength="30" placeholder="piece"></label>
+      <label class="full">Description<textarea id="ed-description" maxlength="2000"></textarea></label>
+     </div>
+    </section>
+
+    <section class="editor-section">
+     <h3>Pricing & order quantity</h3>
+     <div class="editor-fields">
+      <label>MRP (₹)<input id="ed-mrp" type="number" min="0" step="0.01" required ${canPrice?'':'disabled'}></label>
+      <label>Wholesale price (₹)<input id="ed-price" type="number" min="0" step="0.01" required ${canPrice?'':'disabled'}></label>
+      <label>Minimum quantity<input id="ed-min" type="number" min="1" step="1" required></label>
+      <div class="full read-stock"><span id="stock-caption">Stock</span><strong id="ed-stock-display">0</strong><small id="stock-help">Existing stock is changed only through Inventory Vouchers.</small></div>
+      <label id="opening-stock-wrap" class="full">Opening stock<input id="ed-opening-stock" type="number" min="0" step="1" value="0"></label>
+     </div>
+    </section>
+
+    <section class="editor-section full">
+     <div class="row between"><div><h3 style="margin-bottom:3px">Bulk pricing slabs</h3><small>Each slab is a separate rule. No more typing formats such as 30:50.</small></div><button type="button" id="add-slab">+ Add slab</button></div>
+     <div id="slab-list" class="slab-list" style="margin-top:11px"></div>
+    </section>
+
+    <section class="editor-section full">
+     <div class="row between"><div><h3 style="margin-bottom:3px">Product images</h3><small>Up to 6 images. The first image is used as the primary catalogue image.</small></div><span id="image-count" class="muted">0 / 6</span></div>
+     <label class="image-drop" for="ed-upload"><div><b>+ Add product images</b><span>JPG, PNG or WebP · large images are optimized before upload</span></div></label>
+     <input id="ed-upload" type="file" accept="image/png,image/jpeg,image/webp" multiple hidden>
+     <div id="image-preview" class="image-preview"></div>
+    </section>
+
+    <section class="editor-section full">
+     <h3>Availability & audit</h3>
+     <label><input id="ed-active" type="checkbox" style="width:auto;min-height:auto" ${canDeactivate?'':'disabled'}> Available for ordering</label>
+     <label id="reason-wrap">Reason for change<input id="ed-reason" maxlength="500" placeholder="Example: price revision / catalogue correction"></label>
+    </section>
+   </div>
+   <p id="editor-error" class="notice error" hidden></p>
+  </div>
+  <div class="modal-footer"><button type="button" id="editor-cancel">Cancel</button><button class="primary" id="editor-save" type="submit">Save product</button></div>
+ </form>
+</dialog>
+
+<dialog id="stockVoucher">
+ <div class="modal-head-sticky"><div><h2 id="voucher-title" style="margin:0">Stock In</h2><small>Inventory voucher · every change is recorded in the ledger</small></div><button id="voucher-close">×</button></div>
+ <form id="voucher-form">
+  <div class="modal-body-pad">
+   <div class="voucher-grid">
+    <label class="full">Find product<input id="voucher-search" placeholder="Search product name or ID"></label>
+    <label class="full">Product<select id="voucher-product" required></select></label>
+    <label>Movement type<select id="voucher-type" required></select></label>
+    <label>Quantity<input id="voucher-qty" type="number" min="1" step="1" required value="1"></label>
+    <label>Transaction date & time<input id="voucher-date" type="datetime-local"></label>
+    <label>Reference / Invoice No.<input id="voucher-reference" maxlength="120" placeholder="PO-125 / INV-44 / optional"></label>
+    <label class="full">Narration / Note<textarea id="voucher-note" maxlength="1000" placeholder="Supplier receipt, damage reason, physical count correction, etc."></textarea></label>
+    <div class="full stock-preview">
+      <div><span>Current stock</span><strong id="voucher-current">0</strong></div>
+      <div class="stock-arrow">→</div>
+      <div><span>Closing stock</span><strong id="voucher-closing">0</strong></div>
+    </div>
+   </div>
+   <p id="voucher-error" class="notice error" hidden></p>
+  </div>
+  <div class="modal-footer"><button type="button" id="voucher-cancel">Cancel</button><button id="voucher-save" class="primary" type="submit">Post Inventory Voucher</button></div>
+ </form>
+</dialog>
+`;
+
+const productEditor=$('productEditor'),stockVoucher=$('stockVoucher');
+
+function categoryName(id){return categories.find(c=>+c.id===+id)?.name||'Uncategorised'}
+function movementLabel(t){return ({opening:'Opening Balance',purchase:'Purchase / Stock In',return_in:'Return In',adjustment_in:'Adjustment In',adjustment_out:'Adjustment Out',damage:'Damage / Loss',correction:'Correction',order_reserved:'Order Reserved',order_cancelled:'Order Cancelled / Restored',product_edit:'Product Edit'})[t]||String(t||'—').replaceAll('_',' ')}
+function formatDate(v){return v?new Date(v).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',dateStyle:'medium',timeStyle:'short'}):'—'}
+function rupeeInput(p){return Number(p||0)/100}
+function thumb(p){return p.images?.[0]?`<img class="product-thumb" loading="lazy" src="${esc(p.images[0])}" alt="">`:'<div class="product-placeholder">◇</div>'}
+async function uploadProductImage(base64,name){
+ const {data,error}=await A.client.functions.invoke('product-image-upload',{body:{base64,name}});
+ if(error){
+   let message=error.message||'Image upload failed.';
+   try{const body=await error.context?.json?.();message=body?.error?.message||message}catch{}
+   throw Error(message);
+ }
+ if(data?.ok!==true||!data?.data?.url)throw Error(data?.error?.message||'Image upload was not confirmed.');
+ return data.data;
+}
+async function inventoryAdjust(data){
+ const {data:result,error}=await A.client.rpc('admin_inventory_adjust',{p_data:data});
+ if(error)throw error;return result;
+}
+async function inventoryAll(data){
+ const list=[];let before=null;
+ for(let i=0;i<100;i++){
+   const payload={...data,limit:250,...(before?{before_id:before}:{})};
+   const {data:result,error}=await A.client.rpc('admin_inventory_statement',{p_data:payload});
+   if(error)throw error;
+   const batch=Array.isArray(result?.items)?result.items:[];list.push(...batch);
+   const next=result?.next_before_id;if(!next||!batch.length)break;before=next;
+ }
+ return list;
+}
+
+async function loadProducts(){
+ products=await A.all('products.list',{},n=>$('product-count').textContent=`Loaded ${n} products…`);
+ categories=await A.api('categories.list');
+ const opts='<option value="">All categories</option>'+categories.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+ $('product-category').innerHTML=opts;
+ $('ledger-product').innerHTML='<option value="">All products</option>'+products.slice().sort((a,b)=>a.title.localeCompare(b.title)).map(p=>`<option value="${p.id}">#${p.id} · ${esc(p.title)}</option>`).join('');
+ renderCatalogue();
+}
+
+function productRows(){
+ let rows=[...products];
+ const q=$('product-search').value.trim().toLowerCase();
+ if(q)rows=rows.filter(p=>`${p.id} ${p.title} ${p.description||''}`.toLowerCase().includes(q));
+ if($('product-category').value)rows=rows.filter(p=>+p.category_id===+$('product-category').value);
+ const f=$('stock-filter').value;
+ if(f==='in')rows=rows.filter(p=>p.active&&p.stock>0);
+ if(f==='low')rows=rows.filter(p=>p.active&&p.stock>0&&p.stock<=10);
+ if(f==='out')rows=rows.filter(p=>p.stock===0);
+ if(f==='inactive')rows=rows.filter(p=>!p.active);
+ const s=$('product-sort').value;
+ if(s==='name')rows.sort((a,b)=>a.title.localeCompare(b.title));
+ else if(s==='stock-low')rows.sort((a,b)=>a.stock-b.stock);
+ else if(s==='stock-high')rows.sort((a,b)=>b.stock-a.stock);
+ else if(s==='price')rows.sort((a,b)=>a.price_paise-b.price_paise);
+ else rows.sort((a,b)=>b.id-a.id);
+ return rows;
+}
+
+function renderCatalogue(){
+ const rows=productRows();
+ const totalUnits=products.reduce((a,p)=>a+Number(p.stock||0),0);
+ const low=products.filter(p=>p.active&&p.stock>0&&p.stock<=10).length;
+ const out=products.filter(p=>p.stock===0).length;
+ const wholesaleValue=products.reduce((a,p)=>a+Number(p.stock||0)*Number(p.price_paise||0),0);
+ const mrpValue=products.reduce((a,p)=>a+Number(p.stock||0)*Number(p.mrp_paise||0),0);
+
+ $('catalogue-kpis').innerHTML=[
+  ['Total SKUs',products.length,'Catalogue products','accent'],
+  ['Active',products.filter(p=>p.active).length,'Available for ordering',''],
+  ['Units on hand',totalUnits,'Current physical stock',''],
+  ['Low stock',low,'10 units or less','warn'],
+  ['Out of stock',out,'Needs replenishment','bad'],
+  ['Stock value',money(wholesaleValue),`MRP value ${money(mrpValue)}`,'']
+ ].map(([l,v,h,c])=>`<article class="erp-kpi ${c}"><span>${l}</span><strong>${esc(v)}</strong><small>${esc(h)}</small></article>`).join('');
+
+ $('product-count').textContent=`${rows.length} matching products · ${totalUnits} total units on hand`;
+
+ $('product-body').innerHTML=rows.map(p=>`
+  <tr>
+   <td><b>#${p.id}</b></td>
+   <td><div class="product-cell">${thumb(p)}<div><span class="product-title">${esc(p.title)}</span><span class="product-desc">${esc(p.description||'')}</span></div></div></td>
+   <td>${esc(categoryName(p.category_id))}</td>
+   <td><b>${money(p.price_paise)}</b><span class="stock-unit">MRP ${money(p.mrp_paise)}</span></td>
+   <td><span class="stock-number ${p.stock===0?'out':p.stock<=10?'low':''}">${p.stock}</span><span class="stock-unit">${esc(p.unit)}</span></td>
+   <td><b>${p.min_qty}</b><span class="stock-unit">minimum</span></td>
+   <td>${(p.bulk_rules||[]).map(t=>`<span class="slab-chip">${t.min_qty}+ · ${money(t.price_paise)}</span>`).join('')||'<span class="muted">Standard price</span>'}</td>
+   <td>${A.badge(p.active?'active':'inactive')}</td>
+   <td><div class="erp-actions">
+    <button data-view="${p.id}">Details</button>
+    ${canStock?`<button data-stock="${p.id}" class="stock-in">Stock</button>`:''}
+    <button data-statement="${p.id}">Statement</button>
+    ${canEdit?`<button data-edit="${p.id}" class="primary">Edit</button>`:''}
+   </div></td>
+  </tr>`).join('');
+
+ $('mobile-products').innerHTML=rows.map(p=>`
+  <article class="mobile-product">
+   <div class="mobile-product-head">${thumb(p)}<div><b>${esc(p.title)}</b><span class="stock-unit">#${p.id} · ${esc(categoryName(p.category_id))}</span></div>${A.badge(p.active?'active':'inactive')}</div>
+   <div class="mobile-metrics">
+    <div class="mobile-metric"><span>Wholesale</span><strong>${money(p.price_paise)}</strong></div>
+    <div class="mobile-metric"><span>MRP</span><strong>${money(p.mrp_paise)}</strong></div>
+    <div class="mobile-metric"><span>Stock</span><strong>${p.stock} ${esc(p.unit)}</strong></div>
+   </div>
+   <div>${(p.bulk_rules||[]).map(t=>`<span class="slab-chip">${t.min_qty}+ · ${money(t.price_paise)}</span>`).join('')}</div>
+   <div class="toolbar-actions"><button data-view="${p.id}">Details</button>${canStock?`<button data-stock="${p.id}" class="stock-in">Stock</button>`:''}<button data-statement="${p.id}">Statement</button>${canEdit?`<button data-edit="${p.id}" class="primary">Edit</button>`:''}</div>
+  </article>`).join('')||'<div class="card empty">No products match your filters.</div>';
+
+ wireProductActions();
+}
+
+function wireProductActions(){
+ for(const b of document.querySelectorAll('[data-view]'))b.onclick=()=>showDetails(products.find(p=>p.id===+b.dataset.view));
+ for(const b of document.querySelectorAll('[data-edit]'))b.onclick=()=>openEditor(products.find(p=>p.id===+b.dataset.edit));
+ for(const b of document.querySelectorAll('[data-stock]'))b.onclick=()=>openVoucher('in',+b.dataset.stock);
+ for(const b of document.querySelectorAll('[data-statement]'))b.onclick=()=>openProductStatement(+b.dataset.statement);
+}
+
+function showDetails(p){
+ const slabs=(p.bulk_rules||[]).length?A.table(['Minimum Qty','Wholesale Price'],p.bulk_rules.map(t=>[`${t.min_qty} ${p.unit}`,money(t.price_paise)])):'<p class="muted">No bulk pricing slabs.</p>';
+ const gallery=(p.images||[]).length?`<div class="image-preview" style="margin-bottom:14px">${p.images.map((u,i)=>`<div class="image-card"><img src="${esc(u)}" alt="">${i===0?'<span class="primary-image">Primary</span>':''}</div>`).join('')}</div>`:'';
+ A.modal(p.title,`
+  ${gallery}<div class="detail-grid">
+   <div class="card"><small>Current stock</small><h2>${p.stock} ${esc(p.unit)}</h2></div>
+   <div class="card"><small>Wholesale / MRP</small><h2>${money(p.price_paise)} / ${money(p.mrp_paise)}</h2></div>
+  </div>
+  <p>${esc(p.description||'No description')}</p>
+  <p>Category: <b>${esc(categoryName(p.category_id))}</b> · MOQ ${p.min_qty}</p>
+  <h3>Bulk pricing</h3>${slabs}
+  <div class="row" style="margin-top:18px">
+    ${canStock?`<button id="detail-stock-in" class="stock-in">+ Stock In</button><button id="detail-stock-out" class="stock-out">− Stock Out</button>`:''}
+    <button id="detail-statement">Inventory Statement</button>
+    ${canEdit?'<button id="detail-edit" class="primary">Edit Product</button>':''}
+    ${A.can('audit')?'<button id="product-log">Activity Log</button>':''}
+  </div>`);
+ if($('detail-stock-in'))$('detail-stock-in').onclick=()=>openVoucher('in',p.id);
+ if($('detail-stock-out'))$('detail-stock-out').onclick=()=>openVoucher('out',p.id);
+ $('detail-statement').onclick=()=>openProductStatement(p.id);
+ if($('detail-edit'))$('detail-edit').onclick=()=>openEditor(p);
+ if($('product-log'))$('product-log').onclick=()=>A.logs('product',p.id).catch(A.error);
+}
+
+function renumberSlabs(){
+ [...document.querySelectorAll('.slab-row')].forEach((row,i)=>{
+   const n=row.querySelector('.slab-number');if(n)n.textContent=`Price Block ${i+1}`;
+   updateSlabMath(row);
+ });
+}
+function updateSlabMath(row){
+ const q=Number(row.querySelector('.slab-qty')?.value||0),price=Number(row.querySelector('.slab-price')?.value||0);
+ const math=row.querySelector('.slab-math');if(!math)return;
+ math.textContent=q&&price?`From ${q} units, retailer pays ₹${price.toLocaleString('en-IN',{maximumFractionDigits:2})} per unit.`:'Enter the minimum quantity and special wholesale price for this block.';
+}
+function addSlabRow(rule={min_qty:'',price_paise:null}){
+ const row=document.createElement('div');row.className='slab-row';
+ row.innerHTML=`<div class="slab-top"><span class="slab-number">Price Block</span><small class="muted">Quantity-based wholesale offer</small></div>
+ <label>Minimum quantity<input class="slab-qty" type="number" min="1" step="1" value="${esc(rule.min_qty??'')}" required></label>
+ <label>Wholesale price (₹)<input class="slab-price" type="number" min="0" step="0.01" value="${rule.price_paise==null?'':esc(rupeeInput(rule.price_paise))}" required></label>
+ <button type="button" class="remove-slab">Remove block</button>
+ <div class="slab-math"></div>`;
+ row.querySelector('.remove-slab').onclick=()=>{row.remove();renumberSlabs()};
+ for(const input of row.querySelectorAll('input'))input.addEventListener('input',()=>updateSlabMath(row));
+ $('slab-list').append(row);renumberSlabs();
+}
+
+function cleanupEditorImages(){
+ for(const img of editorImages){if(img.localUrl)URL.revokeObjectURL(img.localUrl)}
+ editorImages=[];
+}
+function renderEditorImages(){
+ $('image-count').textContent=`${editorImages.length} / 6`;
+ if(!editorImages.length){$('image-preview').innerHTML='<div class="image-empty">No product images yet. Add clear front/product-pack images for the catalogue.</div>';return}
+ $('image-preview').innerHTML=editorImages.map((img,i)=>`<div class="image-card">
+   <img src="${esc(img.preview||img.url||'')}" alt="Product image ${i+1}">
+   ${i===0?'<span class="primary-image">Primary</span>':''}
+   <span class="image-status ${img.status==='saved'?'saved':img.status==='error'?'error':''}">${img.status==='saved'?'Saved':img.status==='uploading'?'Uploading…':img.status==='error'?'Retry':'Ready'}</span>
+   <div class="image-card-info"><small>${esc(img.name||`Image ${i+1}`)}</small><div class="image-card-actions">${i>0?`<button type="button" data-img-primary="${i}">Make primary</button>`:'<button type="button" disabled>Primary image</button>'}<button type="button" data-img-remove="${i}">Remove</button></div></div>
+ </div>`).join('');
+ for(const b of document.querySelectorAll('[data-img-remove]'))b.onclick=()=>{const i=+b.dataset.imgRemove;const [old]=editorImages.splice(i,1);if(old?.localUrl)URL.revokeObjectURL(old.localUrl);renderEditorImages()};
+ for(const b of document.querySelectorAll('[data-img-primary]'))b.onclick=()=>{const i=+b.dataset.imgPrimary;const [picked]=editorImages.splice(i,1);editorImages.unshift(picked);renderEditorImages()};
+}
+function addSelectedImages(fileList){
+ const files=[...fileList];
+ if(editorImages.length+files.length>6){A.toast('Use at most six product images.');return}
+ for(const file of files){
+   if(!/^image\/(jpeg|png|webp)$/.test(file.type)){A.toast(`${file.name}: use JPG, PNG or WebP.`);continue}
+   if(file.size>8*1024*1024){A.toast(`${file.name}: choose an image smaller than 8 MB.`);continue}
+   const localUrl=URL.createObjectURL(file);
+   editorImages.push({file,localUrl,preview:localUrl,name:file.name,status:'pending',url:null});
+ }
+ renderEditorImages();
+}
+async function imageToBase64(file){
+ const local=URL.createObjectURL(file);
+ try{
+   const img=await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(Error('Could not read this image.'));im.src=local});
+   let w=img.naturalWidth,h=img.naturalHeight;
+   const max=1800,scale=Math.min(1,max/Math.max(w,h));w=Math.max(1,Math.round(w*scale));h=Math.max(1,Math.round(h*scale));
+   const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,w,h);
+   let data=canvas.toDataURL('image/webp',.86);
+   if(data.length>2_600_000){data=canvas.toDataURL('image/webp',.72)}
+   if(data.length>2_600_000){const smaller=document.createElement('canvas');const s=Math.min(1,1200/Math.max(w,h));smaller.width=Math.max(1,Math.round(w*s));smaller.height=Math.max(1,Math.round(h*s));smaller.getContext('2d').drawImage(canvas,0,0,smaller.width,smaller.height);data=smaller.toDataURL('image/webp',.72)}
+   const base64=String(data).split(',')[1];
+   if(!base64||base64.length>2_800_000)throw Error('This image is still too large after optimization. Choose a smaller image.');
+   return base64;
+ }finally{URL.revokeObjectURL(local)}
+}
+async function uploadEditorImages(){
+ for(let i=0;i<editorImages.length;i++){
+   const img=editorImages[i];if(img.url)continue;
+   img.status='uploading';renderEditorImages();
+   try{
+     const base64=await imageToBase64(img.file);
+     let uploaded=null,lastErr=null;
+     for(let attempt=0;attempt<2&&!uploaded;attempt++){
+       try{uploaded=await uploadProductImage(base64,img.name||'product-image')}catch(e){lastErr=e;if(attempt===0)await new Promise(r=>setTimeout(r,900))}
+     }
+     if(!uploaded?.url)throw lastErr||Error('Image upload was not confirmed.');
+     if(img.localUrl)URL.revokeObjectURL(img.localUrl);
+     img.url=uploaded.url;img.preview=uploaded.thumbnail||uploaded.url;img.localUrl=null;img.file=null;img.status='saved';renderEditorImages();
+   }catch(e){img.status='error';renderEditorImages();throw Error(`Image ${i+1} (${img.name||'product image'}): ${e?.message||'upload failed'}`)}
+ }
+ return editorImages.map(x=>x.url).filter(Boolean);
+}
+function openEditor(p=null){
+ if(!categories.length){A.toast('Create a category first.');return}
+ cleanupEditorImages();editing=p;
+ editorImages=(p?.images||[]).map((url,i)=>({url,preview:url,file:null,localUrl:null,name:`Saved image ${i+1}`,status:'saved'}));
+ $('editor-title').textContent=p?'Edit Product':'Add Product';
+ $('editor-subtitle').textContent=p?`#${p.id} · stock is maintained through Inventory Vouchers`:'Create catalogue item and opening stock';
+ $('ed-category').innerHTML=categories.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+ $('ed-title').value=p?.title||'';$('ed-category').value=p?.category_id||categories[0].id;$('ed-unit').value=p?.unit||'piece';$('ed-description').value=p?.description||'';
+ $('ed-mrp').value=rupeeInput(p?.mrp_paise||0);$('ed-price').value=rupeeInput(p?.price_paise||0);$('ed-min').value=p?.min_qty||1;
+ $('ed-stock-display').textContent=p?`${p.stock} ${p.unit}`:'Opening stock will be recorded in the ledger';$('opening-stock-wrap').hidden=!!p;$('ed-opening-stock').value=0;
+ $('stock-help').textContent=p?'Use Stock In / Stock Out to change this quantity so every movement appears in the inventory statement.':'Opening stock will create the first inventory-ledger entry.';
+ $('ed-active').checked=p?.active??true;$('reason-wrap').hidden=!p;$('ed-reason').value='';$('editor-error').hidden=true;$('ed-upload').value='';
+ $('slab-list').innerHTML='';for(const r of p?.bulk_rules||[])addSlabRow(r);renderEditorImages();productEditor.showModal();
+}
+$('add-slab').onclick=()=>addSlabRow();
+$('ed-upload').onchange=e=>{addSelectedImages(e.target.files);e.target.value=''};
+$('editor-close').onclick=$('editor-cancel').onclick=()=>{cleanupEditorImages();productEditor.close()};
+
+$('product-form').onsubmit=async e=>{
+ e.preventDefault();
+ const save=$('editor-save');save.disabled=true;$('editor-error').hidden=true;
+ try{
+  const title=$('ed-title').value.trim(),unit=$('ed-unit').value.trim();
+  if(!title||!unit)throw Error('Product name and unit are required.');
+  const mrp=A.paise($('ed-mrp').value),price=A.paise($('ed-price').value);
+  if(price>mrp)throw Error('Wholesale price cannot be greater than MRP.');
+  const min=+$('ed-min').value;
+  if(!Number.isInteger(min)||min<1)throw Error('Minimum quantity must be a positive whole number.');
+
+  const tiers=[...document.querySelectorAll('.slab-row')].map(row=>{
+    const q=+row.querySelector('.slab-qty').value,pp=A.paise(row.querySelector('.slab-price').value);
+    if(!Number.isInteger(q)||q<min)throw Error(`Every slab quantity must be at least the MOQ (${min}).`);
+    if(pp>price)throw Error('A bulk slab price should not exceed the standard wholesale price.');
+    return {min_qty:q,price_paise:pp};
+  }).sort((a,b)=>a.min_qty-b.min_qty);
+  if(new Set(tiers.map(t=>t.min_qty)).size!==tiers.length)throw Error('Bulk slab quantities must be unique.');
+
+  const urls=await uploadEditorImages();
+  if(urls.length>6)throw Error('Use at most six images.');
+
+  const payload={
+    ...(editing?{id:editing.id,expected_version:editing.version}:{}),
+    title,description:$('ed-description').value.trim(),category_id:+$('ed-category').value,unit,
+    mrp_paise:mrp,price_paise:price,
+    stock:editing?editing.stock:Math.max(0,Math.trunc(+$('ed-opening-stock').value||0)),
+    min_qty:min,qty_step:1,bulk_rules:tiers,images:urls,
+    active:$('ed-active').checked,
+    reason:editing?$('ed-reason').value.trim():'Opening product creation'
+  };
+  if(editing&&!payload.reason)throw Error('Reason for change is required.');
+  await A.api('admin.product.put',payload);
+  cleanupEditorImages();productEditor.close();A.toast(editing?'Product updated':'Product created');
+  await loadProducts();
+ }catch(err){$('editor-error').textContent=A.error(err);$('editor-error').hidden=false}
+ finally{save.disabled=false}
+};
+
+function movementOptions(direction){
+ return direction==='in'
+ ?[['purchase','Purchase / Supplier Receipt'],['return_in','Sales Return / Stock Return In'],['adjustment_in','Adjustment In'],['correction','Physical Stock Correction']]
+ :[['damage','Damage / Loss'],['adjustment_out','Adjustment Out'],['correction','Physical Stock Correction']];
+}
+function updateVoucherProducts(){
+ const q=$('voucher-search').value.trim().toLowerCase();
+ const rows=products.filter(p=>!q||`${p.id} ${p.title}`.toLowerCase().includes(q)).sort((a,b)=>a.title.localeCompare(b.title));
+ const current=$('voucher-product').value;
+ $('voucher-product').innerHTML=rows.map(p=>`<option value="${p.id}">#${p.id} · ${esc(p.title)} · Stock ${p.stock} ${esc(p.unit)}</option>`).join('');
+ if(rows.some(p=>String(p.id)===current))$('voucher-product').value=current;
+ updateVoucherPreview();
+}
+function openVoucher(direction='in',productId=null){
+ voucherDirection=direction;
+ $('voucher-title').textContent=direction==='in'?'Stock In Voucher':'Stock Out Voucher';
+ $('voucher-type').innerHTML=movementOptions(direction).map(([v,l])=>`<option value="${v}">${l}</option>`).join('');
+ $('voucher-search').value='';
+ $('voucher-qty').value=1;
+ $('voucher-reference').value='';
+ $('voucher-note').value='';
+ $('voucher-error').hidden=true;
+ const now=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16);
+ $('voucher-date').value=now;
+ updateVoucherProducts();
+ if(productId&&products.some(p=>p.id===productId))$('voucher-product').value=productId;
+ updateVoucherPreview();
+ $('voucher-save').textContent=direction==='in'?'Post Stock In':'Post Stock Out';
+ $('voucher-save').className=direction==='in'?'primary':'danger';
+ stockVoucher.showModal();
+}
+function updateVoucherPreview(){
+ const p=products.find(x=>x.id===+$('voucher-product').value);
+ const qty=Math.max(0,Math.trunc(+$('voucher-qty').value||0));
+ const current=Number(p?.stock||0),closing=current+(voucherDirection==='in'?qty:-qty);
+ $('voucher-current').textContent=p?`${current} ${p.unit}`:'0';
+ $('voucher-closing').textContent=p?`${closing} ${p.unit}`:'0';
+ $('voucher-closing').style.color=closing<0?'#a33824':voucherDirection==='in'?'#17634c':'#14251f';
+}
+$('voucher-search').oninput=updateVoucherProducts;
+$('voucher-product').onchange=updateVoucherPreview;
+$('voucher-qty').oninput=updateVoucherPreview;
+$('voucher-close').onclick=$('voucher-cancel').onclick=()=>stockVoucher.close();
+
+$('voucher-form').onsubmit=async e=>{
+ e.preventDefault();const save=$('voucher-save');save.disabled=true;$('voucher-error').hidden=true;
+ try{
+  const p=products.find(x=>x.id===+$('voucher-product').value);
+  if(!p)throw Error('Choose a product.');
+  const qty=Math.trunc(+$('voucher-qty').value);
+  if(!Number.isInteger(qty)||qty<1)throw Error('Quantity must be a positive whole number.');
+  if(voucherDirection==='out'&&qty>p.stock)throw Error(`Only ${p.stock} ${p.unit} are currently available.`);
+  let occurred=null;
+  if($('voucher-date').value)occurred=new Date($('voucher-date').value).toISOString();
+  await inventoryAdjust({
+    product_id:p.id,direction:voucherDirection,movement_type:$('voucher-type').value,qty,
+    reference:$('voucher-reference').value.trim(),note:$('voucher-note').value.trim(),
+    ...(occurred?{occurred_at:occurred}:{})
+  });
+  stockVoucher.close();A.toast(`${voucherDirection==='in'?'Stock received':'Stock issued'} · ${qty} ${p.unit}`);
+  await loadProducts();
+  if(tab==='inventory')await loadLedger();
+ }catch(err){$('voucher-error').textContent=A.error(err);$('voucher-error').hidden=false}
+ finally{save.disabled=false}
+};
+
+async function loadLedger(){
+ $('ledger-count').textContent='Loading statement…';
+ const data={
+  ...(+$('ledger-product').value?{product_id:+$('ledger-product').value}:{}),
+  ...($('ledger-type').value?{movement_type:$('ledger-type').value}:{}),
+  ...($('ledger-search').value.trim()?{search:$('ledger-search').value.trim()}:{}),
+ };
+ if($('ledger-from').value)data.from=new Date($('ledger-from').value+'T00:00:00+05:30').toISOString();
+ if($('ledger-to').value)data.to=new Date(new Date($('ledger-to').value+'T00:00:00+05:30').getTime()+86400000).toISOString();
+
+ ledger=await inventoryAll(data);
+ $('ledger-count').textContent=`Loaded ${ledger.length} movements…`;
+ renderLedger();
+}
+function renderLedger(){
+ const selected=products.find(p=>p.id===+$('ledger-product').value);
+ const totalIn=ledger.filter(x=>x.quantity_delta>0).reduce((a,x)=>a+x.quantity_delta,0);
+ const totalOut=ledger.filter(x=>x.quantity_delta<0).reduce((a,x)=>a+Math.abs(x.quantity_delta),0);
+ $('sum-transactions').textContent=ledger.length;$('sum-in').textContent='+'+totalIn;$('sum-out').textContent='−'+totalOut;$('sum-net').textContent=(totalIn-totalOut>=0?'+':'')+(totalIn-totalOut);
+ $('statement-title').textContent=selected?`Inventory Statement · ${selected.title}`:'Inventory Statement · All Products';
+ $('statement-sub').textContent=`${$('ledger-from').value||'Beginning'} through ${$('ledger-to').value||'Today'} · ${$('ledger-type').selectedOptions[0].text}`;
+ $('ledger-count').textContent=`${ledger.length} movement${ledger.length===1?'':'s'}`;
+
+ if(selected&&ledger.length){
+   const chronological=[...ledger].sort((a,b)=>new Date(a.occurred_at)-new Date(b.occurred_at)||a.id-b.id);
+   $('period-opening-card').hidden=false;$('period-closing-card').hidden=false;
+   $('sum-opening').textContent=`${chronological[0].stock_before} ${selected.unit}`;
+   $('sum-closing').textContent=`${chronological.at(-1).stock_after} ${selected.unit}`;
+ }else{
+   $('period-opening-card').hidden=true;$('period-closing-card').hidden=true;
+ }
+
+ $('ledger-body').innerHTML=ledger.map(x=>`
+  <tr>
+   <td>${esc(formatDate(x.occurred_at))}</td>
+   <td><b>${esc(x.product_title)}</b><span class="stock-unit">#${x.product_id}</span></td>
+   <td><span class="movement-type">${esc(movementLabel(x.movement_type))}</span></td>
+   <td><span class="movement-ref">${esc(x.reference_id||'—')}</span></td>
+   <td>${x.stock_before}</td>
+   <td class="movement-in">${x.quantity_delta>0?'+'+x.quantity_delta:'—'}</td>
+   <td class="movement-out">${x.quantity_delta<0?'−'+Math.abs(x.quantity_delta):'—'}</td>
+   <td><b>${x.stock_after}</b></td>
+   <td>${esc(x.actor_name||x.actor_role||'System')}</td>
+   <td class="movement-note">${esc(x.note||'—')}</td>
+  </tr>`).join('');
+ $('ledger-empty').hidden=ledger.length>0;
+}
+
+function syncSheetActive(){
+ for(const id of ['catalogue-view','inventory-view'])$(id)?.classList.remove('sheet-active');
+ if(sheetMode){const active=$(tab==='inventory'?'inventory-view':'catalogue-view');active?.classList.add('sheet-active');$('sheet-context').textContent=tab==='inventory'?'Inventory ledger sheet':'Product catalogue sheet';$('sheet-catalogue').classList.toggle('active',tab==='catalogue');$('sheet-inventory').classList.toggle('active',tab==='inventory')}
+}
+function enterSheetView(){sheetMode=true;document.body.classList.add('erp-sheet-mode');$('erp-sheet-bar').hidden=false;syncSheetActive()}
+function exitSheetView(){sheetMode=false;document.body.classList.remove('erp-sheet-mode');$('erp-sheet-bar').hidden=true;for(const id of ['catalogue-view','inventory-view'])$(id)?.classList.remove('sheet-active')}
+function showTab(next){
+ tab=next;
+ for(const b of document.querySelectorAll('[data-tab]'))b.classList.toggle('active',b.dataset.tab===tab);
+ $('catalogue-view').hidden=tab!=='catalogue';$('inventory-view').hidden=tab!=='inventory';
+ if(tab==='inventory')loadLedger().catch(A.error);
+ syncSheetActive();
+}
+async function openProductStatement(id){
+ $('ledger-product').value=id;showTab('inventory');
+ document.querySelector('[data-tab="inventory"]').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function exportProducts(){
+ const rows=productRows();
+ A.csv('Products',['ID','Product','Category','Unit','MRP INR','Wholesale INR','Stock','MOQ','Bulk Slabs','Active'],
+ rows.map(p=>[p.id,p.title,categoryName(p.category_id),p.unit,p.mrp_paise/100,p.price_paise/100,p.stock,p.min_qty,(p.bulk_rules||[]).map(t=>`${t.min_qty}+ @ ₹${t.price_paise/100}`).join(' | '),p.active]),
+ 'Current product catalogue; filters applied');
+}
+function exportLedger(){
+ A.csv('Inventory Statement',['Date IST','Product ID','Product','Type','Reference','Opening','Stock In','Stock Out','Closing','Staff / Source','Note'],
+ ledger.map(x=>[formatDate(x.occurred_at),x.product_id,x.product_title,movementLabel(x.movement_type),x.reference_id||'',x.stock_before,x.quantity_delta>0?x.quantity_delta:'',x.quantity_delta<0?Math.abs(x.quantity_delta):'',x.stock_after,x.actor_name||x.actor_role||'System',x.note||'']),
+ $('statement-sub').textContent);
+}
+function printLedger(){
+ const selected=products.find(p=>p.id===+$('ledger-product').value);
+ const rows=ledger.map(x=>`<tr><td>${esc(formatDate(x.occurred_at))}</td><td>${esc(x.product_title)}</td><td>${esc(movementLabel(x.movement_type))}</td><td>${esc(x.reference_id||'')}</td><td>${x.stock_before}</td><td>${x.quantity_delta>0?x.quantity_delta:''}</td><td>${x.quantity_delta<0?Math.abs(x.quantity_delta):''}</td><td>${x.stock_after}</td><td>${esc(x.note||'')}</td></tr>`).join('');
+ A.print(selected?`Inventory Statement · ${selected.title}`:'Inventory Statement · All Products',
+ `<p>${esc($('statement-sub').textContent)}</p><table><thead><tr><th>Date</th><th>Product</th><th>Type</th><th>Reference</th><th>Opening</th><th>In</th><th>Out</th><th>Closing</th><th>Narration</th></tr></thead><tbody>${rows}</tbody></table>`);
+}
+
+async function categoryManager(){
+ A.modal('Categories',A.table(['Name','Status',''],categories.map(c=>[esc(c.name),A.badge(c.active?'active':'inactive'),`<button data-category-edit="${c.id}">Edit</button>`]))+'<button id="add-category" class="primary" style="margin-top:18px">Add category</button>');
+ const open=c=>A.form(c?'Edit category':'Add category',[['name','Name','text',[],true],['active','Active','checkbox']],c||{active:true},async v=>{await A.api('admin.category.put',{...v,...(c?{id:c.id,expected_version:c.version}:{})});await loadProducts();});
+ $('add-category').onclick=()=>open();
+ for(const b of document.querySelectorAll('[data-category-edit]'))b.onclick=()=>open(categories.find(c=>c.id===+b.dataset.categoryEdit));
+}
+
+for(const b of document.querySelectorAll('[data-tab]'))b.onclick=()=>showTab(b.dataset.tab);
+for(const id of ['product-search','product-category','stock-filter','product-sort'])$(id).addEventListener('input',renderCatalogue);
+
+$('sheet-view-top').onclick=$('sheet-view-toolbar').onclick=enterSheetView;
+$('sheet-exit').onclick=exitSheetView;$('sheet-catalogue').onclick=()=>showTab('catalogue');$('sheet-inventory').onclick=()=>showTab('inventory');
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sheetMode&&!productEditor.open&&!stockVoucher.open)exitSheetView()});
+if($('new-product'))$('new-product').onclick=()=>openEditor();
+if($('categories-btn'))$('categories-btn').onclick=()=>categoryManager().catch(A.error);
+for(const id of ['stock-in-top','stock-in-toolbar','ledger-stock-in'])if($(id))$(id).onclick=()=>openVoucher('in');
+for(const id of ['stock-out-top','stock-out-toolbar','ledger-stock-out'])if($(id))$(id).onclick=()=>openVoucher('out');
+$('open-ledger').onclick=()=>showTab('inventory');
+if($('product-export'))$('product-export').onclick=exportProducts;
+
+$('ledger-refresh').onclick=()=>loadLedger().catch(A.error);
+$('ledger-export').onclick=exportLedger;$('ledger-print').onclick=printLedger;
+for(const b of document.querySelectorAll('[data-period]'))b.onclick=()=>{
+ const today=new Date(Date.now()+19800000).toISOString().slice(0,10);
+ if(b.dataset.period==='all'){$('ledger-from').value='';$('ledger-to').value=''}
+ if(b.dataset.period==='today'){$('ledger-from').value=today;$('ledger-to').value=today}
+ if(b.dataset.period==='7'){const d=new Date(today+'T00:00:00Z');$('ledger-from').value=new Date(d-6*86400000).toISOString().slice(0,10);$('ledger-to').value=today}
+ if(b.dataset.period==='month'){$('ledger-from').value=today.slice(0,8)+'01';$('ledger-to').value=today}
+ loadLedger().catch(A.error);
+};
+
+await loadProducts();
+
+})().catch(e=>{
+ if(window.App)App.fail(e);
+ else document.body.textContent="Could not load ONeness. Serve all HTML files together over HTTP/HTTPS. "+e.message;
+});
 </script>
-</body></html>
+</body>
+</html>
