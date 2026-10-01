@@ -35,18 +35,18 @@ css.textContent=`
 .erp-toolbar{background:#fff;border:1px solid var(--line);border-radius:15px;padding:13px;margin-bottom:14px}.erp-filter-grid{display:grid;grid-template-columns:minmax(220px,1.4fr) repeat(3,minmax(130px,.7fr)) auto;gap:9px;align-items:end}.erp-filter-grid label{margin:0}.erp-filter-grid input,.erp-filter-grid select{min-height:40px;font-size:14px}
 .toolbar-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
 .stock-in{background:#e5f2e7!important;color:#17634c!important;border-color:#bcd6c2!important}.stock-out{background:#fff0ed!important;color:#a33824!important;border-color:#ecc8c0!important}
-.erp-table-wrap{overflow:auto;background:#fff;border:1px solid var(--line);border-radius:15px}.erp-table{width:100%;border-collapse:collapse;white-space:nowrap}.erp-table th{position:sticky;top:0;background:#fafbf8;z-index:2;font-size:10px;text-transform:uppercase;letter-spacing:.65px;color:var(--muted)}.erp-table td,.erp-table th{padding:11px 12px;border-bottom:1px solid #edf0eb;vertical-align:middle}.erp-table tr:hover td{background:#fbfcf9}
+.erp-table-wrap{overflow:hidden;background:#fff;border:1px solid #dbe3dd;border-radius:15px}.erp-table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed;white-space:normal}.erp-table th{position:sticky;top:0;background:#edf3ee;z-index:2;font-size:10px;text-transform:uppercase;letter-spacing:.55px;color:#496158;font-weight:850}.erp-table td,.erp-table th{padding:10px 10px;border-bottom:1px solid #dfe6e1;border-right:1px solid #e5ebe6;vertical-align:middle;overflow-wrap:anywhere}.erp-table th:last-child,.erp-table td:last-child{border-right:0}.erp-table tbody tr:nth-child(even) td{background:#fafcf9}.erp-table tbody tr:hover td{background:#eef6ef}.erp-table th:nth-child(1){width:4%}.erp-table th:nth-child(2){width:18%}.erp-table th:nth-child(3){width:9%}.erp-table th:nth-child(4){width:10%}.erp-table th:nth-child(5){width:7%}.erp-table th:nth-child(6){width:6%}.erp-table th:nth-child(7){width:27%}.erp-table th:nth-child(8){width:7%}.erp-table th:nth-child(9){width:12%}
 .product-cell{display:grid;grid-template-columns:44px minmax(150px,1fr);gap:9px;align-items:center}.product-thumb{width:44px;height:44px;border-radius:9px;object-fit:contain;background:#f0f3ee}.product-placeholder{width:44px;height:44px;border-radius:9px;background:#eef1eb;display:grid;place-items:center;color:#91a097}.product-title{display:block;font-weight:750}.product-desc{display:block;color:var(--muted);font-size:11px;max-width:260px;overflow:hidden;text-overflow:ellipsis}
-.stock-number{font-size:16px;font-weight:800}.stock-number.low{color:#a4681d}.stock-number.out{color:#a33824}.stock-unit{display:block;color:var(--muted);font-size:10px}.slab-chip{display:inline-flex;margin:2px;padding:4px 6px;border-radius:999px;background:#eef4ec;color:#32614d;font-size:10px}
+.stock-number{font-size:16px;font-weight:800}.stock-number.low{color:#a4681d}.stock-number.out{color:#a33824}.stock-unit{display:block;color:var(--muted);font-size:10px}.plan-stack{display:grid;gap:5px}.plan-chip{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 8px;padding:7px 8px;border:1px solid #d9e4dc;border-radius:9px;background:#f1f7f2;color:#294b3d;font-size:9px;line-height:1.35}.plan-chip:nth-child(2n){background:#fff6e8;border-color:#efdfbf}.plan-chip b{font-size:10px}.plan-chip .plan-price{text-align:right;font-weight:900;color:#173b32}.plan-chip .plan-profit{grid-column:1/-1;color:#17634c;font-weight:800}.plan-chip .plan-meta{color:#6b7a72}.slab-chip{display:inline-flex;margin:2px;padding:4px 6px;border-radius:999px;background:#eef4ec;color:#32614d;font-size:10px}
 .erp-actions{display:flex;gap:5px}.erp-actions button{font-size:11px;min-height:32px;padding:5px 8px}
-.mobile-products{display:none;gap:9px}.mobile-product{background:#fff;border:1px solid var(--line);border-radius:15px;padding:12px}.mobile-product-head{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:9px}.mobile-product .product-thumb,.mobile-product .product-placeholder{width:52px;height:52px}.mobile-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0}.mobile-metric{background:#f7f9f6;border-radius:9px;padding:8px}.mobile-metric span{display:block;font-size:9px;color:var(--muted)}.mobile-metric strong{font-size:12px}
+.mobile-products{display:none;gap:9px}.mobile-product{background:#fff;border:1px solid var(--line);border-radius:15px;padding:12px}.mobile-product-head{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:9px}.mobile-product .product-thumb,.mobile-product .product-placeholder{width:52px;height:52px}.mobile-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0}.mobile-metric{background:#f7f9f6;border-radius:9px;padding:8px}.mobile-metric span{display:block;font-size:9px;color:var(--muted)}.mobile-metric strong{font-size:12px}.mobile-product .plan-stack{margin-top:9px}.mobile-product .plan-chip{font-size:9px}
 
 .inventory-layout{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:13px;align-items:start}.inventory-side{position:sticky;top:18px}.inventory-summary{display:grid;gap:8px}.summary-card{background:#fff;border:1px solid var(--line);border-radius:13px;padding:12px}.summary-card span{font-size:10px;color:var(--muted)}.summary-card strong{display:block;font-size:20px;margin-top:3px}.summary-card.in strong{color:#17634c}.summary-card.out strong{color:#a33824}
 .movement-in{color:#17634c;font-weight:800}.movement-out{color:#a33824;font-weight:800}.movement-type{display:inline-flex;padding:4px 6px;border-radius:999px;background:#f0f3ef;font-size:10px;text-transform:capitalize}.movement-ref{font-size:11px;color:#51675b}.movement-note{white-space:normal;max-width:260px;font-size:11px;color:#5f6d66}
 .ledger-empty{padding:40px 18px;text-align:center;color:var(--muted)}
 
 .editor-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.editor-section{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}.editor-section.full{grid-column:1/-1}.editor-section h3{margin:0 0 12px}.editor-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}.editor-fields .full{grid-column:1/-1}.read-stock{padding:11px;border-radius:10px;background:#f4f7f3}.read-stock span{display:block;font-size:10px;color:var(--muted)}.read-stock strong{display:block;font-size:20px;margin-top:3px}
-.slab-list{display:grid;gap:10px}.slab-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:9px;align-items:end;padding:12px;border:1px solid #e2e8e3;border-radius:13px;background:#f8faf7}.slab-row label{margin:0}.slab-top{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:8px}.slab-number{font-size:11px;font-weight:850;color:#173b32}.slab-math{grid-column:1/-1;font-size:10px;color:#607069;padding:7px 9px;border-radius:9px;background:#eef4ec}.remove-slab{min-height:40px;color:#a33824}.add-slab{margin-top:9px}
+.slab-list{display:grid;gap:11px}.slab-row{display:grid;grid-template-columns:minmax(150px,1.2fr) minmax(110px,.65fr) minmax(130px,.8fr) auto;gap:9px;align-items:end;padding:13px;border:1px solid #dbe5de;border-radius:13px;background:linear-gradient(135deg,#fbfdfb,#f4f8f4)}.slab-row:nth-child(2n){background:linear-gradient(135deg,#fffdfa,#fff7ea);border-color:#eadfc8}.slab-row label{margin:0}.slab-top{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:8px}.slab-number{font-size:11px;font-weight:900;color:#173b32}.slab-math{grid-column:1/-1;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}.plan-metric{padding:8px;border:1px solid #dde7df;border-radius:9px;background:#fff}.plan-metric span{display:block;font-size:8px;color:#748078}.plan-metric b{display:block;font-size:11px;margin-top:2px;color:#173b32}.plan-metric.profit{background:#eaf5eb;border-color:#cfe1d2}.plan-metric.profit b{color:#17634c}.plan-metric.warn{background:#fff2ed;border-color:#efd2c8}.plan-metric.warn b{color:#a33824}.remove-slab{min-height:40px;color:#a33824}.add-slab{margin-top:9px}.plan-explainer{margin-top:9px;padding:10px 11px;border-radius:10px;background:#f1f5f1;color:#5e6d65;font-size:10px;line-height:1.5}
 .image-drop{display:flex;align-items:center;justify-content:center;min-height:96px;border:1.5px dashed #b9c7bf;border-radius:13px;background:#f8faf7;text-align:center;padding:14px;cursor:pointer}.image-drop:hover{border-color:#17634c;background:#f2f7f3}.image-drop b{display:block;color:#173b32}.image-drop span{display:block;color:#6b796f;font-size:11px;margin-top:3px}.image-preview{display:grid;grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:9px;margin-top:10px}.image-card{position:relative;border:1px solid #e0e6e1;border-radius:12px;background:#fff;overflow:hidden}.image-card img{width:100%;height:118px;object-fit:contain;background:#f5f7f4}.image-card-info{padding:7px 8px;border-top:1px solid #edf0ec}.image-card-info small{display:block;color:#6d7a73;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.image-card-actions{display:flex;gap:5px;margin-top:6px}.image-card-actions button{min-height:28px;padding:4px 7px;font-size:10px;flex:1}.primary-image{position:absolute;top:7px;left:7px;padding:4px 6px;border-radius:999px;background:#173b32;color:#fff;font-size:9px;font-weight:800}.image-status{position:absolute;top:7px;right:7px;padding:4px 6px;border-radius:999px;background:#fff8e8;color:#8a5b19;font-size:9px;font-weight:800}.image-status.saved{background:#e7f3e8;color:#397149}.image-status.error{background:#fff0ed;color:#a33824}.image-empty{grid-column:1/-1;padding:18px;border-radius:12px;background:#f7f9f6;color:#6d7a73;text-align:center;font-size:11px}
 
 #productEditor,#stockVoucher{width:min(920px,95vw);max-height:92vh;padding:0;border:0;border-radius:18px;box-shadow:0 30px 100px #10241940;color:var(--ink)}#productEditor::backdrop,#stockVoucher::backdrop{background:#10291e9c}.modal-head-sticky{position:sticky;top:0;z-index:4;background:#fff;border-bottom:1px solid var(--line);padding:15px 18px;display:flex;justify-content:space-between;gap:10px}.modal-body-pad{padding:16px 18px 22px}.modal-footer{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);padding:12px 18px;display:flex;justify-content:flex-end;gap:8px}
@@ -56,10 +56,10 @@ css.textContent=`
 
 
 .sheet-bar{position:fixed;inset:0 0 auto 0;height:52px;z-index:3002;background:#173b32;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 14px;box-shadow:0 2px 12px #10241926}.sheet-bar strong{font-size:14px}.sheet-bar small{color:#cce0d6;margin-left:7px}.sheet-bar .row{gap:6px}.sheet-bar button{min-height:34px;padding:5px 9px;border-color:#ffffff2c;background:#ffffff12;color:#fff}.sheet-bar button.active{background:#fff;color:#173b32}
-body.erp-sheet-mode{overflow:hidden}.sheet-active{position:fixed!important;z-index:3001!important;top:52px;left:0;right:0;bottom:0;background:#f4f6f2;padding:10px 12px 12px;overflow:auto}.sheet-active #catalogue-kpis{display:none}.sheet-active .erp-toolbar{position:sticky;top:0;z-index:12;margin-bottom:8px;padding:8px;border-radius:10px}.sheet-active #product-count{margin:6px 2px}.sheet-active .erp-table-wrap{height:calc(100vh - 200px);overflow-y:auto;overflow-x:hidden;border-radius:10px}.sheet-active .erp-table{table-layout:fixed;white-space:normal;font-size:11px}.sheet-active .erp-table th,.sheet-active .erp-table td{padding:7px 8px}.sheet-active .erp-table th:nth-child(1){width:5%}.sheet-active .erp-table th:nth-child(2){width:20%}.sheet-active .erp-table th:nth-child(3){width:10%}.sheet-active .erp-table th:nth-child(4){width:12%}.sheet-active .erp-table th:nth-child(5){width:8%}.sheet-active .erp-table th:nth-child(6){width:6%}.sheet-active .erp-table th:nth-child(7){width:18%}.sheet-active .erp-table th:nth-child(8){width:8%}.sheet-active .erp-table th:nth-child(9){width:13%}.sheet-active .product-desc{max-width:100%}.sheet-active .erp-actions{flex-wrap:wrap}.sheet-active .erp-actions button{min-height:28px;padding:4px 6px;font-size:10px}.sheet-active .slab-chip{font-size:9px;padding:3px 5px}.sheet-active#inventory-view .erp-table-wrap{height:calc(100vh - 235px)}.sheet-active#inventory-view .inventory-side{display:none}.sheet-active#inventory-view .inventory-layout{grid-template-columns:1fr}.sheet-active#inventory-view .erp-filter-grid{grid-template-columns:minmax(220px,1.5fr) repeat(4,minmax(120px,.7fr))}
+body.erp-sheet-mode{overflow:hidden}.sheet-active{position:fixed!important;z-index:3001!important;top:52px;left:0;right:0;bottom:0;background:#f4f6f2;padding:10px 12px 12px;overflow:auto}.sheet-active #catalogue-kpis{display:none}.sheet-active .erp-toolbar{position:sticky;top:0;z-index:12;margin-bottom:8px;padding:8px;border-radius:10px}.sheet-active #product-count{margin:6px 2px}.sheet-active .erp-table-wrap{height:calc(100vh - 200px);overflow-y:auto;overflow-x:hidden;border-radius:6px;border-color:#bfcac2}.sheet-active .erp-table{table-layout:fixed;white-space:normal;font-size:10px}.sheet-active .erp-table th,.sheet-active .erp-table td{padding:6px 7px;border-color:#cfd8d1}.sheet-active .erp-table th{background:#dfeadf}.sheet-active .erp-table tbody tr:nth-child(even) td{background:#f7faf7}.sheet-active .erp-table th:nth-child(1){width:4%}.sheet-active .erp-table th:nth-child(2){width:18%}.sheet-active .erp-table th:nth-child(3){width:8%}.sheet-active .erp-table th:nth-child(4){width:10%}.sheet-active .erp-table th:nth-child(5){width:7%}.sheet-active .erp-table th:nth-child(6){width:5%}.sheet-active .erp-table th:nth-child(7){width:30%}.sheet-active .erp-table th:nth-child(8){width:7%}.sheet-active .erp-table th:nth-child(9){width:11%}.sheet-active .product-desc{max-width:100%;white-space:normal;overflow:visible}.sheet-active .erp-actions{flex-wrap:wrap}.sheet-active .erp-actions button{min-height:27px;padding:4px 5px;font-size:9px}.sheet-active .plan-chip{padding:5px 6px;font-size:8px}.sheet-active .plan-chip b{font-size:9px}.sheet-active .plan-stack{gap:3px}.sheet-active#inventory-view .erp-table-wrap{height:calc(100vh - 235px)}.sheet-active#inventory-view .inventory-side{display:none}.sheet-active#inventory-view .inventory-layout{grid-template-columns:1fr}.sheet-active#inventory-view .erp-filter-grid{grid-template-columns:minmax(220px,1.5fr) repeat(4,minmax(120px,.7fr))}
 
 @media(max-width:1150px){.erp-kpis{grid-template-columns:repeat(6,135px)}.erp-filter-grid{grid-template-columns:repeat(3,1fr)}.erp-filter-grid .wide{grid-column:span 2}.inventory-layout{grid-template-columns:1fr}.inventory-side{position:static}.inventory-summary{grid-template-columns:repeat(4,1fr)}}
-@media(max-width:760px){.desktop-products{display:none}.mobile-products{display:grid}.erp-filter-grid{grid-template-columns:1fr 1fr}.erp-filter-grid .wide{grid-column:1/-1}.editor-grid,.editor-fields,.voucher-grid{grid-template-columns:1fr}.editor-section.full,.editor-fields .full,.voucher-grid .full{grid-column:auto}.inventory-summary{grid-template-columns:1fr 1fr}.slab-row{grid-template-columns:1fr 1fr}.slab-top,.slab-math{grid-column:1/-1}.remove-slab{grid-column:1/-1}.erp-kpi strong{font-size:19px}}
+@media(max-width:760px){.desktop-products{display:none}.mobile-products{display:grid}.erp-filter-grid{grid-template-columns:1fr 1fr}.erp-filter-grid .wide{grid-column:1/-1}.editor-grid,.editor-fields,.voucher-grid{grid-template-columns:1fr}.editor-section.full,.editor-fields .full,.voucher-grid .full{grid-column:auto}.inventory-summary{grid-template-columns:1fr 1fr}.slab-row{grid-template-columns:1fr}.slab-top,.slab-math{grid-column:1/-1}.slab-math{grid-template-columns:1fr 1fr}.remove-slab{grid-column:1/-1}.erp-kpi strong{font-size:19px}}
 @media(max-width:480px){.erp-filter-grid{grid-template-columns:1fr}.erp-filter-grid .wide{grid-column:auto}.mobile-metrics{grid-template-columns:1fr 1fr}.inventory-summary{grid-template-columns:1fr 1fr}}
 `;
 document.head.append(css);
@@ -113,7 +113,7 @@ $('view').innerHTML=A.header(
  <div class="desktop-products">
    <div class="erp-table-wrap">
     <table class="erp-table">
-     <thead><tr><th>ID</th><th>Product</th><th>Category</th><th>Wholesale / MRP</th><th>Stock</th><th>MOQ</th><th>Bulk price slabs</th><th>Status</th><th>Actions</th></tr></thead>
+     <thead><tr><th>ID</th><th>Product</th><th>Category</th><th>Wholesale / MRP</th><th>Stock</th><th>MOQ</th><th>Bulk Plans</th><th>Status</th><th>Actions</th></tr></thead>
      <tbody id="product-body"></tbody>
     </table>
    </div>
@@ -193,8 +193,8 @@ $('view').innerHTML=A.header(
     </section>
 
     <section class="editor-section full">
-     <div class="row between"><div><h3 style="margin-bottom:3px">Bulk pricing slabs</h3><small>Each slab is a separate rule. No more typing formats such as 30:50.</small></div><button type="button" id="add-slab">+ Add slab</button></div>
-     <div id="slab-list" class="slab-list" style="margin-top:11px"></div>
+     <div class="row between"><div><h3 style="margin-bottom:3px">Wholesale bundle plans</h3><small>Create named plans such as Startup Plan or Advance Plan. Enter units + total plan price; profit is calculated automatically from MRP.</small></div><button type="button" id="add-slab">+ Add plan</button></div>
+     <div id="slab-list" class="slab-list" style="margin-top:11px"></div><div class="plan-explainer"><b>How it works:</b> If Startup Plan is 20 units for ₹400, effective cost is ₹20/unit. If MRP is ₹40/unit, plan MRP value is ₹800 and potential retailer profit is ₹400 (50%).</div>
     </section>
 
     <section class="editor-section full">
@@ -302,6 +302,25 @@ function productRows(){
  return rows;
 }
 
+function defaultPlanTitle(index){return ['Startup Plan','Growth Plan','Advance Plan','Premium Plan','Mega Plan'][index]||`Bulk Plan ${index+1}`}
+function planData(rule,p,index=0){
+ const units=Math.max(1,Number(rule?.units||rule?.min_qty||1));
+ const total=Number(rule?.total_price_paise ?? (Number(rule?.price_paise||0)*units));
+ const unitPrice=units?Math.round(total/units):0;
+ const mrpTotal=Number(p?.mrp_paise||0)*units;
+ const profit=mrpTotal-total;
+ const margin=mrpTotal?profit*100/mrpTotal:0;
+ const stdTotal=Number(p?.price_paise||0)*units;
+ const saving=stdTotal-total;
+ return {title:String(rule?.title||rule?.plan_title||defaultPlanTitle(index)),units,total,unitPrice,mrpTotal,profit,margin,saving};
+}
+function plansHtml(p){
+ const rules=p.bulk_rules||[];
+ if(!rules.length)return '<span class="muted">No bundle plans</span>';
+ return `<div class="plan-stack">${rules.map((r,i)=>{const x=planData(r,p,i);return `<div class="plan-chip"><b>${esc(x.title)}</b><span class="plan-price">${x.units} units · ${money(x.total)}</span><span class="plan-meta">${money(x.unitPrice)}/unit · MRP ${money(x.mrpTotal)}</span><span class="plan-profit">Potential ${money(x.profit)} (${pctPlan(x.margin)})</span></div>`}).join('')}</div>`;
+}
+function pctPlan(v){const n=Number(v||0);return `${n.toFixed(Number.isInteger(n)?0:1)}%`}
+
 function renderCatalogue(){
  const rows=productRows();
  const totalUnits=products.reduce((a,p)=>a+Number(p.stock||0),0);
@@ -329,7 +348,7 @@ function renderCatalogue(){
    <td><b>${money(p.price_paise)}</b><span class="stock-unit">MRP ${money(p.mrp_paise)}</span></td>
    <td><span class="stock-number ${p.stock===0?'out':p.stock<=10?'low':''}">${p.stock}</span><span class="stock-unit">${esc(p.unit)}</span></td>
    <td><b>${p.min_qty}</b><span class="stock-unit">minimum</span></td>
-   <td>${(p.bulk_rules||[]).map(t=>`<span class="slab-chip">${t.min_qty}+ · ${money(t.price_paise)}</span>`).join('')||'<span class="muted">Standard price</span>'}</td>
+   <td>${plansHtml(p)}</td>
    <td>${A.badge(p.active?'active':'inactive')}</td>
    <td><div class="erp-actions">
     <button data-view="${p.id}">Details</button>
@@ -347,7 +366,7 @@ function renderCatalogue(){
     <div class="mobile-metric"><span>MRP</span><strong>${money(p.mrp_paise)}</strong></div>
     <div class="mobile-metric"><span>Stock</span><strong>${p.stock} ${esc(p.unit)}</strong></div>
    </div>
-   <div>${(p.bulk_rules||[]).map(t=>`<span class="slab-chip">${t.min_qty}+ · ${money(t.price_paise)}</span>`).join('')}</div>
+   <div>${plansHtml(p)}</div>
    <div class="toolbar-actions"><button data-view="${p.id}">Details</button>${canStock?`<button data-stock="${p.id}" class="stock-in">Stock</button>`:''}<button data-statement="${p.id}">Statement</button>${canEdit?`<button data-edit="${p.id}" class="primary">Edit</button>`:''}</div>
   </article>`).join('')||'<div class="card empty">No products match your filters.</div>';
 
@@ -362,7 +381,7 @@ function wireProductActions(){
 }
 
 function showDetails(p){
- const slabs=(p.bulk_rules||[]).length?A.table(['Minimum Qty','Wholesale Price'],p.bulk_rules.map(t=>[`${t.min_qty} ${p.unit}`,money(t.price_paise)])):'<p class="muted">No bulk pricing slabs.</p>';
+ const slabs=(p.bulk_rules||[]).length?A.table(['Plan','Units','Plan Price','Effective / Unit','MRP Value','Potential Profit'],p.bulk_rules.map((t,i)=>{const x=planData(t,p,i);return [esc(x.title),`${x.units} ${esc(p.unit)}`,money(x.total),money(x.unitPrice),money(x.mrpTotal),`${money(x.profit)} (${pctPlan(x.margin)})`]})):'<p class="muted">No wholesale bundle plans.</p>';
  const gallery=(p.images||[]).length?`<div class="image-preview" style="margin-bottom:14px">${p.images.map((u,i)=>`<div class="image-card"><img src="${esc(u)}" alt="">${i===0?'<span class="primary-image">Primary</span>':''}</div>`).join('')}</div>`:'';
  A.modal(p.title,`
   ${gallery}<div class="detail-grid">
@@ -371,7 +390,7 @@ function showDetails(p){
   </div>
   <p>${esc(p.description||'No description')}</p>
   <p>Category: <b>${esc(categoryName(p.category_id))}</b> · MOQ ${p.min_qty}</p>
-  <h3>Bulk pricing</h3>${slabs}
+  <h3>Wholesale bundle plans</h3>${slabs}
   <div class="row" style="margin-top:18px">
     ${canStock?`<button id="detail-stock-in" class="stock-in">+ Stock In</button><button id="detail-stock-out" class="stock-out">− Stock Out</button>`:''}
     <button id="detail-statement">Inventory Statement</button>
@@ -387,21 +406,38 @@ function showDetails(p){
 
 function renumberSlabs(){
  [...document.querySelectorAll('.slab-row')].forEach((row,i)=>{
-   const n=row.querySelector('.slab-number');if(n)n.textContent=`Price Block ${i+1}`;
+   row.dataset.planIndex=i;
+   const n=row.querySelector('.slab-number');if(n)n.textContent=`Plan ${i+1}`;
+   const title=row.querySelector('.slab-title');
+   if(title&&!title.value.trim())title.value=defaultPlanTitle(i);
    updateSlabMath(row);
  });
 }
 function updateSlabMath(row){
- const q=Number(row.querySelector('.slab-qty')?.value||0),price=Number(row.querySelector('.slab-price')?.value||0);
+ const units=Number(row.querySelector('.slab-qty')?.value||0);
+ const totalRupees=Number(row.querySelector('.slab-total')?.value||0);
+ const mrpRupees=Number($('ed-mrp')?.value||0);
+ const standardRupees=Number($('ed-price')?.value||0);
  const math=row.querySelector('.slab-math');if(!math)return;
- math.textContent=q&&price?`From ${q} units, retailer pays ₹${price.toLocaleString('en-IN',{maximumFractionDigits:2})} per unit.`:'Enter the minimum quantity and special wholesale price for this block.';
+ const total=Math.round(totalRupees*100),mrp=Math.round(mrpRupees*100),std=Math.round(standardRupees*100);
+ const unit=units?Math.round(total/units):0,mrpTotal=mrp*units,profit=mrpTotal-total,margin=mrpTotal?profit*100/mrpTotal:0,saving=std*units-total;
+ const profitClass=profit<0?'warn':'profit';
+ math.innerHTML=`<div class="plan-metric"><span>Effective / unit</span><b>${units&&totalRupees?money(unit):'—'}</b></div>
+ <div class="plan-metric"><span>MRP value</span><b>${units&&mrpRupees?money(mrpTotal):'—'}</b></div>
+ <div class="plan-metric ${profitClass}"><span>Potential profit</span><b>${units&&totalRupees&&mrpRupees?`${money(profit)} (${pctPlan(margin)})`:'—'}</b></div>
+ <div class="plan-metric"><span>Profit / unit</span><b>${units&&profit?money(Math.round(profit/units)):'—'}</b></div>
+ <div class="plan-metric"><span>Vs normal wholesale</span><b>${units&&totalRupees&&standardRupees?(saving>=0?`Save ${money(saving)}`:`+${money(Math.abs(saving))}`):'—'}</b></div>`;
 }
-function addSlabRow(rule={min_qty:'',price_paise:null}){
+function addSlabRow(rule={}){
+ const i=document.querySelectorAll('.slab-row').length;
+ const units=rule.units??rule.min_qty??'';
+ const totalPaise=rule.total_price_paise ?? ((rule.price_paise!=null&&units)?Number(rule.price_paise)*Number(units):null);
  const row=document.createElement('div');row.className='slab-row';
- row.innerHTML=`<div class="slab-top"><span class="slab-number">Price Block</span><small class="muted">Quantity-based wholesale offer</small></div>
- <label>Minimum quantity<input class="slab-qty" type="number" min="1" step="1" value="${esc(rule.min_qty??'')}" required></label>
- <label>Wholesale price (₹)<input class="slab-price" type="number" min="0" step="0.01" value="${rule.price_paise==null?'':esc(rupeeInput(rule.price_paise))}" required></label>
- <button type="button" class="remove-slab">Remove block</button>
+ row.innerHTML=`<div class="slab-top"><span class="slab-number">Plan ${i+1}</span><small class="muted">Named wholesale bundle · exact units and total plan price</small></div>
+ <label>Plan title<input class="slab-title" maxlength="80" value="${esc(rule.title||rule.plan_title||defaultPlanTitle(i))}" placeholder="Startup Plan" required></label>
+ <label>Total units<input class="slab-qty" type="number" min="1" step="1" value="${esc(units)}" required></label>
+ <label>Bulk total price (₹)<input class="slab-total" type="number" min="0.01" step="0.01" value="${totalPaise==null?'':esc(rupeeInput(totalPaise))}" required></label>
+ <button type="button" class="remove-slab">Remove plan</button>
  <div class="slab-math"></div>`;
  row.querySelector('.remove-slab').onclick=()=>{row.remove();renumberSlabs()};
  for(const input of row.querySelectorAll('input'))input.addEventListener('input',()=>updateSlabMath(row));
@@ -482,6 +518,7 @@ function openEditor(p=null){
  $('slab-list').innerHTML='';for(const r of p?.bulk_rules||[])addSlabRow(r);renderEditorImages();productEditor.showModal();
 }
 $('add-slab').onclick=()=>addSlabRow();
+for(const id of ['ed-mrp','ed-price'])$(id).addEventListener('input',()=>document.querySelectorAll('.slab-row').forEach(updateSlabMath));
 $('ed-upload').onchange=e=>{addSelectedImages(e.target.files);e.target.value=''};
 $('editor-close').onclick=$('editor-cancel').onclick=()=>{cleanupEditorImages();productEditor.close()};
 
@@ -496,13 +533,18 @@ $('product-form').onsubmit=async e=>{
   const min=+$('ed-min').value;
   if(!Number.isInteger(min)||min<1)throw Error('Minimum quantity must be a positive whole number.');
 
-  const tiers=[...document.querySelectorAll('.slab-row')].map(row=>{
-    const q=+row.querySelector('.slab-qty').value,pp=A.paise(row.querySelector('.slab-price').value);
-    if(!Number.isInteger(q)||q<min)throw Error(`Every slab quantity must be at least the MOQ (${min}).`);
-    if(pp>price)throw Error('A bulk slab price should not exceed the standard wholesale price.');
-    return {min_qty:q,price_paise:pp};
-  }).sort((a,b)=>a.min_qty-b.min_qty);
-  if(new Set(tiers.map(t=>t.min_qty)).size!==tiers.length)throw Error('Bulk slab quantities must be unique.');
+  const tiers=[...document.querySelectorAll('.slab-row')].map((row,i)=>{
+    const planTitle=row.querySelector('.slab-title').value.trim(),units=+row.querySelector('.slab-qty').value,total=A.paise(row.querySelector('.slab-total').value);
+    if(!planTitle)throw Error(`Plan ${i+1}: title is required.`);
+    if(!Number.isInteger(units)||units<min)throw Error(`${planTitle}: units must be a whole number and at least the MOQ (${min}).`);
+    if(total<=0)throw Error(`${planTitle}: total plan price must be greater than ₹0.`);
+    const standardTotal=price*units,mrpTotal=mrp*units;
+    if(total>standardTotal)throw Error(`${planTitle}: bundle total cannot be higher than the normal wholesale value ${money(standardTotal)}.`);
+    if(total>mrpTotal)throw Error(`${planTitle}: bundle total cannot be higher than MRP value ${money(mrpTotal)}.`);
+    return {plan_type:'bundle',title:planTitle,units,min_qty:units,total_price_paise:total,price_paise:Math.round(total/units)};
+  }).sort((a,b)=>a.units-b.units);
+  if(new Set(tiers.map(t=>t.units)).size!==tiers.length)throw Error('Bundle plans must use unique unit quantities.');
+  if(new Set(tiers.map(t=>t.title.toLowerCase())).size!==tiers.length)throw Error('Bundle plan titles must be unique.');
 
   const urls=await uploadEditorImages();
   if(urls.length>6)throw Error('Use at most six images.');
@@ -640,7 +682,7 @@ function renderLedger(){
 
 function syncSheetActive(){
  for(const id of ['catalogue-view','inventory-view'])$(id)?.classList.remove('sheet-active');
- if(sheetMode){const active=$(tab==='inventory'?'inventory-view':'catalogue-view');active?.classList.add('sheet-active');$('sheet-context').textContent=tab==='inventory'?'Inventory ledger sheet':'Product catalogue sheet';$('sheet-catalogue').classList.toggle('active',tab==='catalogue');$('sheet-inventory').classList.toggle('active',tab==='inventory')}
+ if(sheetMode){const active=$(tab==='inventory'?'inventory-view':'catalogue-view');active?.classList.add('sheet-active');$('sheet-context').textContent=tab==='inventory'?'Inventory ledger · Excel-style':'Product catalogue · Excel-style';$('sheet-catalogue').classList.toggle('active',tab==='catalogue');$('sheet-inventory').classList.toggle('active',tab==='inventory')}
 }
 function enterSheetView(){sheetMode=true;document.body.classList.add('erp-sheet-mode');$('erp-sheet-bar').hidden=false;syncSheetActive()}
 function exitSheetView(){sheetMode=false;document.body.classList.remove('erp-sheet-mode');$('erp-sheet-bar').hidden=true;for(const id of ['catalogue-view','inventory-view'])$(id)?.classList.remove('sheet-active')}
@@ -658,8 +700,8 @@ async function openProductStatement(id){
 
 function exportProducts(){
  const rows=productRows();
- A.csv('Products',['ID','Product','Category','Unit','MRP INR','Wholesale INR','Stock','MOQ','Bulk Slabs','Active'],
- rows.map(p=>[p.id,p.title,categoryName(p.category_id),p.unit,p.mrp_paise/100,p.price_paise/100,p.stock,p.min_qty,(p.bulk_rules||[]).map(t=>`${t.min_qty}+ @ ₹${t.price_paise/100}`).join(' | '),p.active]),
+ A.csv('Products',['ID','Product','Category','Unit','MRP INR','Wholesale INR','Stock','MOQ','Bulk Plans','Active'],
+ rows.map(p=>[p.id,p.title,categoryName(p.category_id),p.unit,p.mrp_paise/100,p.price_paise/100,p.stock,p.min_qty,(p.bulk_rules||[]).map((t,i)=>{const x=planData(t,p,i);return `${x.title}: ${x.units} units for ₹${(x.total/100).toFixed(2)} | profit ₹${(x.profit/100).toFixed(2)} (${pctPlan(x.margin)})`}).join(' || '),p.active]),
  'Current product catalogue; filters applied');
 }
 function exportLedger(){
