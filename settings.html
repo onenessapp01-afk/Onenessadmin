@@ -45,6 +45,24 @@ body.settings-console #view{height:100%;overflow:auto;max-width:none!important;p
 }
 @media(max-width:480px){.settings-grid{grid-template-columns:1fr}.email-overview,.smart-cards{grid-template-columns:1fr 1fr}.template-editor{display:block}.editor-preview{margin-top:10px}.test-email{width:100%}.editor-footer,.editor-footer .left,.editor-footer .right{display:grid;grid-template-columns:1fr;width:100%}.settings-panel-head{align-items:flex-start}}
 
+
+/* Backup & Export */
+.backup-hero{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(260px,.75fr);gap:9px;margin-bottom:10px}
+.backup-card{border:1px solid #dce5df;border-radius:12px;background:#fff;padding:11px}
+.backup-card.primary{background:linear-gradient(135deg,#173b32,#25634f);color:#fff;border-color:#173b32}
+.backup-card.primary span,.backup-card.primary small{color:#c9dbd2}.backup-card h3{margin:0;font-size:11px}.backup-card p{margin:4px 0 0;font-size:8px;line-height:1.45;color:#6d7a73}.backup-card.primary p{color:#c9dbd2}
+.backup-kpis{display:grid;grid-template-columns:repeat(4,minmax(110px,1fr));gap:7px;margin-bottom:9px}.backup-kpi{padding:9px;border:1px solid #dfe6e1;border-radius:10px;background:#f8faf8}.backup-kpi span{display:block;font-size:7px;color:#6c7972;text-transform:uppercase;letter-spacing:.4px;font-weight:850}.backup-kpi strong{display:block;font-size:13px;margin-top:3px;color:#173b32}.backup-kpi small{display:block;font-size:7px;color:#7d8982;margin-top:2px;line-height:1.35}
+.backup-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,.85fr);gap:9px}.backup-section{border:1px solid #dce5df;border-radius:12px;background:#fff;padding:11px}.backup-section h3{margin:0 0 4px;font-size:12px}.backup-section>p{font-size:8px;color:#6e7c74;margin:0 0 10px;line-height:1.45}
+.backup-form{display:grid;grid-template-columns:1fr 1fr;gap:8px}.backup-form label{margin:0;font-size:8px}.backup-form .wide{grid-column:1/-1}.backup-form input,.backup-form select{min-height:37px}
+.backup-toggle{display:flex!important;align-items:flex-start;gap:8px;padding:9px;border-radius:9px;background:#f5f8f5}.backup-toggle input{width:18px;height:18px;margin-top:1px}.backup-toggle span{display:block}.backup-toggle b{font-size:9px}.backup-toggle small{font-size:7px;color:#6d7b73}
+.backup-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.backup-actions button{min-height:34px;font-size:9px}.backup-actions .download{background:#eaf5ec;color:#17634c;border-color:#cee2d3}.backup-actions .sheet{background:#eef3fb;color:#4d6190;border-color:#dbe4f1}
+.backup-table-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;margin-top:9px}.backup-table-item{display:flex;justify-content:space-between;gap:8px;padding:6px 7px;background:#f7f9f7;border-radius:7px;font-size:7px}.backup-table-item b{color:#173b32}.backup-table-item span{color:#718078}
+.backup-note{padding:8px 9px;border-radius:9px;background:#fff6e8;border:1px solid #eadcc2;color:#77591e;font-size:7.5px;line-height:1.45;margin-top:9px}.backup-ok{background:#edf7ef;border-color:#d4e5d8;color:#285d43}.backup-error{background:#fff0ed;border-color:#efd1ca;color:#8c3a2d}
+.backup-status-grid{display:grid;gap:6px}.backup-status-row{display:grid;grid-template-columns:105px minmax(0,1fr);gap:8px;padding:7px 0;border-bottom:1px solid #eef2ee;font-size:8px}.backup-status-row:last-child{border-bottom:0}.backup-status-row span{color:#748078}.backup-status-row b{overflow-wrap:anywhere}
+.jobs-shell{display:grid;gap:8px}.jobs-head{display:flex;justify-content:space-between;align-items:center;gap:8px}.jobs-head h2{margin:0;font-size:17px}.jobs-head p{margin:3px 0 0;font-size:8px;color:#718078}.jobs-head button{min-height:33px;font-size:9px}
+@media(max-width:980px){.backup-hero,.backup-grid{grid-template-columns:1fr}.backup-kpis{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.backup-form{grid-template-columns:1fr}.backup-form .wide{grid-column:auto}.backup-kpis{grid-template-columns:1fr 1fr}.backup-table-list{grid-template-columns:1fr}.backup-actions{display:grid;grid-template-columns:1fr}.backup-actions button{width:100%}}
+
 </style>
 </head><body>
 <div id="app"><p id="boot">Opening ONeness…</p></div>
@@ -99,10 +117,11 @@ const SETTING_META={
  payments:{icon:'₹',color:'#2c7a58',desc:'COD / online availability and retailer eligibility.'},
  coupons:{icon:'%',color:'#a24f3d',desc:'Discount codes, eligibility, dates and usage.'},
  notifications:{icon:'N',color:'#477b87',desc:'Push notification registration and device control.'},
+ backup:{icon:'B',color:'#2b6f58',desc:'Export the database or schedule encrypted server-side backups to Google Sheets.'},
  jobs:{icon:'J',color:'#675d51',desc:'Pending or failed backend synchronization jobs.'}
 };
 
-const tabs=[['profile','My profile'],['addresses','Addresses'],...(profile.role==='owner'?[['team','Team & Access']]:[]),...(A.can('settings')?[['store','Store'],['payments','Payments']]:[]),...(A.can('coupons')?[['coupons','Coupons']]:[]),['notifications','Notifications'],...(profile.role==='owner'?[['jobs','Sync jobs']]:[])];
+const tabs=[['profile','My profile'],['addresses','Addresses'],...(profile.role==='owner'?[['team','Team & Access'],['backup','Backup & Export']]:[]),...(A.can('settings')?[['store','Store'],['payments','Payments']]:[]),...(A.can('coupons')?[['coupons','Coupons']]:[]),['notifications','Notifications'],...(profile.role==='owner'?[['jobs','Sync jobs']]:[])];
 $('view').innerHTML=`
 <div class="settings-hero">
  <div><h1>Settings</h1><p>Control your account, store operations, team access, payments and communication from one place.</p></div>
@@ -138,7 +157,20 @@ async function show(next=tab){
  if(tab==='coupons'){coupons=await A.all('admin.coupons');el.innerHTML='<div class="row between"><h2>Coupons</h2><button class="primary" id="new-coupon">Create coupon</button></div>'+A.table(['Code','Discount','Eligibility','Status',''],coupons.map(c=>[esc(c.code),c.kind==='percent'?(c.value/100)+'%':money(c.value),c.eligible_users?'Users '+esc(c.eligible_users.join(', ')):'All approved users',A.badge(c.active?'active':'inactive'),`<button class="small" data-edit-coupon="${c.id}">Edit</button> <button class="small" data-usage="${c.id}">Usage</button>`]));$('new-coupon').onclick=()=>editCoupon();for(const b of el.querySelectorAll('[data-edit-coupon]'))b.onclick=()=>editCoupon(coupons.find(c=>c.id===+b.dataset.editCoupon));for(const b of el.querySelectorAll('[data-usage]'))b.onclick=()=>usage(+b.dataset.usage).catch(A.error);}
  if(tab==='notifications'){profile=await A.api('session.me');el.innerHTML=`<h2>Device notifications</h2><p>${profile.push_enabled?'This account has a registered push subscription.':'Notifications are not registered for this account.'}</p><div class="row"><button class="primary" id="enable-push">Enable on this device</button><button id="disable-push">Disable for my account</button></div><p class="muted" style="margin-top:16px">Your most recent app login is the active device.</p>`;$('enable-push').onclick=async()=>{try{await A.notifications();await show();}catch(e){A.error(e);}};$('disable-push').onclick=async()=>{try{await A.api('push.unregister');await show();}catch(e){A.error(e);}};}
 
- if(tab==='jobs'){const jobs=await A.all('admin.jobs');el.innerHTML='<div class="row between"><h2>Pending and failed sync jobs</h2><button id="refresh-jobs">Refresh</button></div>'+A.table(['Job','Type','Order','State','Attempts','Last error',''],jobs.map(j=>[j.id,esc(j.kind),j.order_id||'—',A.badge(j.state),j.attempts,esc(j.last_error||''),j.state==='failed'?`<button class="small" data-retry="${j.id}">Retry</button>`:'']));$('refresh-jobs').onclick=()=>show().catch(A.error);for(const b of el.querySelectorAll('[data-retry]'))b.onclick=async()=>{b.disabled=true;try{await A.api('admin.job.retry',{id:+b.dataset.retry});await show();}catch(e){A.error(e);b.disabled=false;}};}
+ if(tab==='backup')await renderBackup(el);
+ if(tab==='jobs'){
+  el.innerHTML='<p>Loading sync jobs…</p>';
+  let jobs=[];
+  try{
+    jobs=await A.all('admin.jobs',{limit:100});
+  }catch(first){
+    const raw=await A.api('admin.jobs',{limit:100});
+    jobs=Array.isArray(raw)?raw:(raw?.items||[]);
+  }
+  el.innerHTML=`<div class="jobs-shell"><div class="jobs-head"><div><h2>Pending & failed sync jobs</h2><p>Only jobs that still require processing or owner attention are shown.</p></div><button id="refresh-jobs">Refresh</button></div>${jobs.length?A.table(['Job','Type','Order','State','Attempts','Last error',''],jobs.map(j=>[j.id,esc(j.kind),j.order_id||'—',A.badge(j.state),j.attempts,esc(j.last_error||''),j.state==='failed'?`<button class="small" data-retry="${j.id}">Retry</button>`:''])):'<div class="team-empty">No pending or failed sync jobs.</div>'}</div>`;
+  $('refresh-jobs').onclick=()=>show('jobs').catch(A.error);
+  for(const b of el.querySelectorAll('[data-retry]'))b.onclick=async()=>{b.disabled=true;try{await A.api('admin.job.retry',{id:+b.dataset.retry});A.toast('Job queued again');await show('jobs');}catch(e){A.error(e);b.disabled=false;}};
+ }
 }
 
 
@@ -184,6 +216,114 @@ function editCoupon(c){A.form(c?'Edit coupon':'New coupon',[
  ],c?{...c,amount:c.value/100,minimum:c.min_paise/100,cap:c.max_discount_paise===null?'':c.max_discount_paise/100,eligible:c.eligible_users?.join(', ')||'',start:toInput(c.starts_at),end:toInput(c.ends_at)}:{kind:'percent',amount:10,minimum:0,per_user_limit:1,active:true,start:toInput(new Date().toISOString())},async v=>{let eligible=null;if(v.eligible.trim()){if(!/^\d+(\s*,\s*\d+)*$/.test(v.eligible.trim()))throw Error('Use comma-separated numeric retailer IDs.');eligible=v.eligible.split(',').map(Number);}await A.api('admin.coupon.put',{...(c?{id:c.id,expected_version:c.version}:{}),code:v.code,kind:v.kind,value:A.paise(v.amount),min_paise:A.paise(v.minimum),max_discount_paise:v.cap?A.paise(v.cap):null,eligible_users:eligible,starts_at:new Date(v.start+':00+05:30').toISOString(),ends_at:v.end?new Date(v.end+':00+05:30').toISOString():null,max_uses:v.max_uses?+v.max_uses:null,per_user_limit:+v.per_user_limit,active:v.active});await show('coupons');});}
 async function usage(id){const rows=await A.all('admin.coupon.usage',{id});const data=rows.map(o=>[o.id,o.user_id,A.date(o.used_at),o.status,o.discount_paise/100,o.status==='cancelled'?'Released':o.status==='syncing'?'Reserved':'Used']);A.modal('Coupon usage',A.table(['Order','Retailer ID','Used IST','Status','Discount INR','Usage'],data.map(r=>r.map(esc)))+'<button id="export-usage" style="margin-top:18px">Export usage</button>');$('export-usage').onclick=()=>A.csv('Coupon usage',['Order','Retailer ID','Used IST','Status','Discount INR','Usage'],data,'Coupon #'+id+'; all dates');}
 
+
+
+async function backupApi(action,data={}){
+ const {data:result,error}=await A.client.functions.invoke('admin-backup',{body:{action,data}});
+ if(error)throw Error(error.message||'Backup service request failed.');
+ if(!result||result.ok!==true)throw Error(result?.error?.message||'Backup service request failed.');
+ return result.data;
+}
+function backupDate(v){return v?new Date(v).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',dateStyle:'medium',timeStyle:'short'}):'—'}
+function backupInputDate(v){if(!v)return '';return new Date(Date.parse(v)+19800000).toISOString().slice(0,16)}
+function backupCell(v){
+ if(v===null||v===undefined)return '';
+ if(Array.isArray(v)||typeof v==='object')return JSON.stringify(v);
+ return v;
+}
+function backupSheetName(name,used){
+ let base=String(name||'Sheet').replace(/[\\\\/?*\\[\\]:]/g,' ').trim().slice(0,31)||'Sheet',candidate=base,n=2;
+ while(used.has(candidate)){const suffix=` ${n++}`;candidate=(base.slice(0,31-suffix.length)+suffix)}
+ used.add(candidate);return candidate;
+}
+const loadBackupScript=src=>new Promise((resolve,reject)=>{
+ const old=[...document.scripts].find(s=>s.src===src);
+ if(old){if(old.dataset.loaded==='1')return resolve();old.addEventListener('load',resolve,{once:true});old.addEventListener('error',reject,{once:true});return}
+ const s=document.createElement('script');s.src=src;s.async=true;s.onload=()=>{s.dataset.loaded='1';resolve()};s.onerror=()=>reject(Error('Could not load Excel export library. Check internet access.'));document.head.append(s);
+});
+async function exportDatabaseExcel(btn){
+ btn.disabled=true;const old=btn.textContent;btn.textContent='Preparing database…';
+ try{
+  const snap=await backupApi('snapshot');
+  await loadBackupScript('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js');
+  if(!window.XLSX)throw Error('Excel library did not load.');
+  const wb=XLSX.utils.book_new(),used=new Set(),tables=snap.tables||{};
+  for(const [name,raw] of Object.entries(tables)){
+   const rows=Array.isArray(raw)?raw:[],keys=[];
+   for(const row of rows)for(const key of Object.keys(row||{}))if(!keys.includes(key))keys.push(key);
+   const matrix=keys.length?[keys,...rows.map(row=>keys.map(k=>backupCell(row?.[k])))]:[['No rows']];
+   const ws=XLSX.utils.aoa_to_sheet(matrix);
+   ws['!cols']=keys.length?keys.map((k,i)=>({wch:Math.min(38,Math.max(11,k.length+2,...rows.slice(0,80).map(r=>String(backupCell(r?.[k])??'').length).map(n=>Math.min(n,34))))} )):[{wch:18}];
+   XLSX.utils.book_append_sheet(wb,ws,backupSheetName(name,used));
+  }
+  const stamp=new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb,`oneness-database-backup-${stamp}.xlsx`);
+  A.toast('Database Excel backup created');
+ }finally{btn.disabled=false;btn.textContent=old}
+}
+async function renderBackup(el){
+ let cfg=await backupApi('config.get');
+ const tableNames=['profiles','categories','products','addresses','orders','coupons','notifications','settings','payment_method_rules','inventory_movements','order_events','jobs'];
+ el.innerHTML=`<div class="settings-section-head"><div><h2>Backup & Export</h2><p>Owner-only database backup tools. Download a workbook now or keep a Google Sheet automatically refreshed.</p></div><span class="chip">${cfg.enabled?'Automatic backup on':'Manual only'}</span></div>
+ <div class="backup-hero">
+  <div class="backup-card primary"><h3>Database workbook</h3><p>Creates one Excel workbook with a separate worksheet for every backed-up business table.</p><div class="backup-actions"><button id="backup-excel" class="download">Download Excel backup</button></div></div>
+  <div class="backup-card"><h3>Protected backup scope</h3><p>Business data is exported. Supabase Auth sessions, service-role keys, API secrets, webhook secrets and active session identifiers are deliberately excluded.</p></div>
+ </div>
+ <div class="backup-kpis">
+  <div class="backup-kpi"><span>Automatic backup</span><strong>${cfg.enabled?'Enabled':'Off'}</strong><small>${cfg.interval_minutes?`Every ${formatBackupInterval(cfg.interval_minutes)}`:'Not scheduled'}</small></div>
+  <div class="backup-kpi"><span>Next backup</span><strong>${cfg.next_run_at?backupDate(cfg.next_run_at):'—'}</strong><small>Scheduler checks every 15 minutes</small></div>
+  <div class="backup-kpi"><span>Last successful</span><strong>${cfg.last_success_at?backupDate(cfg.last_success_at):'Never'}</strong><small>Latest confirmed scheduled/manual run</small></div>
+  <div class="backup-kpi"><span>Last status</span><strong>${esc(cfg.last_status||'never')}</strong><small>${esc(cfg.last_error||'No backup error')}</small></div>
+ </div>
+ <div class="backup-grid">
+  <section class="backup-section"><h3>Google Sheets automatic backup</h3><p>Share the Google Sheet with edit access to the Google account that owns your existing ONeness Apps Script bridge. Each database table is written to its own tab.</p>
+   <div id="backup-message"></div>
+   <div class="backup-form">
+    <label class="wide">Google Sheet edit link<input id="backup-sheet-url" placeholder="https://docs.google.com/spreadsheets/d/..." value="${esc(cfg.spreadsheet_url||'')}"></label>
+    <label>Backup frequency<select id="backup-frequency">${[[60,'Every hour'],[360,'Every 6 hours'],[720,'Every 12 hours'],[1440,'Every day'],[4320,'Every 3 days'],[10080,'Every 7 days']].map(([v,l])=>`<option value="${v}" ${+cfg.interval_minutes===v?'selected':''}>${l}</option>`).join('')}</select></label>
+    <label>Next backup time (IST)<input id="backup-next" type="datetime-local" value="${backupInputDate(cfg.next_run_at)}"></label>
+    <label class="wide">Email backup to<input id="backup-email" type="email" placeholder="owner@example.com" value="${esc(cfg.recipient_email||profile.email||'')}"></label>
+    <label class="backup-toggle wide"><input id="backup-email-xlsx" type="checkbox" ${cfg.email_xlsx!==false?'checked':''}><span><b>Email an Excel copy after each Google Sheet backup</b><br><small>The mail also includes the Google Sheet link and backup time.</small></span></label>
+    <label class="backup-toggle wide"><input id="backup-enabled" type="checkbox" ${cfg.enabled?'checked':''}><span><b>Enable recurring automatic backup</b><br><small>The database scheduler checks for due backups every 15 minutes.</small></span></label>
+   </div>
+   <div class="backup-actions"><button id="backup-save" class="primary">Save backup schedule</button><button id="backup-push" class="sheet">Push database to Google Sheet now</button></div>
+   <div class="backup-note">Google Sheet writes require the <b>backup.sync</b> handler in your existing ONeness Apps Script bridge. The database scheduler and secure Supabase backup service are already prepared.</div>
+  </section>
+  <aside class="backup-section"><h3>Backup contents</h3><p>These are the business tables included in Excel and Google Sheets backups.</p><div class="backup-table-list">${tableNames.map(x=>`<div class="backup-table-item"><b>${esc(x)}</b><span>table</span></div>`).join('')}</div>
+   <div class="backup-status-grid" style="margin-top:10px">
+    <div class="backup-status-row"><span>Last run</span><b>${backupDate(cfg.last_run_at)}</b></div>
+    <div class="backup-status-row"><span>Last success</span><b>${backupDate(cfg.last_success_at)}</b></div>
+    <div class="backup-status-row"><span>Current status</span><b>${esc(cfg.last_status||'never')}</b></div>
+    <div class="backup-status-row"><span>Last error</span><b>${esc(cfg.last_error||'—')}</b></div>
+   </div>
+  </aside>
+ </div>`;
+ $('backup-excel').onclick=()=>exportDatabaseExcel($('backup-excel')).catch(A.error);
+ $('backup-save').onclick=async()=>{
+  const btn=$('backup-save');btn.disabled=true;
+  try{
+   const url=$('backup-sheet-url').value.trim(),email=$('backup-email').value.trim(),enabled=$('backup-enabled').checked,next=$('backup-next').value;
+   if(enabled&&!url)throw Error('Add the Google Sheet edit link before enabling automatic backup.');
+   if(url){try{const u=new URL(url);if(u.protocol!=='https:'||u.hostname!=='docs.google.com'||!u.pathname.startsWith('/spreadsheets/d/'))throw Error();}catch{throw Error('Paste a valid Google Sheets link.');}}
+   if(email&&!/^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(email))throw Error('Enter a valid backup email address.');
+   cfg=await backupApi('config.put',{expected_version:cfg.version,enabled,spreadsheet_url:url,recipient_email:email,email_xlsx:$('backup-email-xlsx').checked,interval_minutes:+$('backup-frequency').value,next_run_at:next?new Date(next+':00+05:30').toISOString():null});
+   A.toast('Backup schedule saved');await renderBackup(el);
+  }catch(e){A.error(e)}finally{btn.disabled=false}
+ };
+ $('backup-push').onclick=async()=>{
+  const btn=$('backup-push');btn.disabled=true;const old=btn.textContent;btn.textContent='Pushing database…';
+  try{
+   if(!$('backup-sheet-url').value.trim())throw Error('Save a Google Sheet link first.');
+   if($('backup-sheet-url').value.trim()!==String(cfg.spreadsheet_url||''))throw Error('Save the Google Sheet link before running a backup.');
+   const result=await backupApi('run.now');
+   A.toast(result?.spreadsheet_url?'Google Sheet backup completed':'Backup sent to Google Sheets');
+   await renderBackup(el);
+  }catch(e){A.error(e)}finally{btn.disabled=false;btn.textContent=old}
+ };
+}
+function formatBackupInterval(minutes){
+ const n=Number(minutes||0);if(n%10080===0)return `${n/10080} week${n===10080?'':'s'}`;if(n%1440===0)return `${n/1440} day${n===1440?'':'s'}`;if(n%60===0)return `${n/60} hour${n===60?'':'s'}`;return `${n} minutes`;
+}
 
 async function uploadAvatar(){
  const file=$('avatar-file').files?.[0];if(!file)return;
