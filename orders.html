@@ -114,15 +114,21 @@ body.order-console-page .footer-bar{flex:0 0 auto;margin-top:5px}
 }
 
 .journey-card{overflow:hidden;background:linear-gradient(180deg,#fbfdfb,#f0f7f1)}
-.journey{position:relative;padding:19px 14px 12px}
-.journey-road{position:absolute;left:8%;right:8%;top:32px;height:4px;border-radius:999px;background:linear-gradient(90deg,#17634c 0 var(--progress),#dce5df var(--progress) 100%)}
-.journey-road:after{content:'';position:absolute;left:0;right:0;top:1px;border-top:1px dashed rgba(255,255,255,.9)}
-.journey-truck{position:absolute;top:15px;left:calc(var(--truck) - 14px);font-size:23px;z-index:5;filter:drop-shadow(0 3px 4px #173b3230);animation:truckRide 1.1s ease-in-out infinite alternate;transition:left .45s ease}
-@keyframes truckRide{from{transform:translateY(-1px) rotate(-1deg)}to{transform:translateY(2px) rotate(1deg)}}
-.journey-steps{position:relative;z-index:3;display:grid;grid-template-columns:repeat(5,1fr)}
-.jstep{text-align:center}.jdot{width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid #d6e0d9;margin:auto;transition:.2s}.jstep.done .jdot,.jstep.current .jdot{border-color:#17634c;background:#17634c}.jstep.current .jdot{box-shadow:0 0 0 5px #dff0e2;animation:dotPulse 1.4s infinite}
+.journey{position:relative;padding:18px 14px 12px}
+.journey-route{position:absolute;left:10%;right:10%;top:27px;height:4px;z-index:2}
+.journey-road{position:absolute;inset:0;border-radius:999px;background:linear-gradient(90deg,#17634c 0 var(--progress),#dce5df var(--progress) 100%);box-shadow:inset 0 0 0 1px rgba(23,99,76,.05)}
+.journey-road:after{content:'';position:absolute;left:2px;right:2px;top:1px;border-top:1px dashed rgba(255,255,255,.9)}
+.journey-truck{position:absolute;left:var(--truck);top:-15px;width:31px;height:21px;z-index:6;transform:translateX(-50%);transition:left .5s cubic-bezier(.2,.8,.2,1);filter:drop-shadow(0 3px 4px rgba(23,59,50,.18));animation:truckGlow 1.8s ease-in-out infinite}
+.journey-truck svg{display:block;width:31px;height:21px;overflow:visible}
+@keyframes truckGlow{50%{filter:drop-shadow(0 3px 6px rgba(23,99,76,.28))}}
+.journey-steps{position:relative;z-index:4;display:grid;grid-template-columns:repeat(5,1fr)}
+.jstep{text-align:center}
+.jdot{position:relative;width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid #d6e0d9;margin:auto;transition:.2s}
+.jstep.done .jdot,.jstep.current .jdot{border-color:#17634c;background:#17634c}
+.jstep.current .jdot{box-shadow:0 0 0 5px #dff0e2;animation:dotPulse 1.4s infinite}
 @keyframes dotPulse{50%{box-shadow:0 0 0 9px #dff0e255}}
-.jstep span{display:block;margin-top:8px;font-size:7px;font-weight:800;color:#718078}.jstep.done span,.jstep.current span{color:#173b32}
+.jstep span{display:block;margin-top:8px;font-size:7px;font-weight:800;color:#718078}
+.jstep.done span,.jstep.current span{color:#173b32}
 .cancel-journey{padding:11px;border-radius:10px;background:#fff0ed;color:#a13c30;font-size:9px;font-weight:850}
 .admin-bottom-card{display:grid!important;gap:8px}
 .admin-profile{display:grid;grid-template-columns:42px minmax(0,1fr);gap:9px;align-items:center;padding:9px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.05)}
@@ -314,21 +320,106 @@ async function exitSheetMode(){const ws=$('smartWorkspace');sheetMode=false;ws.c
 function toggleSheetMode(){return sheetMode?exitSheetMode():enterSheetMode()}
 function toggleDensity(){denseMode=!denseMode;$('smartWorkspace').classList.toggle('dense',denseMode);syncSheetButtons()}
 function modalForm(title,sub,fields,onSave){$('action-title').textContent=title;$('action-sub').textContent=sub||'';$('action-body').innerHTML=fields;$('action-form').onsubmit=async e=>{e.preventDefault();const btn=$('action-save');btn.disabled=true;try{await onSave(new FormData(e.currentTarget));$('actionModal').close()}catch(err){A.error(err)}finally{btn.disabled=false}};$('actionModal').showModal()}
+
+function statusConflictError(err){
+ const m=String(err?.message||err||'').toLowerCase();
+ return m.includes('version_conflict')||
+        m.includes('database operation failed')||
+        m.includes('409')||
+        m.includes('conflict');
+}
+async function freshOrderState(id){
+ try{
+  const d=await detail(id);
+  if(d?.order)return d.order;
+ }catch{}
+ // Fallback to a fresh orders list if the detail snapshot cannot be opened
+ // (for example while an order is still syncing).
+ const fresh=await A.all('orders.list',{});
+ const live=fresh.find(x=>+x.id===+id);
+ if(!live)throw Error(`Order #ON${id} is no longer available.`);
+ return live;
+}
+function statusPayload(live,next,fd){
+ const reason=next==='cancelled'
+   ?[fd.get('reason'),fd.get('other')].filter(Boolean).join(' · ')
+   :undefined;
+ return {
+  id:live.id,
+  status:next,
+  expected_version:live.version,
+  ...(next==='dispatched'?{tracking:String(fd.get('tracking')||live.tracking||'')}:{}),
+  ...(reason?{reason}:{}),
+  note:String(fd.get('note')||'')
+ };
+}
+async function updateOrderStatusSmart(id,next,fd){
+ let live=await freshOrderState(id);
+
+ if(live.status===next)return live;
+
+ if(!validNext(live.status).includes(next)){
+  throw Error(
+   `Order #ON${id} is currently ${statusLabel(live.status)}. `+
+   `${statusLabel(next)} is no longer the next available action.`
+  );
+ }
+
+ try{
+  return await A.api('order.status',statusPayload(live,next,fd));
+ }catch(first){
+  if(!statusConflictError(first))throw first;
+
+  // Another action may have updated the order between opening the page
+  // and pressing Save. Re-read the authoritative row and retry once.
+  live=await freshOrderState(id);
+
+  if(live.status===next)return live;
+
+  if(!validNext(live.status).includes(next)){
+   throw Error(
+    `Order #ON${id} changed to ${statusLabel(live.status)} while this page was open. `+
+    `The list has been refreshed; choose the next status again.`
+   );
+  }
+
+  try{
+   return await A.api('order.status',statusPayload(live,next,fd));
+  }catch(second){
+   if(statusConflictError(second)){
+    throw Error(
+     `Order #ON${id} changed again before the status could be saved. `+
+     `Refresh once and try the status action again.`
+    );
+   }
+   throw second;
+  }
+ }
+}
+
 function openStatusAction(id,next){
  const o=orders.find(x=>+x.id===+id);if(!o)return;let fields='';
  if(next==='dispatched')fields=`<label>Tracking / dispatch reference<input name="tracking" value="${esc(o.tracking||'')}" placeholder="LR / courier / vehicle / tracking"></label>`;
  if(next==='cancelled')fields=`<label>Cancellation reason<select name="reason"><option>Customer requested cancellation</option><option>Out of stock</option><option>Duplicate order</option><option>Wrong order</option><option>Wrong address</option><option>Payment issue</option><option>Other</option></select></label><label>Additional reason<textarea name="other" placeholder="Optional details"></textarea></label>`;
  fields+=`<label>Internal note<textarea name="note" placeholder="Optional admin note"></textarea></label>`;
- modalForm(next==='cancelled'?`Cancel #ON${id}`:`Mark #ON${id} ${statusLabel(next)}`,'The retailer will receive an order notification after this status change.',fields,async fd=>{
-  const reason=next==='cancelled'?[fd.get('reason'),fd.get('other')].filter(Boolean).join(' · '):undefined;
-  await A.api('order.status',{id,status:next,expected_version:o.version,...(next==='dispatched'?{tracking:String(fd.get('tracking')||'')}:{}),...(reason?{reason}:{}),note:String(fd.get('note')||'')});
-  A.toast(`Order #ON${id} updated to ${statusLabel(next)}`);await load();if(current?.order?.id===id)await openDetail(id)
+ modalForm(next==='cancelled'?`Cancel #ON${id}`:`Mark #ON${id} ${statusLabel(next)}`,'The current order version will be rechecked before saving. The retailer will receive a notification after a successful status change.',fields,async fd=>{
+  await updateOrderStatusSmart(id,next,fd);
+  A.toast(`Order #ON${id} updated to ${statusLabel(next)}`);
+  await load();
+  if(current?.order?.id===id)await openDetail(id)
  })
 }
 function editNote(id){
  const o=orders.find(x=>+x.id===+id);if(!o)return;
  modalForm(`Internal note · #ON${id}`,'This note is visible only to authorized admins.',`<label>Internal note<textarea name="note">${esc(o.internal_note||'')}</textarea></label>`,async fd=>{
-  await A.api('order.status',{id,status:o.status,operation:'note',expected_version:o.version,note:String(fd.get('note')||'')});
+  let live=await freshOrderState(id);
+  try{
+   await A.api('order.status',{id,status:live.status,operation:'note',expected_version:live.version,note:String(fd.get('note')||'')});
+  }catch(err){
+   if(!statusConflictError(err))throw err;
+   live=await freshOrderState(id);
+   await A.api('order.status',{id,status:live.status,operation:'note',expected_version:live.version,note:String(fd.get('note')||'')});
+  }
   A.toast('Internal note saved');await load();if(current?.order?.id===id)await openDetail(id)
  })
 }
@@ -465,7 +556,8 @@ async function detail(id){return await A.api('order.details',{id})}
 function journey(status){
  if(status==='cancelled')return `<div class="cancel-journey">● Order cancelled — fulfilment journey stopped.</div>`;
  const steps=['placed','confirmed','packed','dispatched','delivered'],idx=steps.indexOf(status),safe=Math.max(0,idx),progress=idx<0?0:(safe/(steps.length-1))*100;
- return `<div class="journey" style="--progress:${progress}%;--truck:${progress}%"><div class="journey-road"></div><div class="journey-truck" aria-hidden="true">🚚</div><div class="journey-steps">${steps.map((s,i)=>`<div class="jstep ${i<safe?'done':i===safe&&idx>=0?'current':''}"><div class="jdot"></div><span>${esc(statusLabel(s))}</span></div>`).join('')}</div></div>`;
+ const truck=`<svg viewBox="0 0 52 32" role="img" aria-label="Delivery truck"><rect x="2" y="6" width="29" height="17" rx="3" fill="#17634c"/><path d="M31 11h9l8 8v4H31z" fill="#2f7d61"/><path d="M35 13h5l5 5h-10z" fill="#dff2e6"/><circle cx="13" cy="25" r="5" fill="#173b32"/><circle cx="39" cy="25" r="5" fill="#173b32"/><circle cx="13" cy="25" r="2" fill="#dfe9e2"/><circle cx="39" cy="25" r="2" fill="#dfe9e2"/><rect x="4" y="9" width="17" height="2" rx="1" fill="#7db39a"/></svg>`;
+ return `<div class="journey"><div class="journey-route" style="--progress:${progress}%;--truck:${progress}%"><div class="journey-road"></div><div class="journey-truck" aria-hidden="true">${truck}</div></div><div class="journey-steps">${steps.map((s,i)=>`<div class="jstep ${i<safe?'done':i===safe&&idx>=0?'current':''}"><div class="jdot"></div><span>${esc(statusLabel(s))}</span></div>`).join('')}</div></div>`;
 }
 async function openDetail(id){
  $('detail-title').textContent=`Order #ON${id}`;$('detail-sub').textContent='Loading complete order information…';$('detail-body').innerHTML='<p>Loading…</p>';$('detailModal').showModal();
