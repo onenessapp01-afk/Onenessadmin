@@ -87,6 +87,81 @@ body.erp-sheet-mode{overflow:hidden}.sheet-active{position:fixed!important;z-ind
 @media(max-width:850px){.erp-filter-grid{grid-template-columns:1fr 1fr}.erp-filter-grid .wide{grid-column:1/-1}.slab-row{grid-template-columns:1fr 1fr}.slab-top,.slab-math{grid-column:1/-1}.slab-row>label,.slab-row>.auto-unit-box,.slab-row>.remove-slab{border-right:0;border-bottom:1px solid #edf1ed}.remove-slab{grid-column:1/-1!important;border-left:0!important}.slab-math{grid-template-columns:1fr 1fr}}
 @media(max-width:560px){#view{padding-left:10px!important;padding-right:10px!important}.erp-kpis{display:flex}.erp-kpi{min-width:112px}.erp-filter-grid{grid-template-columns:1fr}.erp-filter-grid .wide{grid-column:auto}.slab-row{display:block}.slab-top{display:flex}.slab-row>label,.slab-row>.auto-unit-box,.slab-row>.remove-slab{display:block;width:100%;box-sizing:border-box}.slab-math{display:grid;grid-template-columns:1fr 1fr}}
 
+
+/* Full-width colored inventory workspace */
+#inventory-view{min-width:0}
+#inventory-view .erp-toolbar{background:linear-gradient(180deg,#ffffff,#f7faf7);border-color:#d8e3dc}
+.inventory-headline{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 2px 9px;padding:0 2px}
+.inventory-headline .statement-title{font-size:15px;font-weight:900;color:#173b32;letter-spacing:-.2px}
+.inventory-headline .statement-sub{font-size:9px;color:#718078;margin-top:2px}
+.inventory-count{display:inline-flex;padding:5px 8px;border-radius:999px;background:#e8f1ea;color:#3a5d4d;font-size:9px;font-weight:850}
+.inventory-summary-strip{display:grid;grid-template-columns:repeat(6,minmax(125px,1fr));gap:7px;margin-bottom:9px}
+.inventory-summary-strip .summary-card{position:relative;overflow:hidden;min-height:78px;border-radius:10px;padding:10px 11px;border:1px solid transparent;box-shadow:none}
+.inventory-summary-strip .summary-card:after{content:"";position:absolute;width:52px;height:52px;border-radius:50%;right:-18px;bottom:-20px;background:currentColor;opacity:.07}
+.inventory-summary-strip .summary-card span{font-size:8px;font-weight:850;text-transform:uppercase;letter-spacing:.45px}
+.inventory-summary-strip .summary-card strong{font-size:20px;line-height:1;margin-top:5px}
+.inventory-summary-strip .summary-card small{display:block;font-size:7px;margin-top:4px;color:inherit;opacity:.72}
+.summary-card.transactions{background:#eef3f8;color:#465f79;border-color:#d8e2ec}
+.summary-card.in{background:#e8f5eb;color:#17634c;border-color:#cfe4d4}
+.summary-card.out{background:#fff0ed;color:#a33824;border-color:#f0d2cb}
+.summary-card.net{background:#fff6e7;color:#8a5b19;border-color:#eadbbd}
+.summary-card.opening{background:#eeeefa;color:#57549a;border-color:#dcdcf0}
+.summary-card.closing{background:#e7f0ff;color:#355f9d;border-color:#ceddf2}
+.inventory-ledger-shell{background:#fff;border:1px solid #d8e2db;border-radius:11px;overflow:hidden}
+.inventory-ledger-note{display:flex;align-items:center;gap:8px;padding:8px 10px;background:#173b32;color:#fff;border-bottom:1px solid #244c3f}
+.inventory-ledger-note>span{display:grid;place-items:center;width:27px;height:27px;border-radius:7px;background:#ffffff12;font-size:14px}
+.inventory-ledger-note b{display:block;font-size:10px}.inventory-ledger-note small{display:block;color:#c7dbd1;font-size:8px;margin-top:1px}
+.inventory-table-wrap{border:0!important;border-radius:0!important;overflow:auto!important;max-height:calc(100vh - 395px)}
+.inventory-table{table-layout:fixed!important}
+.inventory-table th{background:#e8f0ea!important;color:#3f594d!important;font-size:8px!important;padding:7px 6px!important}
+.inventory-table td{font-size:9px!important;padding:7px 6px!important;line-height:1.3}
+.inventory-table th:nth-child(1){width:10%}.inventory-table th:nth-child(2){width:16%}.inventory-table th:nth-child(3){width:11%}.inventory-table th:nth-child(4){width:9%}.inventory-table th:nth-child(5){width:7%}.inventory-table th:nth-child(6){width:6%}.inventory-table th:nth-child(7){width:6%}.inventory-table th:nth-child(8){width:7%}.inventory-table th:nth-child(9){width:11%}.inventory-table th:nth-child(10){width:17%}
+.inventory-table tbody tr td:first-child{border-left:3px solid transparent}
+.inventory-table tbody tr.row-in td:first-child{border-left-color:#55a66e}
+.inventory-table tbody tr.row-out td:first-child{border-left-color:#d56a5a}
+.inventory-table tbody tr.row-neutral td:first-child{border-left-color:#7a8fb1}
+.inventory-table tbody tr.row-in:hover td{background:#f1f9f3!important}
+.inventory-table tbody tr.row-out:hover td{background:#fff5f2!important}
+.inventory-table tbody tr.row-neutral:hover td{background:#f4f6fb!important}
+.movement-type{font-size:8px!important;padding:4px 6px!important;border-radius:6px!important;font-weight:850!important;text-transform:none!important}
+.movement-type.tone-in{background:#e7f4ea;color:#17634c}
+.movement-type.tone-out{background:#fff0ed;color:#a33824}
+.movement-type.tone-order{background:#fff4de;color:#8b5d1d}
+.movement-type.tone-opening{background:#e9eef8;color:#4e6385}
+.movement-type.tone-correction{background:#f1ebfb;color:#65519a}
+.movement-ref{font-size:8px!important;display:block;white-space:normal;overflow-wrap:anywhere}
+.movement-note{font-size:8px!important;max-width:none!important;line-height:1.35}
+.ledger-stock{display:inline-flex;min-width:30px;justify-content:center;padding:3px 5px;border-radius:6px;background:#f1f4f1;font-weight:850}
+.ledger-stock.closing{background:#eaf3ec;color:#285943}
+.movement-in,.movement-out{font-size:10px;font-weight:900!important;text-align:center}
+.inventory-footnote{font-size:8px;color:#7c8982;margin:7px 2px 0;padding-left:2px}
+.ledger-empty{display:grid;place-items:center;gap:4px;min-height:180px}.ledger-empty-icon{font-size:28px;color:#9aac9f}.ledger-empty b{font-size:12px;color:#42584d}.ledger-empty span{font-size:9px}
+.sheet-active#inventory-view{overflow:hidden!important;display:flex!important;flex-direction:column!important}
+.sheet-active#inventory-view .erp-toolbar{position:relative!important;top:auto!important;flex:0 0 auto}
+.sheet-active#inventory-view .inventory-headline{flex:0 0 auto}
+.sheet-active#inventory-view .inventory-summary-strip{grid-template-columns:repeat(6,1fr);flex:0 0 auto}
+.sheet-active#inventory-view .inventory-ledger-shell{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+.sheet-active#inventory-view .inventory-table-wrap{height:auto!important;max-height:none!important;flex:1 1 auto;min-height:0}
+.sheet-active#inventory-view .inventory-table th{position:sticky;top:0;z-index:4}
+.sheet-active#inventory-view .inventory-footnote{display:none}
+@media(max-width:1180px){.inventory-summary-strip{grid-template-columns:repeat(3,1fr)}.inventory-table-wrap{max-height:none}}
+@media(max-width:760px){
+ #inventory-view .erp-toolbar{padding:8px}
+ .inventory-headline{align-items:flex-start}.inventory-head-right{margin-top:1px}
+ .inventory-summary-strip{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+ .inventory-summary-strip .summary-card{min-height:68px;padding:9px}.inventory-summary-strip .summary-card strong{font-size:18px}
+ .inventory-ledger-shell{border-radius:10px}
+ .inventory-ledger-note{padding:8px}
+ .inventory-table-wrap{overflow-x:auto!important}
+ .inventory-table{min-width:940px!important}
+ .inventory-table th,.inventory-table td{white-space:normal}
+}
+@media(max-width:480px){
+ .inventory-headline{display:block}.inventory-head-right{margin-top:6px}
+ .inventory-summary-strip{grid-template-columns:1fr 1fr}
+ .inventory-summary-strip .summary-card span{font-size:7px}.inventory-summary-strip .summary-card small{font-size:7px}
+}
+
 `;
 document.head.append(css);
 
@@ -166,30 +241,34 @@ $('view').innerHTML=A.header(
   </div>
  </div>
 
- <div class="inventory-layout">
+ <div class="inventory-headline">
   <div>
-   <div class="row between" style="margin-bottom:9px"><div><div id="statement-title" class="statement-title">Inventory Statement · All Products</div><div id="statement-sub" class="statement-sub">All recorded movements</div></div><span id="ledger-count" class="muted"></span></div>
-   <div class="erp-table-wrap">
-    <table class="erp-table">
-     <thead><tr><th>Date</th><th>Product</th><th>Type</th><th>Reference</th><th>Opening</th><th>In</th><th>Out</th><th>Closing</th><th>Staff / Source</th><th>Note</th></tr></thead>
-     <tbody id="ledger-body"></tbody>
-    </table>
-    <div id="ledger-empty" class="ledger-empty" hidden>No inventory movements match this statement.</div>
-   </div>
+   <div id="statement-title" class="statement-title">Inventory Statement · All Products</div>
+   <div id="statement-sub" class="statement-sub">All recorded movements</div>
   </div>
-
-  <aside class="inventory-side">
-   <div class="inventory-summary">
-    <div class="summary-card"><span>Transactions</span><strong id="sum-transactions">0</strong></div>
-    <div class="summary-card in"><span>Stock In</span><strong id="sum-in">0</strong></div>
-    <div class="summary-card out"><span>Stock Out</span><strong id="sum-out">0</strong></div>
-    <div class="summary-card"><span>Net movement</span><strong id="sum-net">0</strong></div>
-    <div id="period-opening-card" class="summary-card" hidden><span>Opening balance</span><strong id="sum-opening">0</strong></div>
-    <div id="period-closing-card" class="summary-card accent" hidden><span>Closing balance</span><strong id="sum-closing">0</strong></div>
-   </div>
-   <p class="muted" style="font-size:11px;margin-top:10px">Opening balances mark the point inventory tracking was enabled. Earlier historical stock movements are not reconstructed.</p>
-  </aside>
+  <div class="inventory-head-right"><span id="ledger-count" class="inventory-count">0 movements</span></div>
  </div>
+
+ <div class="inventory-summary inventory-summary-strip">
+  <div class="summary-card transactions"><span>Transactions</span><strong id="sum-transactions">0</strong><small>movement entries</small></div>
+  <div class="summary-card in"><span>Stock In</span><strong id="sum-in">0</strong><small>units received</small></div>
+  <div class="summary-card out"><span>Stock Out</span><strong id="sum-out">0</strong><small>units issued</small></div>
+  <div class="summary-card net"><span>Net movement</span><strong id="sum-net">0</strong><small>in minus out</small></div>
+  <div id="period-opening-card" class="summary-card opening" hidden><span>Opening balance</span><strong id="sum-opening">0</strong><small>period start</small></div>
+  <div id="period-closing-card" class="summary-card closing" hidden><span>Closing balance</span><strong id="sum-closing">0</strong><small>period end</small></div>
+ </div>
+
+ <div class="inventory-ledger-shell">
+  <div class="inventory-ledger-note"><span>▦</span><div><b>Stock movement ledger</b><small>Every stock voucher and order movement is recorded chronologically.</small></div></div>
+  <div class="erp-table-wrap inventory-table-wrap">
+   <table class="erp-table inventory-table">
+    <thead><tr><th>Date & time</th><th>Product</th><th>Movement</th><th>Reference</th><th>Opening</th><th>In</th><th>Out</th><th>Closing</th><th>Staff / Source</th><th>Note</th></tr></thead>
+    <tbody id="ledger-body"></tbody>
+   </table>
+   <div id="ledger-empty" class="ledger-empty" hidden><div class="ledger-empty-icon">▦</div><b>No inventory movements</b><span>No transactions match the selected filters.</span></div>
+  </div>
+ </div>
+ <p class="inventory-footnote">Opening balances mark the point inventory tracking was enabled. Earlier historical stock movements are not reconstructed.</p>
 </section>
 
 <dialog id="productEditor">
@@ -674,6 +753,13 @@ async function loadLedger(){
  $('ledger-count').textContent=`Loaded ${ledger.length} movements…`;
  renderLedger();
 }
+function movementTone(type,delta){
+ if(type==='opening')return 'tone-opening';
+ if(type==='correction'||type==='product_edit')return 'tone-correction';
+ if(type==='order_reserved'||type==='order_cancelled')return 'tone-order';
+ return delta>0?'tone-in':delta<0?'tone-out':'tone-opening';
+}
+function movementRowClass(delta){return delta>0?'row-in':delta<0?'row-out':'row-neutral'}
 function renderLedger(){
  const selected=products.find(p=>p.id===+$('ledger-product').value);
  const totalIn=ledger.filter(x=>x.quantity_delta>0).reduce((a,x)=>a+x.quantity_delta,0);
@@ -693,15 +779,15 @@ function renderLedger(){
  }
 
  $('ledger-body').innerHTML=ledger.map(x=>`
-  <tr>
+  <tr class="${movementRowClass(x.quantity_delta)}">
    <td>${esc(formatDate(x.occurred_at))}</td>
    <td><b>${esc(x.product_title)}</b><span class="stock-unit">#${x.product_id}</span></td>
-   <td><span class="movement-type">${esc(movementLabel(x.movement_type))}</span></td>
+   <td><span class="movement-type ${movementTone(x.movement_type,x.quantity_delta)}">${esc(movementLabel(x.movement_type))}</span></td>
    <td><span class="movement-ref">${esc(x.reference_id||'—')}</span></td>
-   <td>${x.stock_before}</td>
+   <td><span class="ledger-stock">${x.stock_before}</span></td>
    <td class="movement-in">${x.quantity_delta>0?'+'+x.quantity_delta:'—'}</td>
    <td class="movement-out">${x.quantity_delta<0?'−'+Math.abs(x.quantity_delta):'—'}</td>
-   <td><b>${x.stock_after}</b></td>
+   <td><span class="ledger-stock closing">${x.stock_after}</span></td>
    <td>${esc(x.actor_name||x.actor_role||'System')}</td>
    <td class="movement-note">${esc(x.note||'—')}</td>
   </tr>`).join('');
