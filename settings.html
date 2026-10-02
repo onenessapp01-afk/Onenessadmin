@@ -6,6 +6,58 @@ body{margin:0;background:#f4f6f2;font-family:system-ui}#boot{padding:30px;color:
 
 .payment-grid{display:grid;gap:14px;margin-top:14px}.payment-card{border:1px solid #dfe6e1;border-radius:16px;padding:16px;background:#fff}.payment-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}.payment-title{font-weight:800;font-size:1.05rem;color:#173b32}.payment-sub{margin-top:4px;color:#6b786f;font-size:.88rem;line-height:1.45}.payment-state{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;background:#eef6ef;color:#17634c;font-size:.78rem;font-weight:750;white-space:nowrap}.payment-state.off{background:#f1f2f1;color:#68736d}.payment-state.warn{background:#fff4dc;color:#7a5a0e}.payment-controls{display:grid;grid-template-columns:220px minmax(0,1fr);gap:14px;margin-top:16px}.payment-side{border:1px solid #e1e7e2;border-radius:14px;padding:12px;background:#fafcfb}.payment-side label{display:block;margin-bottom:10px}.payment-side select{width:100%;box-sizing:border-box}.payment-toggle{display:flex!important;align-items:center;gap:9px;margin:0 0 14px!important;padding:10px;border-radius:12px;background:#f4f8f4}.payment-toggle input{width:18px;height:18px}.audience-help{color:#708078;font-size:.8rem;line-height:1.45;margin:8px 0 0}.retailer-picker{border:1px solid #e1e7e2;border-radius:14px;padding:12px;min-width:0}.retailer-search{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}.retailer-search input{width:100%;box-sizing:border-box}.retailer-count{display:flex;align-items:center;padding:0 8px;font-size:.8rem;color:#65746b;white-space:nowrap}.retailer-list{display:grid;gap:7px;margin-top:10px;max-height:330px;overflow:auto;padding-right:3px}.retailer-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:9px;padding:9px;border:1px solid #e6ebe7;border-radius:11px;background:#fff}.retailer-row input{width:17px;height:17px}.retailer-row b{display:block;font-size:.9rem}.retailer-row small{display:block;color:#718078;margin-top:2px}.retailer-status{font-size:.72rem;color:#607069}.payment-summary{margin-top:12px;padding:11px;border-radius:12px;background:#f5f8f5;color:#486056;font-size:.86rem}.payment-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:14px}.payment-actions button{min-width:120px}.payment-lock{margin-top:12px;padding:10px 12px;border-radius:12px;background:#fff4dc;color:#74570e;font-size:.84rem}
 @media(max-width:720px){.team-toolbar,.team-stats,.access-grid,.integration-grid,.payment-controls{grid-template-columns:1fr}.team-card-head,.payment-head{flex-direction:column}.team-card-head button{width:100%}.preset-row button{flex:1 1 calc(50% - 8px)}.tabs{overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}}
+
+/* Smart settings workspace */
+body.settings-console{overflow:hidden}
+body.settings-console .main{height:100vh;overflow:hidden}
+body.settings-console .top{display:none!important}
+body.settings-console .content{height:100vh;max-width:none!important;margin:0!important;padding:10px 14px 8px!important;overflow:hidden}
+body.settings-console #view{height:100%;overflow:auto;max-width:none!important;padding:0!important;scrollbar-gutter:stable}
+.settings-hero{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:10px}
+.settings-hero h1{margin:0;font-size:28px;letter-spacing:-.7px;color:#14251f}.settings-hero p{margin:4px 0 0;color:#6c7a72;font-size:11px}
+.settings-hero-badge{padding:7px 10px;border:1px solid #dce5df;border-radius:10px;background:#fff;font-size:9px;color:#51645a;font-weight:800;white-space:nowrap}
+.settings-grid{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:8px;margin-bottom:9px}
+.setting-tile{position:relative;display:grid;grid-template-columns:38px minmax(0,1fr);gap:10px;align-items:center;text-align:left;padding:11px;border:1px solid #dce5df;border-radius:12px;background:#fff;min-height:78px;box-shadow:none;transition:.18s ease;overflow:hidden}
+.setting-tile:before{content:"";position:absolute;inset:auto -22px -28px auto;width:76px;height:76px;border-radius:50%;background:var(--tile,#17634c);opacity:.06}
+.setting-tile:hover{transform:translateY(-1px);border-color:#bfcfc5;box-shadow:0 8px 20px rgba(25,60,46,.06)}
+.setting-tile.active{border-color:#17634c;background:#f3f8f4;box-shadow:0 0 0 1px #17634c inset}
+.tile-icon{display:grid;place-items:center;width:38px;height:38px;border-radius:10px;background:color-mix(in srgb,var(--tile,#17634c) 12%,white);color:var(--tile,#17634c);font-size:16px;font-weight:900}
+.tile-copy{min-width:0}.tile-copy b{display:block;font-size:11px;color:#173b32}.tile-copy span{display:block;font-size:8px;color:#708078;line-height:1.35;margin-top:3px}
+.tile-arrow{position:absolute;right:9px;top:9px;color:#93a199;font-size:12px}
+.settings-panel{border:1px solid #dbe4de;border-radius:12px;background:#fff;overflow:hidden;margin-bottom:12px}
+.settings-panel[hidden]{display:none}
+.settings-panel.panel-in{animation:settingsPanelIn .24s ease both}
+@keyframes settingsPanelIn{from{opacity:0;transform:translateY(10px) scale(.995)}to{opacity:1;transform:none}}
+.settings-panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 11px;background:#173b32;color:#fff}
+.settings-panel-title{display:flex;align-items:center;gap:9px;min-width:0}.settings-panel-title button{min-height:30px;padding:4px 8px;background:#ffffff12;border-color:#ffffff26;color:#fff;font-size:9px}.settings-panel-title b{font-size:12px}.settings-panel-title span{display:block;color:#c6d9cf;font-size:8px;margin-top:1px}
+.settings-panel-head .panel-close{min-height:30px;padding:4px 8px;background:#fff;color:#173b32;border-color:#fff;font-size:9px}
+#settings-body{border:0!important;border-radius:0!important;margin:0!important;box-shadow:none!important;padding:14px!important;min-height:260px}
+.settings-section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}.settings-section-head h2{margin:0;font-size:18px}.settings-section-head p{margin:4px 0 0;font-size:9px;color:#6e7c74;line-height:1.4}
+.smart-cards{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:7px;margin:10px 0}.smart-card{border:1px solid #dfe6e1;border-radius:10px;padding:9px;background:#f9fbf9}.smart-card span{display:block;font-size:7px;color:#6e7c74;text-transform:uppercase;letter-spacing:.45px;font-weight:800}.smart-card strong{display:block;font-size:15px;color:#173b32;margin-top:3px}.smart-card small{display:block;font-size:7px;color:#7d8982;margin-top:2px}
+.admin-bottom-card{display:grid!important;gap:8px}.admin-profile{display:grid;grid-template-columns:42px minmax(0,1fr);gap:9px;align-items:center;padding:9px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.05)}
+.avatar-btn{width:42px;height:42px;min-height:42px;padding:0;border:2px solid rgba(255,255,255,.26);border-radius:50%;overflow:hidden;background:#31594a;color:#fff;font-weight:900;font-size:14px}.avatar-btn img{width:100%;height:100%;object-fit:cover;display:block}.avatar-btn .avatar-initial{display:grid;place-items:center;width:100%;height:100%}
+.admin-profile-copy{min-width:0}.admin-profile-copy b{display:block;font-size:11px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.admin-profile-copy span{display:block;font-size:8px;color:#b9d0c4;text-transform:uppercase;margin-top:1px}.admin-panel-label{font-size:9px;color:#b0cabd;line-height:1.4}.side .bottom #logout{width:100%;min-height:34px;padding:6px 9px;background:transparent;border-color:rgba(255,255,255,.18);color:#fff;font-size:10px}.avatar-uploading{opacity:.55;pointer-events:none}
+
+/* Email Studio */
+.email-overview{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:7px;margin-bottom:10px}.email-overview-card{border:1px solid #dde6df;border-radius:11px;padding:10px;background:#f8faf8}.email-overview-card.good{background:#eaf5ec;border-color:#d0e4d5}.email-overview-card.auth{background:#eef3fb;border-color:#dbe4f1}.email-overview-card.warn{background:#fff6e7;border-color:#eadbbc}.email-overview-card span{display:block;font-size:7px;color:#68766f;text-transform:uppercase;letter-spacing:.45px;font-weight:850}.email-overview-card strong{display:block;font-size:14px;color:#173b32;margin-top:4px}.email-overview-card small{display:block;font-size:7px;color:#76847d;margin-top:3px;line-height:1.35}
+.email-tools-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}.email-tools-row button{min-height:34px;font-size:9px}
+.template-toolbar{display:grid;grid-template-columns:minmax(220px,1fr) auto;gap:7px;align-items:center;margin-bottom:9px}.template-toolbar input{min-height:36px}
+.template-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.template-card{border:1px solid #dfe6e1;border-radius:12px;padding:11px;background:#fff;transition:.16s ease}.template-card:hover{border-color:#bcd0c3;box-shadow:0 6px 16px rgba(23,72,52,.05)}.template-card-head{display:flex;justify-content:space-between;gap:8px}.template-card h3{margin:0;font-size:11px}.template-card p{margin:4px 0 0;color:#6f7d75;font-size:8px;line-height:1.4}.template-badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}.template-pill{display:inline-flex;padding:4px 6px;border-radius:999px;background:#eef3ef;color:#426052;font-size:7px;font-weight:800}.template-pill.auth{background:#eaf0ff;color:#4d6190}.template-pill.off{background:#f1f1f1;color:#6b756f}
+.template-subject{margin:8px 0;padding:7px 8px;border-radius:7px;background:#f7f9f7;font-size:8px;color:#43564d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.template-placeholders{display:flex;gap:4px;flex-wrap:wrap}.placeholder-chip{display:inline-flex;padding:3px 5px;border-radius:6px;background:#fff4df;color:#7d591c;font-size:6.5px;font-family:ui-monospace,SFMono-Regular,monospace}.template-actions{display:flex;justify-content:flex-end;gap:5px;margin-top:9px}.template-actions button{min-height:30px;padding:4px 8px;font-size:8px}
+.template-editor{display:grid;grid-template-columns:minmax(0,1fr) minmax(330px,.9fr);gap:12px;max-height:76vh;overflow:hidden}.editor-fields{overflow:auto;padding-right:3px}.editor-fields label{display:block;margin-bottom:9px;font-size:9px}.editor-fields input,.editor-fields textarea{width:100%;box-sizing:border-box}.editor-fields textarea{min-height:105px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11px;line-height:1.4}.html-editor{min-height:220px!important}
+.placeholder-box{border:1px dashed #c5d2c9;border-radius:9px;padding:8px;margin:8px 0 10px;background:#fafcfb}.placeholder-box b{display:block;font-size:9px;margin-bottom:6px}.placeholder-buttons{display:flex;gap:5px;flex-wrap:wrap}.placeholder-buttons button{min-height:27px;padding:3px 6px;font-size:7px;font-family:ui-monospace,SFMono-Regular,monospace}
+.editor-preview{border:1px solid #dce5df;border-radius:11px;background:#f6f8f6;overflow:hidden;display:flex;flex-direction:column;min-height:520px}.preview-head{padding:9px 10px;background:#173b32;color:#fff}.preview-head span{display:block;font-size:7px;color:#c7d9d0}.preview-head b{display:block;font-size:10px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.preview-frame{width:100%;border:0;background:#fff;flex:1;min-height:410px}.preview-text{padding:9px;border-top:1px solid #dce5df;font-size:8px;color:#63716a;white-space:pre-wrap;max-height:100px;overflow:auto;background:#fff}
+.editor-footer{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-top:9px;flex-wrap:wrap}.editor-footer .left,.editor-footer .right{display:flex;gap:6px;flex-wrap:wrap}.editor-footer button{min-height:34px;font-size:9px}.test-email{min-height:34px;width:220px}
+.email-warning{padding:9px 10px;border-radius:9px;background:#fff6e8;border:1px solid #eadcc2;color:#77591e;font-size:8px;line-height:1.45;margin-bottom:9px}
+.email-success{padding:9px 10px;border-radius:9px;background:#edf7ef;border:1px solid #d4e5d8;color:#285d43;font-size:8px;line-height:1.45;margin-bottom:9px}
+.queue-review{display:grid;gap:8px}.queue-review .review-row{padding:9px;border-radius:9px;background:#f7f9f7;border:1px solid #e2e8e3}.queue-review span{display:block;font-size:7px;color:#6d7b73}.queue-review b{display:block;font-size:9px;margin-top:2px;overflow-wrap:anywhere}
+@media(max-width:1150px){.settings-grid{grid-template-columns:repeat(3,1fr)}.template-editor{grid-template-columns:1fr}.editor-preview{min-height:430px}.preview-frame{min-height:320px}}
+@media(max-width:760px){
+ body.settings-console{overflow:auto}body.settings-console .main{height:auto;overflow:visible}body.settings-console .content{height:auto;overflow:visible;padding:10px!important}body.settings-console #view{height:auto}.side .bottom{display:none!important}
+ .settings-hero{display:block}.settings-hero-badge{display:inline-flex;margin-top:7px}.settings-grid{grid-template-columns:1fr 1fr}.setting-tile{min-height:72px;padding:9px}.email-overview{grid-template-columns:1fr 1fr}.template-grid{grid-template-columns:1fr}.template-toolbar{grid-template-columns:1fr}.smart-cards{grid-template-columns:1fr 1fr}
+}
+@media(max-width:480px){.settings-grid{grid-template-columns:1fr}.email-overview,.smart-cards{grid-template-columns:1fr 1fr}.template-editor{display:block}.editor-preview{margin-top:10px}.test-email{width:100%}.editor-footer,.editor-footer .left,.editor-footer .right{display:grid;grid-template-columns:1fr;width:100%}.settings-panel-head{align-items:flex-start}}
+
 </style>
 </head><body>
 <div id="app"><p id="boot">Opening ONeness…</p></div>
@@ -17,7 +69,7 @@ const shared=new DOMParser().parseFromString(await response.text(),'text/html');
 for(const id of ['oneness-config','oneness-theme']){const node=shared.getElementById(id);if(!node)throw Error('index.html is incomplete.');document.head.append(node.cloneNode(true));}
 const source=shared.getElementById('oneness-core');if(!source)throw Error('index.html is incomplete.');
 const runtime=document.createElement('script');runtime.textContent=source.textContent;document.body.append(runtime);
-const A=await App.init('settings'),{$,esc,money}=A;let profile=A.profile,settings=A.settings,coupons=[];let tab='profile';
+const A=await App.init('settings'),{$,esc,money}=A;let profile=A.profile,settings=A.settings,coupons=[];let tab='home';
 
 const PERMISSION_GROUPS=[
  ['Dashboard',[['dashboard.ops','Operational totals','Orders, fulfilment and stock overview'],['dashboard.finance','Financial totals','Revenue and collection totals']]],
@@ -52,19 +104,64 @@ function buildStoredPermissions(detail){const out=new Set(detail);for(const p of
 function accessSummary(member){const d=detailPerms(member.permissions);if(member.role==='owner')return 'Full owner access';if(!d.length)return 'No business permissions';const preset=Object.entries(PRESETS).find(([name,arr])=>name!=='Custom'&&arr.length===d.length&&arr.every(x=>d.includes(x)));return preset?preset[0]:`${d.length} custom permissions`;}
 function statusChip(status){return `<span class="chip ${status==='blocked'?'bad':status==='unverified'?'warn':''}">${esc(status)}</span>`;}
 
-const tabs=[['profile','My profile'],['addresses','Addresses'],...(profile.role==='owner'?[['team','Team & Access']]:[]),...(A.can('settings')?[['store','Store'],['payments','Payments']]:[]),...(A.can('coupons')?[['coupons','Coupons']]:[]),['notifications','Notifications'],...(A.can('notifications')?[['email','Email tools']]:[]),...(profile.role==='owner'?[['jobs','Sync jobs']]:[])];
-$('view').innerHTML=A.header('Account & store settings','Manage your preferences and the controls available to your role.')+`<nav class="tabs">${tabs.map(([id,name])=>`<button data-tab="${id}">${name}</button>`).join('')}</nav><section id="settings-body" class="card"></section>`;
+const EMAIL_TEMPLATE_CATALOG=[
+ {id:'auth_otp',label:'Login / verification OTP',kind:'auth',desc:'Authentication verification code sent through the Supabase Auth email transport.',placeholders:['store_name','name','otp','purpose','email']},
+ {id:'order_placed',label:'Order placed',kind:'order',desc:'Sent when a retailer order is successfully placed.',placeholders:['store_name','name','order_id','total','status','tracking','payment_method','payment_status']},
+ {id:'order_confirmed',label:'Order confirmed',kind:'order',desc:'Sent after the order is confirmed by staff.',placeholders:['store_name','name','order_id','total','status','tracking','payment_method','payment_status']},
+ {id:'order_packed',label:'Order packed',kind:'order',desc:'Sent when fulfilment marks an order packed.',placeholders:['store_name','name','order_id','total','status','tracking','payment_method','payment_status']},
+ {id:'order_dispatched',label:'Order dispatched',kind:'order',desc:'Sent when an order leaves for delivery.',placeholders:['store_name','name','order_id','total','status','tracking','payment_method','payment_status']},
+ {id:'order_delivered',label:'Order delivered',kind:'order',desc:'Sent after the order reaches the retailer.',placeholders:['store_name','name','order_id','total','status','tracking','payment_method','payment_status']},
+ {id:'order_cancelled',label:'Order cancelled',kind:'order',desc:'Sent when an eligible order is cancelled.',placeholders:['store_name','name','order_id','total','status','tracking','payment_method','payment_status']},
+ {id:'payment_collected',label:'Payment collected',kind:'order',desc:'Sent after a payment is recorded as collected.',placeholders:['store_name','name','order_id','total','status','tracking','payment_method','payment_status']}
+];
+const SETTING_META={
+ profile:{icon:'P',color:'#17634c',desc:'Your account, business name, phone and security.'},
+ addresses:{icon:'A',color:'#4f6793',desc:'Saved delivery and business addresses.'},
+ team:{icon:'T',color:'#7b5b96',desc:'Staff approvals, roles, permissions and sessions.'},
+ store:{icon:'S',color:'#8a641e',desc:'Store name, delivery, minimum order and service PINs.'},
+ payments:{icon:'₹',color:'#2c7a58',desc:'COD / online availability and retailer eligibility.'},
+ coupons:{icon:'%',color:'#a24f3d',desc:'Discount codes, eligibility, dates and usage.'},
+ notifications:{icon:'N',color:'#477b87',desc:'Push notification registration and device control.'},
+ email:{icon:'E',color:'#4e6292',desc:'Email templates, OTP design, testing and queue review.'},
+ jobs:{icon:'J',color:'#675d51',desc:'Pending or failed backend synchronization jobs.'}
+};
+
+const tabs=[['profile','My profile'],['addresses','Addresses'],...(profile.role==='owner'?[['team','Team & Access']]:[]),...(A.can('settings')?[['store','Store'],['payments','Payments']]:[]),...(A.can('coupons')?[['coupons','Coupons']]:[]),['notifications','Notifications'],...(A.can('notifications')?[['email','Email Studio']]:[]),...(profile.role==='owner'?[['jobs','Sync jobs']]:[])];
+$('view').innerHTML=`
+<div class="settings-hero">
+ <div><h1>Settings</h1><p>Control your account, store operations, team access, payments and communication from one place.</p></div>
+ <div class="settings-hero-badge">${esc(profile.role)} · ${esc(profile.status)}</div>
+</div>
+<div id="settings-grid" class="settings-grid">
+ ${tabs.map(([id,name])=>{const m=SETTING_META[id]||{icon:name[0],color:'#17634c',desc:''};return `<button class="setting-tile" data-tab="${id}" style="--tile:${m.color}"><span class="tile-icon">${esc(m.icon)}</span><span class="tile-copy"><b>${esc(name)}</b><span>${esc(m.desc)}</span></span><span class="tile-arrow">↗</span></button>`}).join('')}
+</div>
+<section id="settings-panel" class="settings-panel" hidden>
+ <div class="settings-panel-head">
+  <div class="settings-panel-title"><button id="settings-back">← All settings</button><div><b id="panel-title">Settings</b><span id="panel-subtitle">Manage this setting</span></div></div>
+  <button id="panel-close" class="panel-close">Close</button>
+ </div>
+ <section id="settings-body" class="card"></section>
+</section>
+<input id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+`;
 
 async function show(next=tab){
- tab=next;for(const b of document.querySelectorAll('[data-tab]'))b.classList.toggle('active',b.dataset.tab===tab);const el=$('settings-body');el.innerHTML='<p>Loading…</p>';
- if(tab==='profile'){profile=await A.api('session.me');el.innerHTML=`<h2>${esc(profile.business_name||profile.name)}</h2><p>${esc(profile.email)} · ${A.badge(profile.status)}</p><p>Phone: ${esc(profile.phone||'Not set')}</p><div class="row"><button id="edit-profile">Edit profile</button><button id="reset-password">Email password reset</button></div>`;$('edit-profile').onclick=()=>A.form('Edit profile',[['name','Name','text',[],true],['business_name','Business name'],['phone','Phone','tel']],profile,async v=>{await A.api('profile.update',{...v,expected_version:profile.version});await show();});$('reset-password').onclick=async()=>{const{error}=await A.client.auth.resetPasswordForEmail(profile.email,{redirectTo:new URL('index.html?mode=reset',location.href).href});if(error)A.error(error);else A.toast('Check your email for a password-reset link.');};}
+ tab=next;
+ for(const b of document.querySelectorAll('[data-tab]'))b.classList.toggle('active',b.dataset.tab===tab);
+ const panel=$('settings-panel'),el=$('settings-body');
+ if(tab==='home'){panel.hidden=true;return;}
+ const item=tabs.find(x=>x[0]===tab),m=SETTING_META[tab]||{};
+ $('panel-title').textContent=item?.[1]||'Settings';$('panel-subtitle').textContent=m.desc||'Manage this setting';
+ panel.hidden=false;panel.classList.remove('panel-in');void panel.offsetWidth;panel.classList.add('panel-in');
+ el.innerHTML='<p>Loading…</p>';
+ if(tab==='profile'){profile=await A.api('session.me');el.innerHTML=`<div class="settings-section-head"><div><h2>${esc(profile.business_name||profile.name)}</h2><p>Personal identity and account security.</p></div>${A.badge(profile.status)}</div><div class="smart-cards"><div class="smart-card"><span>Email</span><strong>${esc(profile.email||'—')}</strong><small>Login identity</small></div><div class="smart-card"><span>Phone</span><strong>${esc(profile.phone||'Not set')}</strong><small>Contact number</small></div><div class="smart-card"><span>Role</span><strong>${esc(profile.role)}</strong><small>Current access role</small></div><div class="smart-card"><span>Device</span><strong>${esc(profile.platform||'web')}</strong><small>Current platform</small></div></div><div class="row"><button id="edit-profile" class="primary">Edit profile</button><button id="reset-password">Email password reset</button></div>`;$('edit-profile').onclick=()=>A.form('Edit profile',[['name','Name','text',[],true],['business_name','Business name'],['phone','Phone','tel']],profile,async v=>{await A.api('profile.update',{...v,expected_version:profile.version});await show();});$('reset-password').onclick=async()=>{const{error}=await A.client.auth.resetPasswordForEmail(profile.email,{redirectTo:new URL('index.html?mode=reset',location.href).href});if(error)A.error(error);else A.toast('Check your email for a password-reset link.');};}
  if(tab==='addresses'){const rows=await A.api('addresses.list');el.innerHTML='<div class="row between"><h2>Saved addresses</h2><button class="primary" id="new-address">Add address</button></div>'+A.table(['Label','Address',''],rows.map(a=>[esc(a.label),Object.values(a.details).filter(Boolean).map(esc).join(', '),`<button class="small" data-edit="${a.id}">Edit</button> <button class="small danger" data-delete="${a.id}">Delete</button>`]));$('new-address').onclick=()=>A.addressForm(null,()=>show());for(const b of el.querySelectorAll('[data-edit]'))b.onclick=()=>A.addressForm(rows.find(x=>x.id===+b.dataset.edit),()=>show());for(const b of el.querySelectorAll('[data-delete]'))b.onclick=async()=>{if(!confirm('Delete this saved address? Existing orders keep their saved address.'))return;const a=rows.find(x=>x.id===+b.dataset.delete);try{await A.api('address.delete',{id:a.id,expected_version:a.version});await show();}catch(e){A.error(e);}};}
  if(tab==='team')await renderTeam(el);
  if(tab==='payments')await renderPayments(el);
  if(tab==='store'){settings=await A.api('settings.get');const cod=(settings.payment_methods||[]).find(x=>x.method==='cod');el.innerHTML=`<h2>${esc(settings.store_name)}</h2><p>Delivery: ${money(settings.delivery_paise)} · Minimum order: ${money(settings.minimum_order_paise)}</p><p>Cash on Delivery: ${cod?.enabled?'enabled':'disabled'} · Email ${settings.email_enabled?'enabled':'disabled'} · Push ${settings.push_enabled?'enabled':'disabled'}</p><p>Serviceable PIN codes: ${esc(settings.allowed_pincodes.join(', ')||'All PIN codes')}</p><div class="row"><button id="edit-store" class="primary">Edit store settings</button><button id="open-payments">Manage payment methods</button></div><div class="integration-grid"><div class="integration-item"><b>Apps Script bridge</b><span class="muted">Configured server-side</span></div><div class="integration-item"><b>Push / email secrets</b><span class="muted">Hidden from the browser</span></div></div><p class="muted" style="margin-top:20px">Payment eligibility is managed in the Payments tab. Secret integration values remain backend-only.</p>`;$('open-payments').onclick=()=>show('payments').catch(A.error);$('edit-store').onclick=()=>A.form('Store settings',[['store_name','Store name','text',[],true],['delivery','Delivery charge (₹)','number',[],true],['minimum','Minimum order (₹)','number',[],true],['pincodes','Serviceable PIN codes, comma separated; blank = all','textarea'],['email_enabled','Enable order emails','checkbox'],['push_enabled','Enable push notifications','checkbox']],{...settings,delivery:settings.delivery_paise/100,minimum:settings.minimum_order_paise/100,pincodes:settings.allowed_pincodes.join(', ')},async v=>{const pins=v.pincodes.split(',').map(x=>x.trim()).filter(Boolean);if(pins.some(x=>!/^[0-9]{6}$/.test(x)))throw Error('Use valid six-digit PIN codes.');await A.api('admin.settings.put',{expected_version:settings.version,store_name:v.store_name,delivery_paise:A.paise(v.delivery),minimum_order_paise:A.paise(v.minimum),allowed_pincodes:pins,email_enabled:v.email_enabled,push_enabled:v.push_enabled});await show();});}
  if(tab==='coupons'){coupons=await A.all('admin.coupons');el.innerHTML='<div class="row between"><h2>Coupons</h2><button class="primary" id="new-coupon">Create coupon</button></div>'+A.table(['Code','Discount','Eligibility','Status',''],coupons.map(c=>[esc(c.code),c.kind==='percent'?(c.value/100)+'%':money(c.value),c.eligible_users?'Users '+esc(c.eligible_users.join(', ')):'All approved users',A.badge(c.active?'active':'inactive'),`<button class="small" data-edit-coupon="${c.id}">Edit</button> <button class="small" data-usage="${c.id}">Usage</button>`]));$('new-coupon').onclick=()=>editCoupon();for(const b of el.querySelectorAll('[data-edit-coupon]'))b.onclick=()=>editCoupon(coupons.find(c=>c.id===+b.dataset.editCoupon));for(const b of el.querySelectorAll('[data-usage]'))b.onclick=()=>usage(+b.dataset.usage).catch(A.error);}
  if(tab==='notifications'){profile=await A.api('session.me');el.innerHTML=`<h2>Device notifications</h2><p>${profile.push_enabled?'This account has a registered push subscription.':'Notifications are not registered for this account.'}</p><div class="row"><button class="primary" id="enable-push">Enable on this device</button><button id="disable-push">Disable for my account</button></div><p class="muted" style="margin-top:16px">Your most recent app login is the active device.</p>`;$('enable-push').onclick=async()=>{try{await A.notifications();await show();}catch(e){A.error(e);}};$('disable-push').onclick=async()=>{try{await A.api('push.unregister');await show();}catch(e){A.error(e);}};}
- if(tab==='email'){el.innerHTML='<h2>Email tools</h2><p class="muted">Order emails are queued automatically. Manage reusable templates or review a specific queued email here.</p><div class="row"><button id="template">Open / create template</button><button id="compose">Queue an email</button><button id="review">Review email by ID</button></div>';$('template').onclick=()=>template().catch(A.error);$('compose').onclick=compose;$('review').onclick=()=>review().catch(A.error);}
+ if(tab==='email')await renderEmailStudio(el);
  if(tab==='jobs'){const jobs=await A.all('admin.jobs');el.innerHTML='<div class="row between"><h2>Pending and failed sync jobs</h2><button id="refresh-jobs">Refresh</button></div>'+A.table(['Job','Type','Order','State','Attempts','Last error',''],jobs.map(j=>[j.id,esc(j.kind),j.order_id||'—',A.badge(j.state),j.attempts,esc(j.last_error||''),j.state==='failed'?`<button class="small" data-retry="${j.id}">Retry</button>`:'']));$('refresh-jobs').onclick=()=>show().catch(A.error);for(const b of el.querySelectorAll('[data-retry]'))b.onclick=async()=>{b.disabled=true;try{await A.api('admin.job.retry',{id:+b.dataset.retry});await show();}catch(e){A.error(e);b.disabled=false;}};}
 }
 
@@ -110,9 +207,116 @@ function editCoupon(c){A.form(c?'Edit coupon':'New coupon',[
  ['code','Coupon code','text',[],true],['kind','Discount type','select',['percent','fixed']],['amount','Percentage or fixed amount (₹)','number',[],true],['minimum','Minimum subtotal (₹)','number',[],true],['cap','Maximum discount (₹), optional','number'],['eligible','Eligible retailer IDs, comma separated; blank = all','textarea'],['start','Starts at (IST)','datetime-local',[],true],['end','Ends at (IST), optional','datetime-local'],['max_uses','Total usage limit, optional','number'],['per_user_limit','Usage limit per user','number',[],true],['active','Active','checkbox']
  ],c?{...c,amount:c.value/100,minimum:c.min_paise/100,cap:c.max_discount_paise===null?'':c.max_discount_paise/100,eligible:c.eligible_users?.join(', ')||'',start:toInput(c.starts_at),end:toInput(c.ends_at)}:{kind:'percent',amount:10,minimum:0,per_user_limit:1,active:true,start:toInput(new Date().toISOString())},async v=>{let eligible=null;if(v.eligible.trim()){if(!/^\d+(\s*,\s*\d+)*$/.test(v.eligible.trim()))throw Error('Use comma-separated numeric retailer IDs.');eligible=v.eligible.split(',').map(Number);}await A.api('admin.coupon.put',{...(c?{id:c.id,expected_version:c.version}:{}),code:v.code,kind:v.kind,value:A.paise(v.amount),min_paise:A.paise(v.minimum),max_discount_paise:v.cap?A.paise(v.cap):null,eligible_users:eligible,starts_at:new Date(v.start+':00+05:30').toISOString(),ends_at:v.end?new Date(v.end+':00+05:30').toISOString():null,max_uses:v.max_uses?+v.max_uses:null,per_user_limit:+v.per_user_limit,active:v.active});await show('coupons');});}
 async function usage(id){const rows=await A.all('admin.coupon.usage',{id});const data=rows.map(o=>[o.id,o.user_id,A.date(o.used_at),o.status,o.discount_paise/100,o.status==='cancelled'?'Released':o.status==='syncing'?'Reserved':'Used']);A.modal('Coupon usage',A.table(['Order','Retailer ID','Used IST','Status','Discount INR','Usage'],data.map(r=>r.map(esc)))+'<button id="export-usage" style="margin-top:18px">Export usage</button>');$('export-usage').onclick=()=>A.csv('Coupon usage',['Order','Retailer ID','Used IST','Status','Discount INR','Usage'],data,'Coupon #'+id+'; all dates');}
-async function template(){const id=prompt('Template ID (letters, numbers, hyphens or underscores)');if(!id)return;let existing={id,version:0,active:true};try{existing=await A.api('template.get',{id});}catch(e){if(!/not.found|NOT_FOUND|missing/i.test(e.message))throw e;}const request_id=crypto.randomUUID();A.form('Email template: '+id,[['subject','Subject','text',[],true],['text','Plain text body','textarea',[],true],['html','HTML body, optional','textarea'],['active','Active','checkbox']],{...existing,active:existing.active===true||existing.active==='true'},async v=>{await A.api('template.put',{...v,id,expected_version:+existing.version},{request_id});});}
+
+function templateSamples(id){
+ const base={store_name:settings?.store_name||'ONeness',name:'Ravi Patil',order_id:'1024',total:'1,850.00',status:'confirmed',tracking:'MH20-ON-8842',payment_method:'cod',payment_status:'collected',otp:'482913',purpose:'login',email:'retailer@example.com'};
+ return base;
+}
+function renderTemplateValue(value,vars){let out=String(value||'');for(const [k,v] of Object.entries(vars||{}))out=out.split(`{{${k}}}`).join(String(v??''));return out}
+function templateCard(meta,t){
+ const live=t&&t.active!==false,kind=meta.kind==='auth'?'Auth OTP':'Order email';
+ return `<article class="template-card" data-template-card="${meta.id}">
+  <div class="template-card-head"><div><h3>${esc(meta.label)}</h3><p>${esc(meta.desc)}</p></div><span class="template-pill ${meta.kind==='auth'?'auth':''} ${live?'':'off'}">${live?'Active':'Disabled'}</span></div>
+  <div class="template-badges"><span class="template-pill ${meta.kind==='auth'?'auth':''}">${esc(kind)}</span><span class="template-pill">v${esc(t?.version??'—')}</span></div>
+  <div class="template-subject">${esc(t?.subject||'Template unavailable')}</div>
+  <div class="template-placeholders">${meta.placeholders.slice(0,6).map(x=>`<span class="placeholder-chip">{{${esc(x)}}}</span>`).join('')}${meta.placeholders.length>6?`<span class="placeholder-chip">+${meta.placeholders.length-6}</span>`:''}</div>
+  <div class="template-actions"><button data-template-edit="${meta.id}" ${t?'':'disabled'}>Open editor</button></div>
+ </article>`;
+}
+async function loadEmailTemplates(){
+ const results=await Promise.all(EMAIL_TEMPLATE_CATALOG.map(async meta=>{try{return await A.api('template.get',{id:meta.id})}catch{return null}}));
+ return EMAIL_TEMPLATE_CATALOG.map((meta,i)=>({meta,template:results[i]}));
+}
+async function renderEmailStudio(el){
+ settings=await A.api('settings.get');profile=await A.api('session.me');
+ const all=await loadEmailTemplates(),available=all.filter(x=>x.template),active=available.filter(x=>x.template.active!==false).length;
+ el.innerHTML=`<div class="settings-section-head"><div><h2>Email Studio</h2><p>One place for every transactional email design, test delivery and queue review.</p></div></div>
+ <div class="${settings.email_enabled?'email-success':'email-warning'}">${settings.email_enabled?'Automated order email delivery is enabled.':'Automated order email delivery is currently disabled in Store settings.'} Order templates below are rendered from these saved designs. The OTP design is prepared for the custom Auth email hook.</div>
+ <div class="email-overview">
+  <div class="email-overview-card ${settings.email_enabled?'good':'warn'}"><span>Order email</span><strong>${settings.email_enabled?'Enabled':'Disabled'}</strong><small>Controlled from Store settings.</small></div>
+  <div class="email-overview-card good"><span>Templates</span><strong>${active}/${available.length}</strong><small>Active saved templates.</small></div>
+  <div class="email-overview-card auth"><span>Auth OTP</span><strong>${available.some(x=>x.meta.id==='auth_otp')?'Ready':'Missing'}</strong><small>Editable OTP design source.</small></div>
+  <div class="email-overview-card"><span>Test recipient</span><strong>${esc(profile.email||'—')}</strong><small>Current admin email.</small></div>
+ </div>
+ <div class="email-tools-row"><button class="primary" id="send-custom-email">Compose email</button><button id="review-email">Review queue ID</button><button id="real-otp-test">Send real Auth OTP test</button></div>
+ <div class="template-toolbar"><input id="template-search" placeholder="Search template, subject or placeholder"><span class="muted">${available.length} configured templates</span></div>
+ <div id="template-grid" class="template-grid">${all.map(x=>templateCard(x.meta,x.template)).join('')}</div>`;
+ const draw=()=>{const q=$('template-search').value.trim().toLowerCase();for(const card of el.querySelectorAll('[data-template-card]')){const id=card.dataset.templateCard,meta=EMAIL_TEMPLATE_CATALOG.find(x=>x.id===id),item=all.find(x=>x.meta.id===id),blob=`${id} ${meta?.label||''} ${meta?.desc||''} ${item?.template?.subject||''} ${(meta?.placeholders||[]).join(' ')}`.toLowerCase();card.hidden=!!q&&!blob.includes(q)}};
+ $('template-search').oninput=draw;
+ for(const b of el.querySelectorAll('[data-template-edit]'))b.onclick=()=>{const item=all.find(x=>x.meta.id===b.dataset.templateEdit);openEmailTemplateEditor(item.meta,item.template).catch(A.error)};
+ $('send-custom-email').onclick=compose;
+ $('review-email').onclick=()=>review().catch(A.error);
+ $('real-otp-test').onclick=sendRealOtpTest;
+}
+async function openEmailTemplateEditor(meta,t){
+ if(!t)throw Error('Template is unavailable.');
+ const vars=templateSamples(meta.id);
+ A.modal(meta.label,`<div class="template-editor">
+  <div class="editor-fields">
+   ${meta.kind==='auth'?'<div class="email-warning">This is the editable OTP design source. A real OTP test uses the live Supabase Auth Send Email Hook; deploy the included auth-hook patch so live OTP emails render this saved template.</div>':''}
+   <label>Subject<input id="tmpl-subject" value="${esc(t.subject||'')}" maxlength="300"></label>
+   <label>Plain-text fallback<textarea id="tmpl-text">${esc(t.text||'')}</textarea></label>
+   <label>HTML email design<textarea id="tmpl-html" class="html-editor">${esc(t.html||'')}</textarea></label>
+   <label class="payment-toggle"><input id="tmpl-active" type="checkbox" ${t.active!==false?'checked':''}><span><b>Template active</b><br><small class="muted">Inactive order templates fall back to the server’s plain notification copy.</small></span></label>
+   <div class="placeholder-box"><b>Available placeholders · click to insert at the cursor</b><div class="placeholder-buttons">${meta.placeholders.map(p=>`<button type="button" data-insert-placeholder="${p}">{{${p}}}</button>`).join('')}</div></div>
+   <div class="editor-footer"><div class="left"><input id="template-test-email" class="test-email" type="email" value="${esc(profile.email||'')}" placeholder="Test recipient"><button id="template-test">Send design test</button>${meta.kind==='auth'?'<button id="template-real-otp">Send real Auth OTP</button>':''}</div><div class="right"><button class="primary" id="template-save">Save template</button></div></div>
+  </div>
+  <aside class="editor-preview"><div class="preview-head"><span>Email preview</span><b id="preview-subject"></b></div><iframe id="tmpl-preview" class="preview-frame" sandbox=""></iframe><div id="preview-text" class="preview-text"></div></aside>
+ </div>`);
+ let lastField=$('tmpl-html');
+ for(const id of ['tmpl-subject','tmpl-text','tmpl-html']){$(id).addEventListener('focus',()=>lastField=$(id));$(id).addEventListener('input',refreshTemplatePreview)}
+ function refreshTemplatePreview(){
+  const rendered={subject:renderTemplateValue($('tmpl-subject').value,vars),text:renderTemplateValue($('tmpl-text').value,vars),html:renderTemplateValue($('tmpl-html').value,vars)};
+  $('preview-subject').textContent=rendered.subject;$('preview-text').textContent=rendered.text||'No plain-text fallback';$('tmpl-preview').srcdoc=rendered.html||`<div style="font-family:Arial;padding:24px;color:#64746b">No HTML body. The plain-text version will be used.</div>`;
+  return rendered;
+ }
+ for(const b of document.querySelectorAll('[data-insert-placeholder]'))b.onclick=()=>{const token=`{{${b.dataset.insertPlaceholder}}}`,elField=lastField||$('tmpl-html'),a=elField.selectionStart??elField.value.length,z=elField.selectionEnd??a;elField.setRangeText(token,a,z,'end');elField.dispatchEvent(new Event('input'));elField.focus()};
+ refreshTemplatePreview();
+ $('template-save').onclick=async()=>{const btn=$('template-save');btn.disabled=true;try{await A.api('template.put',{id:meta.id,expected_version:+t.version,subject:$('tmpl-subject').value.trim(),text:$('tmpl-text').value,html:$('tmpl-html').value,active:$('tmpl-active').checked},{request_id:crypto.randomUUID()});A.toast('Email template saved');$('modal').close();await show('email')}catch(e){A.error(e);btn.disabled=false}};
+ $('template-test').onclick=async()=>{const to=$('template-test-email').value.trim();if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(to)){A.error(Error('Enter a valid test email address.'));return}const rendered=refreshTemplatePreview(),btn=$('template-test');btn.disabled=true;const id='template-test-'+crypto.randomUUID();try{await A.api('email.enqueue',{id,kind:'test',to,subject:rendered.subject,text:rendered.text,html:rendered.html,template_id:meta.id,entity:'settings',entity_id:'1'},{request_id:crypto.randomUUID()});A.toast('Test email queued · '+id)}catch(e){A.error(e)}finally{btn.disabled=false}};
+ if($('template-real-otp'))$('template-real-otp').onclick=sendRealOtpTest;
+}
+async function sendRealOtpTest(){
+ if(!profile?.email){A.error(Error('This account has no email address.'));return}
+ if(!confirm(`Send a real Supabase Auth verification email to ${profile.email}? This tests the live Auth email transport.`))return;
+ try{
+  const {error}=await A.client.auth.resetPasswordForEmail(profile.email,{redirectTo:new URL('index.html?mode=reset',location.href).href});
+  if(error)throw error;A.toast('Real Auth verification email requested. Check your inbox.');
+ }catch(e){A.error(e)}
+}
 function compose(){const request_id=crypto.randomUUID(),id='email-'+crypto.randomUUID();A.form('Queue an email',[['to','Recipient email','email',[],true],['subject','Subject','text',[],true],['text','Message','textarea',[],true]],{},async v=>{await A.api('email.enqueue',{...v,id,entity:'settings',entity_id:'1'},{request_id});return 'Queued. Email ID: '+id;});}
 async function review(){const id=prompt('Email queue ID');if(!id)return;const m=await A.api('email.get',{id});A.modal('Email '+id,`<p>${A.badge(m.state)}</p><p>To: ${esc(m.to)}<br>Subject: ${esc(m.subject)}</p><p>${esc(m.note||'')}</p>${m.state==='review'?'<label>Resolution reason<input id="email-reason" required></label><label><input type="checkbox" id="duplicate-risk">I checked delivery and accept the risk of a duplicate email.</label><button id="retry-email" class="primary">Retry sending</button>':''}`);if($('retry-email'))$('retry-email').onclick=async()=>{try{if(!$('duplicate-risk').checked||!$('email-reason').value.trim())throw Error('Provide a reason and acknowledge the duplicate risk.');await A.api('email.resolve',{id,resolution:'retry',reason:$('email-reason').value,accept_duplicate_risk:true},{request_id:crypto.randomUUID()});$('modal').close();A.toast('Email queued again');}catch(e){A.error(e);}};}
-for(const b of document.querySelectorAll('[data-tab]'))b.onclick=()=>show(b.dataset.tab).catch(A.error);await show();
+
+async function avatarBase64(file){
+ if(!['image/jpeg','image/png','image/webp'].includes(file.type))throw Error('Use JPG, PNG or WebP for the profile photo.');
+ const src=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)});
+ const img=await new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=src});
+ const size=Math.min(img.naturalWidth,img.naturalHeight),sx=(img.naturalWidth-size)/2,sy=(img.naturalHeight-size)/2;
+ const canvas=document.createElement('canvas');canvas.width=512;canvas.height=512;canvas.getContext('2d').drawImage(img,sx,sy,size,size,0,0,512,512);
+ const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',.86));if(!blob)throw Error('Could not prepare profile photo.');
+ return await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result).split(',')[1]);r.onerror=reject;r.readAsDataURL(blob)});
+}
+async function uploadAvatar(){
+ const file=$('avatar-file').files?.[0];if(!file)return;
+ const btn=$('avatar-btn');btn.classList.add('avatar-uploading');
+ try{
+  const base64=await avatarBase64(file);
+  const {data,error}=await A.client.functions.invoke('admin-avatar-upload',{body:{base64,name:file.name||'avatar.webp'}});
+  if(error||data?.ok!==true)throw Error(data?.error?.message||error?.message||'Profile photo upload failed.');
+  profile.avatar_url=data.data.url;A.profile.avatar_url=data.data.url;btn.innerHTML=`<img src="${esc(data.data.url)}" alt="">`;A.toast('Profile photo updated');
+ }catch(e){A.error(e)}finally{btn.classList.remove('avatar-uploading');$('avatar-file').value=''}
+}
+function enhanceAdminShell(){
+ document.body.classList.add('settings-console');
+ const side=document.querySelector('.side'),bottom=side?.querySelector('.bottom'),logout=document.getElementById('logout');if(!bottom)return;
+ const initial=(profile?.name||'A').trim().charAt(0).toUpperCase()||'A',avatar=profile?.avatar_url?`<img src="${esc(profile.avatar_url)}" alt="">`:`<span class="avatar-initial">${esc(initial)}</span>`;
+ bottom.className='bottom admin-bottom-card';bottom.innerHTML=`<div class="admin-profile"><button id="avatar-btn" class="avatar-btn" title="Change profile photo">${avatar}</button><div class="admin-profile-copy"><b>${esc(profile?.name||'Administrator')}</b><span>${esc(profile?.role||'admin')}</span></div></div><div class="admin-panel-label">ONeness admin panel<br>Click photo to update profile image</div>`;
+ if(logout){logout.className='';bottom.append(logout)}
+ $('avatar-btn').onclick=()=>$('avatar-file').click();$('avatar-file').onchange=uploadAvatar;
+}
+enhanceAdminShell();
+$('settings-back').onclick=$('panel-close').onclick=()=>show('home').catch(A.error);
+for(const b of document.querySelectorAll('[data-tab]'))b.onclick=()=>show(b.dataset.tab).catch(A.error);
+await show('home');
 })().catch(e=>{if(window.App)App.fail(e);else{document.body.textContent="Could not load ONeness. Serve all HTML files together over HTTP/HTTPS. "+e.message;}});
 </script></body></html>
