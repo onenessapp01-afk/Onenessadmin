@@ -91,27 +91,15 @@ body.erp-sheet-mode{overflow:hidden}.sheet-active{position:fixed!important;z-ind
 /* Full-width colored inventory workspace */
 #inventory-view{min-width:0}
 #inventory-view .erp-toolbar{background:linear-gradient(180deg,#ffffff,#f7faf7);border-color:#d8e3dc}
-.inventory-headline{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 2px 6px;padding:0 2px}
+.inventory-headline{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 2px 5px;padding:0 2px}
 .inventory-headline .statement-title{font-size:15px;font-weight:900;color:#173b32;letter-spacing:-.2px}
 .inventory-headline .statement-sub{font-size:9px;color:#718078;margin-top:2px}
 .inventory-count{display:inline-flex;padding:5px 8px;border-radius:999px;background:#e8f1ea;color:#3a5d4d;font-size:9px;font-weight:850}
-.inventory-summary-strip{display:grid;grid-template-columns:repeat(4,minmax(135px,1fr));gap:6px;margin-bottom:6px}
-.inventory-summary-strip .summary-card{position:relative;overflow:hidden;min-height:58px;border-radius:9px;padding:8px 10px;border:1px solid transparent;box-shadow:none}
-.inventory-summary-strip .summary-card:after{content:"";position:absolute;width:52px;height:52px;border-radius:50%;right:-18px;bottom:-20px;background:currentColor;opacity:.07}
-.inventory-summary-strip .summary-card span{font-size:8px;font-weight:850;text-transform:uppercase;letter-spacing:.45px}
-.inventory-summary-strip .summary-card strong{font-size:17px;line-height:1;margin-top:3px}
-.inventory-summary-strip .summary-card small{display:block;font-size:7px;margin-top:2px;color:inherit;opacity:.72}
-.summary-card.transactions{background:#eef3f8;color:#465f79;border-color:#d8e2ec}
-.summary-card.in{background:#e8f5eb;color:#17634c;border-color:#cfe4d4}
-.summary-card.out{background:#fff0ed;color:#a33824;border-color:#f0d2cb}
-.summary-card.net{background:#fff6e7;color:#8a5b19;border-color:#eadbbd}
-.summary-card.opening{background:#eeeefa;color:#57549a;border-color:#dcdcf0}
-.summary-card.closing{background:#e7f0ff;color:#355f9d;border-color:#ceddf2}
 .inventory-ledger-shell{background:#fff;border:1px solid #d8e2db;border-radius:11px;overflow:hidden}
 .inventory-ledger-note{display:flex;align-items:center;gap:8px;padding:6px 9px;background:#173b32;color:#fff;border-bottom:1px solid #244c3f}
 .inventory-ledger-note>span{display:grid;place-items:center;width:27px;height:27px;border-radius:7px;background:#ffffff12;font-size:14px}
 .inventory-ledger-note b{display:block;font-size:10px}.inventory-ledger-note small{display:block;color:#c7dbd1;font-size:8px;margin-top:1px}
-.inventory-table-wrap{border:0!important;border-radius:0!important;overflow:auto!important;height:calc(100vh - 285px);max-height:none!important;min-height:420px}
+.inventory-table-wrap{border:0!important;border-radius:0!important;overflow:auto!important;height:calc(100vh - 205px);max-height:none!important;min-height:520px}
 .inventory-table{table-layout:fixed!important}
 .inventory-table th{background:#e8f0ea!important;color:#3f594d!important;font-size:8px!important;padding:7px 6px!important}
 .inventory-table td{font-size:9px!important;padding:7px 6px!important;line-height:1.3}
@@ -139,18 +127,14 @@ body.erp-sheet-mode{overflow:hidden}.sheet-active{position:fixed!important;z-ind
 .sheet-active#inventory-view{overflow:hidden!important;display:flex!important;flex-direction:column!important}
 .sheet-active#inventory-view .erp-toolbar{position:relative!important;top:auto!important;flex:0 0 auto}
 .sheet-active#inventory-view .inventory-headline{flex:0 0 auto}
-.sheet-active#inventory-view .inventory-summary-strip{grid-template-columns:repeat(6,1fr);flex:0 0 auto}
-.sheet-active#inventory-view .inventory-ledger-shell{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+.sheet-active#inventory-view .sheet-active#inventory-view .inventory-ledger-shell{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
 .sheet-active#inventory-view .inventory-table-wrap{height:auto!important;max-height:none!important;flex:1 1 auto;min-height:0}
 .sheet-active#inventory-view .inventory-table th{position:sticky;top:0;z-index:4}
 .sheet-active#inventory-view .inventory-footnote{display:none}
-@media(max-width:1180px){.inventory-summary-strip{grid-template-columns:repeat(3,1fr)}.inventory-table-wrap{max-height:none}}
-@media(max-width:760px){
+@media(max-width:1180px){@media(max-width:760px){
  #inventory-view .erp-toolbar{padding:8px}
  .inventory-headline{align-items:flex-start}.inventory-head-right{margin-top:1px}
- .inventory-summary-strip{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
- .inventory-summary-strip .summary-card{min-height:68px;padding:9px}.inventory-summary-strip .summary-card strong{font-size:18px}
- .inventory-ledger-shell{border-radius:10px}
+   .inventory-ledger-shell{border-radius:10px}
  .inventory-ledger-note{padding:8px}
  .inventory-table-wrap{overflow-x:auto!important}
  .inventory-table{min-width:940px!important}
@@ -158,35 +142,42 @@ body.erp-sheet-mode{overflow:hidden}.sheet-active{position:fixed!important;z-ind
 }
 @media(max-width:480px){
  .inventory-headline{display:block}.inventory-head-right{margin-top:6px}
- .inventory-summary-strip{grid-template-columns:1fr 1fr}
- .inventory-summary-strip .summary-card span{font-size:7px}.inventory-summary-strip .summary-card small{font-size:7px}
-}
+  }
 
 
-#inventory-view:not([hidden]){display:flex!important;flex-direction:column;min-height:calc(100vh - 135px)}
-#inventory-view .erp-toolbar{flex:0 0 auto;margin-bottom:5px!important;padding:7px!important}
+#inventory-view:not([hidden]){display:flex!important;flex-direction:column;height:calc(100vh - 84px);min-height:0}
+#inventory-view .erp-toolbar{flex:0 0 auto;margin-bottom:4px!important;padding:6px 7px!important}
 #inventory-view .toolbar-actions{margin-top:5px!important}
 #inventory-view .inventory-headline{flex:0 0 auto}
-#inventory-view .inventory-summary-strip{flex:0 0 auto}
+
 #inventory-view .inventory-ledger-shell{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
 #inventory-view .inventory-table-wrap{flex:1 1 auto;min-height:0}
-#inventory-view .inventory-footnote{flex:0 0 auto;margin-top:4px}
+#inventory-view .inventory-footnote{display:none}
 #inventory-view .erp-filter-grid{gap:5px}
 #inventory-view .erp-filter-grid input,#inventory-view .erp-filter-grid select{min-height:34px;padding:5px 7px;font-size:11px}
 #inventory-view .toolbar-actions button{min-height:31px;padding:4px 8px;font-size:9px}
 #inventory-view .inventory-table th{padding:6px!important}
 #inventory-view .inventory-table td{padding:6px!important}
-.sheet-active#inventory-view .inventory-summary-strip{grid-template-columns:repeat(4,1fr)}
+
 .sheet-active#inventory-view .inventory-table-wrap{height:auto!important;min-height:0!important}
 @media(max-width:1180px){
- #inventory-view:not([hidden]){min-height:auto}
- .inventory-summary-strip{grid-template-columns:repeat(4,1fr)!important}
- .inventory-table-wrap{height:calc(100vh - 330px);min-height:380px}
+ #inventory-view:not([hidden]){height:calc(100vh - 84px);min-height:0}
+ .inventory-table-wrap{height:calc(100vh - 220px);min-height:460px}
 }
 @media(max-width:760px){
- #inventory-view:not([hidden]){display:block!important}
- .inventory-summary-strip{grid-template-columns:1fr 1fr!important}
- .inventory-table-wrap{height:auto!important;min-height:460px}
+ #inventory-view:not([hidden]){display:block!important;height:auto}
+ .inventory-table-wrap{height:auto!important;min-height:540px}
+}
+
+
+#inventory-view .inventory-ledger-shell{border:1px solid #cfdcd3;box-shadow:0 5px 16px rgba(19,57,43,.05)}
+#inventory-view .inventory-ledger-note{min-height:38px}
+#inventory-view .inventory-table-wrap{background:#fff}
+#inventory-view .inventory-table tbody tr{height:37px}
+#inventory-view .inventory-table thead th{position:sticky;top:0;z-index:5}
+@media(min-width:851px){
+ #inventory-view .inventory-ledger-shell{flex:1 1 auto;min-height:0}
+ #inventory-view .inventory-table-wrap{flex:1 1 auto;height:auto!important;min-height:0!important}
 }
 
 `;
@@ -271,19 +262,21 @@ $('view').innerHTML=A.header(
  <div class="inventory-headline">
   <div>
    <div id="statement-title" class="statement-title">Inventory Statement · All Products</div>
-   <div id="statement-sub" class="statement-sub">All recorded movements</div>
+   <div id="statement-sub" class="statement-sub">Live stock movement register</div>
   </div>
   <div class="inventory-head-right"><span id="ledger-count" class="inventory-count">0 movements</span></div>
  </div>
 
- <div class="inventory-summary inventory-summary-strip">
-  <div class="summary-card transactions"><span>Total Transactions</span><strong id="sum-transactions">0</strong><small>movement entries</small></div>
-  <div class="summary-card net"><span>Net movement</span><strong id="sum-net">0</strong><small>in minus out</small></div>
-  <div id="period-opening-card" class="summary-card opening" hidden><span>Opening balance</span><strong id="sum-opening">0</strong><small>period start</small></div>
-  <div id="period-closing-card" class="summary-card closing" hidden><span>Closing balance</span><strong id="sum-closing">0</strong><small>period end</small></div>
+ <div hidden>
+  <span id="sum-transactions">0</span>
+  <span id="sum-in">0</span>
+  <span id="sum-out">0</span>
+  <span id="sum-net">0</span>
+  <span id="sum-opening">0</span>
+  <span id="sum-closing">0</span>
+  <div id="period-opening-card" hidden></div>
+  <div id="period-closing-card" hidden></div>
  </div>
-
- <div hidden><span id="sum-in">0</span><span id="sum-out">0</span></div>
  <div class="inventory-ledger-shell">
   <div class="inventory-ledger-note"><span>▦</span><div><b>Inventory transactions</b><small>Chronological stock movement ledger</small></div></div>
   <div class="erp-table-wrap inventory-table-wrap">
