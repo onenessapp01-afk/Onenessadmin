@@ -156,6 +156,21 @@ body.payments-console .pay-footer{flex:0 0 auto}
  .side .bottom{display:none!important}
 }
 
+
+.receipt-btn{background:#f3f1ff!important;color:#5b4a91!important;border-color:#ded8f3!important}
+.statement-print-btn{background:#f7f8f6!important;color:#43574d!important;border-color:#d8e1db!important}
+.receipt-paper{font-family:Arial,sans-serif;color:#17241f;max-width:760px;margin:auto}
+.receipt-brand{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #17634c;padding-bottom:12px;margin-bottom:14px}
+.receipt-brand h1{margin:0;color:#17634c;font-size:26px}.receipt-brand p{margin:3px 0 0;font-size:11px;color:#66766e}
+.receipt-no{text-align:right}.receipt-no b{display:block;font-size:18px}.receipt-no span{font-size:10px;color:#67766e}
+.receipt-box{border:1px solid #dbe4dd;border-radius:10px;padding:12px;margin-bottom:10px}
+.receipt-box h3{margin:0 0 9px;font-size:13px}.receipt-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.receipt-grid div{padding:8px;background:#f7f9f7;border-radius:7px}.receipt-grid span{display:block;font-size:9px;color:#6b7972}.receipt-grid b{display:block;font-size:11px;margin-top:2px;overflow-wrap:anywhere}
+.receipt-total{display:flex;justify-content:space-between;align-items:center;padding:13px;border-radius:10px;background:#173b32;color:#fff;margin-bottom:10px}
+.receipt-total span{font-size:11px;color:#caddd4}.receipt-total b{font-size:24px}
+.receipt-foot{font-size:9px;color:#6b7972;line-height:1.5;margin-top:14px}
+@media(max-width:520px){.receipt-grid{grid-template-columns:1fr}}
+
 `;
 document.head.append(style);
 
@@ -227,6 +242,61 @@ async function uploadAvatar(){
  }catch(e){A.error(e)}finally{btn.classList.remove('avatar-uploading');$('avatar-file').value=''}
 }
 
+
+function paymentReceiptHtml(d,listOrder){
+ const o=d?.order||listOrder||{},c=d?.customer||{},t=effectiveRecordType(o);
+ const received=recordLabel(o);
+ const recTime=recordedAt(o);
+ return `<section class="receipt-paper">
+  <div class="receipt-brand">
+   <div><h1>${esc(A.settings?.store_name||'ONeness')}</h1><p>Payment Receipt</p></div>
+   <div class="receipt-no"><b>#ON${esc(o.id)}</b><span>${esc(date(recTime||o.created_at))}</span></div>
+  </div>
+  <div class="receipt-total"><span>Amount received</span><b>${money(o.total_paise)}</b></div>
+  <div class="receipt-box"><h3>Payment details</h3><div class="receipt-grid">
+   <div><span>Payment status</span><b>${esc(o.payment_status||'—')}</b></div>
+   <div><span>Order payment method</span><b>${esc((o.payment_method||'—').toUpperCase())}</b></div>
+   <div><span>Received via</span><b>${esc(received)}</b></div>
+   <div><span>Reference / UTR</span><b>${esc(o.payment_reference||'—')}</b></div>
+   <div><span>Paid / recorded at</span><b>${esc(date(recTime))}</b></div>
+   <div><span>Recorded by</span><b>${esc(d?.payment_recorded_by_name||listOrder?.payment_recorded_by_name||(t==='gateway'?'Payment Gateway':'—'))}</b></div>
+  </div></div>
+  <div class="receipt-box"><h3>Retailer / order</h3><div class="receipt-grid">
+   <div><span>Business</span><b>${esc(c.business_name||listOrder?.business_name||'—')}</b></div>
+   <div><span>Customer</span><b>${esc(c.name||listOrder?.customer_name||'—')}</b></div>
+   ${d?.show_contact?`<div><span>Mobile</span><b>${esc(c.phone||'—')}</b></div><div><span>Email</span><b>${esc(c.email||'—')}</b></div>`:''}
+   <div><span>Order status</span><b>${esc(o.status||'—')}</b></div>
+   <div><span>Order created</span><b>${esc(date(o.created_at))}</b></div>
+  </div></div>
+  ${o.payment_note?`<div class="receipt-box"><h3>Payment note</h3><div style="font-size:10px;white-space:pre-wrap">${esc(o.payment_note)}</div></div>`:''}
+  <p class="receipt-foot">This is a payment receipt for the recorded order payment. It is not a GST tax invoice unless separately issued by the seller.</p>
+ </section>`;
+}
+
+async function printPaymentReceipt(id){
+ const listOrder=orders.find(x=>+x.id===+id);
+ if(!listOrder)throw Error('Payment record not found.');
+ if(listOrder.payment_status!=='collected')throw Error('A payment receipt can be printed only after payment is collected.');
+ const d=await A.api('order.details',{id});
+ A.print(`Payment Receipt · #ON${id}`,paymentReceiptHtml(d,listOrder));
+}
+
+function printPaymentStatement(){
+ const rows=filtered();
+ const body=rows.map(o=>`<tr>
+  <td>ON${esc(o.id)}</td>
+  <td>${esc(retailer(o))}</td>
+  <td>${money(o.total_paise)}</td>
+  <td>${esc((o.payment_method||'—').toUpperCase())}</td>
+  <td>${esc(recordLabel(o))}</td>
+  <td>${esc(o.payment_reference||'—')}</td>
+  <td>${esc(date(recordedAt(o)))}</td>
+  <td>${esc(o.payment_status||'—')}</td>
+  <td>${esc(o.status||'—')}</td>
+ </tr>`).join('');
+ A.print('Payment Statement',`<table><thead><tr><th>Order</th><th>Retailer / Shop</th><th>Amount</th><th>Order Payment</th><th>Received Via</th><th>Reference</th><th>Recorded / Paid At</th><th>Payment</th><th>Order Status</th></tr></thead><tbody>${body}</tbody></table>`);
+}
+
 function exportRows(){
  return filtered().map(o=>({
   'Order ID':`ON${o.id}`,
@@ -261,42 +331,77 @@ async function exportExcel(){
 }
 
 async function exportPdf(){
- await Promise.all([
-  loadExternalScript('https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js'),
-  loadExternalScript('https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js')
- ]);
- const jspdf=window.jspdf;if(!jspdf?.jsPDF)throw Error('PDF export library did not load.');
+ await loadExternalScript('https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js');
+ const jspdf=window.jspdf;
+ if(!jspdf?.jsPDF)throw Error('PDF export library did not load.');
  const rows=filtered();
  const doc=new jspdf.jsPDF({orientation:'landscape',unit:'pt',format:'a4'});
- doc.setFontSize(15);doc.text('ONeness Payment Statement',28,28);
- doc.setFontSize(8);doc.text(`${A.range().label} · Generated ${date(new Date())}`,28,42);
- const body=rows.map(o=>[
-  `ON${o.id}`,
-  retailer(o),
-  (Number(o.total_paise||0)/100).toFixed(2),
-  String(o.payment_method||'').toUpperCase(),
-  recordLabel(o),
-  o.payment_reference||'—',
-  date(recordedAt(o)),
-  o.payment_status||'',
-  o.status||''
- ]);
- doc.autoTable({
-  startY:52,
-  head:[['Order','Retailer / Shop','Amount INR','Order Payment','Received Via','Reference','Recorded / Paid At','Payment','Order Status']],
-  body,
-  styles:{fontSize:7,cellPadding:3,overflow:'linebreak'},
-  headStyles:{fillColor:[23,99,76]},
-  margin:{left:24,right:24},
-  columnStyles:{0:{cellWidth:52},1:{cellWidth:110},2:{cellWidth:62},3:{cellWidth:72},4:{cellWidth:82},5:{cellWidth:100},6:{cellWidth:100},7:{cellWidth:62},8:{cellWidth:68}}
- });
+ const pageW=doc.internal.pageSize.getWidth(),pageH=doc.internal.pageSize.getHeight();
+ const margin=24,rowH=22,headerH=23;
+ const cols=[
+  {k:'order',label:'Order',w:52},
+  {k:'retailer',label:'Retailer / Shop',w:118},
+  {k:'amount',label:'Amount INR',w:66},
+  {k:'method',label:'Order Payment',w:72},
+  {k:'via',label:'Received Via',w:78},
+  {k:'ref',label:'Reference',w:100},
+  {k:'time',label:'Recorded / Paid At',w:108},
+  {k:'payment',label:'Payment',w:62},
+  {k:'status',label:'Order Status',w:70}
+ ];
+ const totalW=cols.reduce((n,c)=>n+c.w,0);
+ const scale=Math.min(1,(pageW-margin*2)/totalW);
+ cols.forEach(c=>c.w*=scale);
+
+ function header(){
+  doc.setFont('helvetica','bold');doc.setFontSize(15);doc.setTextColor(23,99,76);
+  doc.text('ONeness Payment Statement',margin,24);
+  doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(90,105,97);
+  doc.text(`${A.range().label} · Generated ${date(new Date())}`,margin,38);
+  let x=margin,y=48;
+  doc.setFillColor(23,99,76);doc.rect(margin,y,pageW-margin*2,headerH,'F');
+  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(6.7);
+  for(const c of cols){doc.text(c.label,x+3,y+14,{maxWidth:c.w-6});x+=c.w}
+  return y+headerH;
+ }
+ function rowData(o){
+  return {
+   order:`ON${o.id}`,
+   retailer:retailer(o),
+   amount:(Number(o.total_paise||0)/100).toFixed(2),
+   method:String(o.payment_method||'').toUpperCase(),
+   via:recordLabel(o),
+   ref:o.payment_reference||'—',
+   time:date(recordedAt(o)),
+   payment:o.payment_status||'',
+   status:o.status||''
+  };
+ }
+
+ let y=header(),rowIndex=0;
+ for(const o of rows){
+  if(y+rowH>pageH-28){doc.addPage();y=header()}
+  let x=margin;
+  if(rowIndex%2){doc.setFillColor(248,250,248);doc.rect(margin,y,pageW-margin*2,rowH,'F')}
+  const r=rowData(o);
+  doc.setDrawColor(225,231,226);doc.line(margin,y+rowH,pageW-margin,y+rowH);
+  doc.setFont('helvetica','normal');doc.setFontSize(6.5);doc.setTextColor(31,46,39);
+  for(const c of cols){
+   const lines=doc.splitTextToSize(String(r[c.k]??''),Math.max(16,c.w-6));
+   doc.text(lines.slice(0,2),x+3,y+8,{baseline:'top'});
+   x+=c.w;
+  }
+  y+=rowH;rowIndex++;
+ }
+ doc.setFontSize(7);doc.setTextColor(100,110,104);
+ doc.text(`Total records: ${rows.length}`,margin,pageH-12);
  doc.save(`oneness-payments-${A.today()}.pdf`);
 }
 
 $('view').innerHTML=`
 <div class="pay-head">
  <div><h1>Payments</h1><p>Complete payment statement · gateway payments and manual COD collections in one register.</p></div>
- <div class="pay-actions"><button id="sheet-view" class="primary">⛶ Sheet View</button><button id="refresh">Refresh</button><button id="excel" class="export-excel">Excel</button><button id="pdf" class="export-pdf">PDF</button><button id="export">CSV</button></div>
+ <div class="pay-actions"><button id="sheet-view" class="primary">⛶ Sheet View</button><button id="refresh">Refresh</button><button id="excel" class="export-excel">Excel</button><button id="pdf" class="export-pdf">PDF</button><button id="print-statement" class="statement-print-btn">Print</button><button id="export">CSV</button></div>
 </div>
 
 <div id="summary" class="pay-summary"></div>
@@ -304,7 +409,7 @@ $('view').innerHTML=`
 <section id="paymentWorkspace" class="pay-workspace">
  <div class="pay-workspace-bar">
   <div class="pay-workspace-title"><span style="font-size:17px">▦</span><div><strong>ONeness Payment Statement</strong><span id="sheet-meta">Spreadsheet view · payment reconciliation</span></div></div>
-  <div class="pay-workspace-actions"><button id="sheet-density">Compact rows</button><button id="sheet-refresh">Refresh</button><button id="sheet-excel">Excel</button><button id="sheet-pdf">PDF</button><button id="sheet-export">CSV</button><button id="exit-sheet" class="exit-sheet">Exit Sheet View</button></div>
+  <div class="pay-workspace-actions"><button id="sheet-density">Compact rows</button><button id="sheet-refresh">Refresh</button><button id="sheet-excel">Excel</button><button id="sheet-pdf">PDF</button><button id="sheet-print">Print</button><button id="sheet-export">CSV</button><button id="exit-sheet" class="exit-sheet">Exit Sheet View</button></div>
  </div>
 
 <section class="pay-filters">
@@ -435,19 +540,20 @@ function render(){
   <td>${rec.when}</td>
   <td><span class="status-pill ${esc(o.payment_status||'')}">${esc(o.payment_status||'—')}</span></td>
   <td>${A.badge(o.status)}</td>
-  <td><div class="action-cell"><button class="view-btn" data-view="${o.id}">View</button>${canCollect&&o.payment_method==='cod'&&o.status!=='cancelled'&&(o.payment_status!=='collected'||!o.payment_record_type)?`<button class="record-btn" data-record="${o.id}">${o.payment_status==='collected'?'Complete':'Record'}</button>`:''}</div></td>
+  <td><div class="action-cell"><button class="view-btn" data-view="${o.id}">View</button>${o.payment_status==='collected'?`<button class="receipt-btn" data-receipt="${o.id}">Receipt</button>`:''}${canCollect&&o.payment_method==='cod'&&o.status!=='cancelled'&&(o.payment_status!=='collected'||!o.payment_record_type)?`<button class="record-btn" data-record="${o.id}">${o.payment_status==='collected'?'Complete':'Record'}</button>`:''}</div></td>
  </tr>`}).join('');
  $('mobile-payments').innerHTML=rows.map(o=>{const rec=rowRecord(o);return `<article class="pay-card">
   <div class="card-top"><div><span class="order-id">#ON${o.id}</span><span class="retailer-sub">${esc(date(o.created_at))}</span></div><span class="status-pill ${esc(o.payment_status||'')}">${esc(o.payment_status||'—')}</span></div>
   <div style="margin-top:7px"><span class="retailer">${esc(retailer(o))}</span><span class="retailer-sub">${esc(customerSub(o)||'')}</span></div>
   <div class="card-grid"><div><span>Amount</span><b>${money(o.total_paise)}</b></div><div><span>Order payment</span><b>${esc((o.payment_method||'—').toUpperCase())}</b></div><div><span>Received via</span><b>${esc(recordLabel(o))}</b></div><div><span>Reference</span><b>${esc(o.payment_reference||'—')}</b></div><div><span>Paid / recorded</span><b>${esc(date(recordedAt(o)))}</b></div><div><span>Order status</span><b>${esc(o.status||'—')}</b></div></div>
-  <div class="card-actions"><button class="view-btn" data-view="${o.id}">View payment</button>${canCollect&&o.payment_method==='cod'&&o.status!=='cancelled'&&(o.payment_status!=='collected'||!o.payment_record_type)?`<button class="record-btn" data-record="${o.id}">${o.payment_status==='collected'?'Complete record':'Record payment'}</button>`:''}</div>
+  <div class="card-actions"><button class="view-btn" data-view="${o.id}">View payment</button>${o.payment_status==='collected'?`<button class="receipt-btn" data-receipt="${o.id}">Print receipt</button>`:''}${canCollect&&o.payment_method==='cod'&&o.status!=='cancelled'&&(o.payment_status!=='collected'||!o.payment_record_type)?`<button class="record-btn" data-record="${o.id}">${o.payment_status==='collected'?'Complete record':'Record payment'}</button>`:''}</div>
  </article>`}).join('');
  wireRows();updateSheetMeta();
 }
 function wireRows(){
  for(const b of document.querySelectorAll('[data-view]'))b.onclick=()=>openPayment(+b.dataset.view);
  for(const b of document.querySelectorAll('[data-record]'))b.onclick=()=>openRecord(+b.dataset.record);
+ for(const b of document.querySelectorAll('[data-receipt]'))b.onclick=async()=>{b.disabled=true;try{await printPaymentReceipt(+b.dataset.receipt)}catch(e){A.error(e)}finally{b.disabled=false}};
 }
 async function load(){
  orders=await A.all('orders.list',{},n=>$('statement-count')&&($('statement-count').textContent=`Loaded ${n} orders…`));
@@ -524,10 +630,12 @@ async function openPayment(id){
     </div>
     <div class="modal-actions">
      <a class="button" href="orders.html?id=${o.id}">Open full order</a>
+     ${o.payment_status==='collected'?`<button id="detail-receipt" class="receipt-btn">Print payment receipt</button>`:''}
      ${canCollect&&o.payment_method==='cod'&&o.status!=='cancelled'&&(o.payment_status!=='collected'||!o.payment_record_type)?`<button id="detail-record" class="record-btn">${o.payment_status==='collected'?'Complete payment record':'Record payment'}</button>`:''}
     </div>
    </section>`;
   if($('detail-record'))$('detail-record').onclick=()=>{$('payment-modal').close();openRecord(o.id)};
+  if($('detail-receipt'))$('detail-receipt').onclick=async()=>{const b=$('detail-receipt');b.disabled=true;try{await printPaymentReceipt(o.id)}catch(e){A.error(e)}finally{b.disabled=false}};
  }catch(e){$('modal-body').innerHTML=`<div class="notice error">${esc(e.message||'Could not load payment')}</div>`}
 }
 
@@ -607,6 +715,7 @@ $('refresh').onclick=()=>load().catch(A.error);
 $('export').onclick=()=>{try{exportCsv()}catch(e){A.error(e)}};
 $('excel').onclick=async()=>{try{await exportExcel()}catch(e){A.error(e)}};
 $('pdf').onclick=async()=>{try{await exportPdf()}catch(e){A.error(e)}};
+$('print-statement').onclick=()=>{try{printPaymentStatement()}catch(e){A.error(e)}};
 $('sheet-view').onclick=()=>toggleSheetMode();
 $('exit-sheet').onclick=()=>exitSheetMode();
 $('sheet-density').onclick=toggleDensity;
@@ -614,6 +723,7 @@ $('sheet-refresh').onclick=()=>load().catch(A.error);
 $('sheet-export').onclick=()=>{try{exportCsv()}catch(e){A.error(e)}};
 $('sheet-excel').onclick=async()=>{try{await exportExcel()}catch(e){A.error(e)}};
 $('sheet-pdf').onclick=async()=>{try{await exportPdf()}catch(e){A.error(e)}};
+$('sheet-print').onclick=()=>{try{printPaymentStatement()}catch(e){A.error(e)}};
 document.addEventListener('fullscreenchange',()=>{
  if(!document.fullscreenElement&&sheetMode){
   sheetMode=false;
