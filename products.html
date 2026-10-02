@@ -61,6 +61,32 @@ body.erp-sheet-mode{overflow:hidden}.sheet-active{position:fixed!important;z-ind
 @media(max-width:1150px){.erp-kpis{grid-template-columns:repeat(6,135px)}.erp-filter-grid{grid-template-columns:repeat(3,1fr)}.erp-filter-grid .wide{grid-column:span 2}.inventory-layout{grid-template-columns:1fr}.inventory-side{position:static}.inventory-summary{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:760px){.desktop-products{display:none}.mobile-products{display:grid}.erp-filter-grid{grid-template-columns:1fr 1fr}.erp-filter-grid .wide{grid-column:1/-1}.editor-grid,.editor-fields,.voucher-grid{grid-template-columns:1fr}.editor-section.full,.editor-fields .full,.voucher-grid .full{grid-column:auto}.inventory-summary{grid-template-columns:1fr 1fr}.slab-row{grid-template-columns:1fr}.slab-top,.slab-math{grid-column:1/-1}.slab-math{grid-template-columns:1fr 1fr}.remove-slab{grid-column:1/-1}.erp-kpi strong{font-size:19px}}
 @media(max-width:480px){.erp-filter-grid{grid-template-columns:1fr}.erp-filter-grid .wide{grid-column:auto}.mobile-metrics{grid-template-columns:1fr 1fr}.inventory-summary{grid-template-columns:1fr 1fr}}
+
+/* Clean order-register style catalogue */
+#view{max-width:none!important;width:100%!important;padding-left:16px!important;padding-right:16px!important;box-sizing:border-box}
+.erp-tabs{margin-bottom:9px}
+.erp-kpis{grid-template-columns:repeat(6,minmax(105px,1fr));gap:7px;margin-bottom:9px}
+.erp-kpi{border-radius:10px;padding:9px 10px;min-width:105px;box-shadow:none}.erp-kpi span{font-size:8px;letter-spacing:.45px}.erp-kpi strong{font-size:17px;margin-top:2px}.erp-kpi small{font-size:8px;margin-top:1px}
+.erp-toolbar{border-radius:10px;padding:9px;margin-bottom:8px;box-shadow:none}
+.erp-filter-grid{grid-template-columns:minmax(230px,1.6fr) repeat(3,minmax(120px,.75fr)) auto;gap:7px}.erp-filter-grid input,.erp-filter-grid select{min-height:36px;font-size:12px;border-radius:7px}
+.toolbar-actions{margin-top:7px;gap:6px}.toolbar-actions button{min-height:33px;padding:5px 9px;font-size:10px;border-radius:7px}
+#product-count{margin:5px 2px 7px;font-size:10px}
+.erp-table-wrap{border-radius:8px}.erp-table th{font-size:8px;background:#eef3ef;padding:7px}.erp-table td{padding:7px;font-size:10px}
+.erp-table th:nth-child(1){width:4%}.erp-table th:nth-child(2){width:20%}.erp-table th:nth-child(3){width:8%}.erp-table th:nth-child(4){width:10%}.erp-table th:nth-child(5){width:7%}.erp-table th:nth-child(6){width:8%}.erp-table th:nth-child(7){width:27%}.erp-table th:nth-child(8){width:6%}.erp-table th:nth-child(9){width:10%}
+.product-cell{grid-template-columns:42px minmax(0,1fr);gap:8px}.product-thumb,.product-placeholder{width:42px;height:42px;border-radius:7px}.product-title{font-size:10px;font-weight:850;line-height:1.25}
+.product-desc{display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal!important;max-width:none!important;line-height:1.28;max-height:2.56em;overflow:hidden!important;text-overflow:ellipsis!important;color:#758179;font-size:8px;margin-top:2px}
+.stock-number{font-size:14px}.stock-unit{font-size:8px}
+.alert-cell{display:grid;gap:3px}.alert-cell b{font-size:11px}.alert-badge{display:inline-flex;width:max-content;max-width:100%;padding:3px 5px;border-radius:999px;background:#eef4ed;color:#52685c;font-size:7px;font-weight:850}.alert-badge.low{background:#fff2db;color:#91601e}.alert-badge.out{background:#fff0ed;color:#a33824}
+.plan-stack{gap:4px}.plan-chip{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 7px;border-radius:6px;padding:6px 7px;background:#edf6ef;border-color:#d4e2d7;font-size:8px;line-height:1.25}.plan-chip:nth-child(2n){background:#fff6e8}.plan-chip b{font-size:9px}.plan-chip .plan-price{font-size:9px}.plan-chip .plan-meta{grid-column:1/-1;font-size:7px}.plan-chip .plan-profit{grid-column:1/-1;font-size:8px}
+.erp-actions{display:grid;grid-template-columns:1fr 1fr;gap:4px}.erp-actions button{min-height:27px;padding:3px 5px;font-size:8px;border-radius:6px;width:100%}
+.mobile-product{border-radius:12px;padding:10px}.mobile-product-head{grid-template-columns:48px minmax(0,1fr) auto}.mobile-product .product-thumb,.mobile-product .product-placeholder{width:48px;height:48px}.mobile-metrics{margin:8px 0}.mobile-metric{padding:7px;border-radius:7px}.mobile-metric span{font-size:8px}.mobile-metric strong{font-size:10px}.mobile-offer-title{font-size:8px;text-transform:uppercase;letter-spacing:.4px;color:#6c7972;font-weight:850;margin-top:8px}
+.sheet-active .product-desc{display:-webkit-box!important;-webkit-line-clamp:2!important;white-space:normal!important;overflow:hidden!important;max-height:2.56em!important}.sheet-active .erp-table th:nth-child(2){width:20%}.sheet-active .erp-table th:nth-child(6){width:7%}.sheet-active .erp-table th:nth-child(7){width:29%}.sheet-active .erp-table th:nth-child(9){width:10%}
+
+/* Better quantity-offer editor */
+.slab-list{gap:9px}.slab-row{grid-template-columns:1.2fr .6fr .75fr .6fr auto;gap:0;padding:0;border-radius:11px;overflow:hidden;background:#fff!important;border:1px solid #d9e3dc;box-shadow:none;align-items:stretch}.slab-top{grid-column:1/-1;padding:8px 10px;background:#edf5ef;border-bottom:1px solid #dbe6de}.slab-row:nth-child(even) .slab-top{background:#fff4e4}.slab-row>label,.slab-row>.auto-unit-box,.slab-row>.remove-slab{margin:0;padding:9px}.slab-row>label{align-self:stretch;border-right:1px solid #edf1ed}.slab-row input{min-height:37px;font-size:13px}.total-price-hint{font-size:8px;line-height:1.3}.auto-unit-box{border:0!important;border-radius:0!important;background:#f8faf8!important;display:flex;flex-direction:column;justify-content:center}.remove-slab{border:0!important;border-left:1px solid #edf1ed!important;border-radius:0!important;background:#fff!important;min-height:auto!important}.slab-math{grid-column:1/-1;grid-template-columns:repeat(5,1fr);gap:0;border-top:1px solid #e4ebe5;background:#fafcf9}.plan-metric{border:0;border-right:1px solid #e5ebe6;border-radius:0;padding:7px 9px;background:transparent}.plan-metric:last-child{border-right:0}.plan-metric.profit{background:#eaf5eb}.plan-metric.warn{background:#fff1ed}
+@media(max-width:850px){.erp-filter-grid{grid-template-columns:1fr 1fr}.erp-filter-grid .wide{grid-column:1/-1}.slab-row{grid-template-columns:1fr 1fr}.slab-top,.slab-math{grid-column:1/-1}.slab-row>label,.slab-row>.auto-unit-box,.slab-row>.remove-slab{border-right:0;border-bottom:1px solid #edf1ed}.remove-slab{grid-column:1/-1!important;border-left:0!important}.slab-math{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){#view{padding-left:10px!important;padding-right:10px!important}.erp-kpis{display:flex}.erp-kpi{min-width:112px}.erp-filter-grid{grid-template-columns:1fr}.erp-filter-grid .wide{grid-column:auto}.slab-row{display:block}.slab-top{display:flex}.slab-row>label,.slab-row>.auto-unit-box,.slab-row>.remove-slab{display:block;width:100%;box-sizing:border-box}.slab-math{display:grid;grid-template-columns:1fr 1fr}}
+
 `;
 document.head.append(css);
 
@@ -99,7 +125,7 @@ $('view').innerHTML=A.header(
    <div class="erp-filter-grid">
     <label class="wide">Search products<input id="product-search" placeholder="Product name, description or ID"></label>
     <label>Category<select id="product-category"><option value="">All categories</option></select></label>
-    <label>Stock status<select id="stock-filter"><option value="">All products</option><option value="in">In stock</option><option value="low">Low stock (≤10)</option><option value="out">Out of stock</option><option value="inactive">Inactive</option></select></label>
+    <label>Stock status<select id="stock-filter"><option value="">All products</option><option value="in">In stock</option><option value="low">Low stock alert</option><option value="out">Out of stock</option><option value="inactive">Inactive</option></select></label>
     <label>Sort<select id="product-sort"><option value="new">Newest first</option><option value="name">Name A–Z</option><option value="stock-low">Stock low → high</option><option value="stock-high">Stock high → low</option><option value="price">Wholesale price ↑</option></select></label>
     ${canExport?'<button id="product-export">Export Products</button>':''}
    </div>
@@ -113,7 +139,7 @@ $('view').innerHTML=A.header(
  <div class="desktop-products">
    <div class="erp-table-wrap">
     <table class="erp-table">
-     <thead><tr><th>ID</th><th>Product</th><th>Category</th><th>Wholesale / MRP</th><th>Stock</th><th>MOQ</th><th>Bulk Plans</th><th>Status</th><th>Actions</th></tr></thead>
+     <thead><tr><th>ID</th><th>Product</th><th>Category</th><th>Wholesale / MRP</th><th>Stock</th><th>Low Stock Alert</th><th>Qty Offers</th><th>Status</th><th>Actions</th></tr></thead>
      <tbody id="product-body"></tbody>
     </table>
    </div>
@@ -182,11 +208,11 @@ $('view').innerHTML=A.header(
     </section>
 
     <section class="editor-section">
-     <h3>Pricing & order quantity</h3>
+     <h3>Pricing & stock alert</h3>
      <div class="editor-fields">
       <label>MRP (₹)<input id="ed-mrp" type="number" min="0" step="0.01" required ${canPrice?'':'disabled'}></label>
       <label>Standard wholesale price / unit (₹)<input id="ed-price" type="number" min="0" step="0.01" required ${canPrice?'':'disabled'}></label>
-      <label>Minimum quantity<input id="ed-min" type="number" min="1" step="1" required></label>
+      <label>Low stock alert qty<input id="ed-alert" type="number" min="0" step="1" required><small class="muted">Warning starts when current stock reaches this quantity.</small></label>
       <div class="full read-stock"><span id="stock-caption">Stock</span><strong id="ed-stock-display">0</strong><small id="stock-help">Existing stock is changed only through Inventory Vouchers.</small></div>
       <label id="opening-stock-wrap" class="full">Opening stock<input id="ed-opening-stock" type="number" min="0" step="1" value="0"></label>
      </div>
@@ -290,7 +316,7 @@ function productRows(){
  if($('product-category').value)rows=rows.filter(p=>+p.category_id===+$('product-category').value);
  const f=$('stock-filter').value;
  if(f==='in')rows=rows.filter(p=>p.active&&p.stock>0);
- if(f==='low')rows=rows.filter(p=>p.active&&p.stock>0&&p.stock<=10);
+ if(f==='low')rows=rows.filter(p=>p.active&&p.stock>0&&p.stock<=Number(p.low_stock_alert_qty??10));
  if(f==='out')rows=rows.filter(p=>p.stock===0);
  if(f==='inactive')rows=rows.filter(p=>!p.active);
  const s=$('product-sort').value;
@@ -316,15 +342,15 @@ function planData(rule,p,index=0){
 }
 function plansHtml(p){
  const rules=p.bulk_rules||[];
- if(!rules.length)return '<span class="muted">No bundle plans</span>';
- return `<div class="plan-stack">${rules.map((r,i)=>{const x=planData(r,p,i);return `<div class="plan-chip"><b>${esc(x.title)}</b><span class="plan-price">${x.units} units · Total ${money(x.total)}</span><span class="plan-meta">Auto ${money(x.unitPrice)}/unit · Retail value ${money(x.mrpTotal)}</span><span class="plan-profit">Potential ${money(x.profit)} (${pctPlan(x.margin)})</span></div>`}).join('')}</div>`;
+ if(!rules.length)return '<span class="muted">No quantity offers</span>';
+ return `<div class="plan-stack">${rules.map((r,i)=>{const x=planData(r,p,i);return `<div class="plan-chip"><b>${esc(x.title)}</b><span class="plan-price">${x.units} units · ${money(x.total)} total</span><span class="plan-meta">${money(x.unitPrice)}/unit · MRP value ${money(x.mrpTotal)}</span><span class="plan-profit">Potential ${money(x.profit)} (${pctPlan(x.margin)})</span></div>`}).join('')}</div>`;
 }
 function pctPlan(v){const n=Number(v||0);return `${n.toFixed(Number.isInteger(n)?0:1)}%`}
 
 function renderCatalogue(){
  const rows=productRows();
  const totalUnits=products.reduce((a,p)=>a+Number(p.stock||0),0);
- const low=products.filter(p=>p.active&&p.stock>0&&p.stock<=10).length;
+ const low=products.filter(p=>p.active&&p.stock>0&&p.stock<=Number(p.low_stock_alert_qty??10)).length;
  const out=products.filter(p=>p.stock===0).length;
  const wholesaleValue=products.reduce((a,p)=>a+Number(p.stock||0)*Number(p.price_paise||0),0);
  const mrpValue=products.reduce((a,p)=>a+Number(p.stock||0)*Number(p.mrp_paise||0),0);
@@ -333,7 +359,7 @@ function renderCatalogue(){
   ['Total SKUs',products.length,'Catalogue products','accent'],
   ['Active',products.filter(p=>p.active).length,'Available for ordering',''],
   ['Units on hand',totalUnits,'Current physical stock',''],
-  ['Low stock',low,'10 units or less','warn'],
+  ['Low stock',low,'At or below alert qty','warn'],
   ['Out of stock',out,'Needs replenishment','bad'],
   ['Stock value',money(wholesaleValue),`MRP value ${money(mrpValue)}`,'']
  ].map(([l,v,h,c])=>`<article class="erp-kpi ${c}"><span>${l}</span><strong>${esc(v)}</strong><small>${esc(h)}</small></article>`).join('');
@@ -346,8 +372,8 @@ function renderCatalogue(){
    <td><div class="product-cell">${thumb(p)}<div><span class="product-title">${esc(p.title)}</span><span class="product-desc">${esc(p.description||'')}</span></div></div></td>
    <td>${esc(categoryName(p.category_id))}</td>
    <td><b>${money(p.price_paise)}</b><span class="stock-unit">MRP ${money(p.mrp_paise)}</span></td>
-   <td><span class="stock-number ${p.stock===0?'out':p.stock<=10?'low':''}">${p.stock}</span><span class="stock-unit">${esc(p.unit)}</span></td>
-   <td><b>${p.min_qty}</b><span class="stock-unit">minimum</span></td>
+   <td><span class="stock-number ${p.stock===0?'out':p.stock<=Number(p.low_stock_alert_qty??10)?'low':''}">${p.stock}</span><span class="stock-unit">${esc(p.unit)}</span></td>
+   <td><div class="alert-cell"><b>${Number(p.low_stock_alert_qty??10)} ${esc(p.unit)}</b><span class="alert-badge ${p.stock===0?'out':p.stock<=Number(p.low_stock_alert_qty??10)?'low':''}">${p.stock===0?'Out of stock':p.stock<=Number(p.low_stock_alert_qty??10)?'Alert active':'Healthy'}</span></div></td>
    <td>${plansHtml(p)}</td>
    <td>${A.badge(p.active?'active':'inactive')}</td>
    <td><div class="erp-actions">
@@ -360,13 +386,13 @@ function renderCatalogue(){
 
  $('mobile-products').innerHTML=rows.map(p=>`
   <article class="mobile-product">
-   <div class="mobile-product-head">${thumb(p)}<div><b>${esc(p.title)}</b><span class="stock-unit">#${p.id} · ${esc(categoryName(p.category_id))}</span></div>${A.badge(p.active?'active':'inactive')}</div>
+   <div class="mobile-product-head">${thumb(p)}<div><b>${esc(p.title)}</b><span class="stock-unit">#${p.id} · ${esc(categoryName(p.category_id))}</span><span class="product-desc">${esc(p.description||'')}</span></div>${A.badge(p.active?'active':'inactive')}</div>
    <div class="mobile-metrics">
     <div class="mobile-metric"><span>Wholesale</span><strong>${money(p.price_paise)}</strong></div>
     <div class="mobile-metric"><span>MRP</span><strong>${money(p.mrp_paise)}</strong></div>
-    <div class="mobile-metric"><span>Stock</span><strong>${p.stock} ${esc(p.unit)}</strong></div>
+    <div class="mobile-metric"><span>Stock / Alert</span><strong>${p.stock} / ${Number(p.low_stock_alert_qty??10)}</strong></div>
    </div>
-   <div>${plansHtml(p)}</div>
+   <div class="mobile-offer-title">Quantity offers</div><div>${plansHtml(p)}</div>
    <div class="toolbar-actions"><button data-view="${p.id}">Details</button>${canStock?`<button data-stock="${p.id}" class="stock-in">Stock</button>`:''}<button data-statement="${p.id}">Statement</button>${canEdit?`<button data-edit="${p.id}" class="primary">Edit</button>`:''}</div>
   </article>`).join('')||'<div class="card empty">No products match your filters.</div>';
 
@@ -389,7 +415,7 @@ function showDetails(p){
    <div class="card"><small>Wholesale / MRP</small><h2>${money(p.price_paise)} / ${money(p.mrp_paise)}</h2></div>
   </div>
   <p>${esc(p.description||'No description')}</p>
-  <p>Category: <b>${esc(categoryName(p.category_id))}</b> · MOQ ${p.min_qty}</p>
+  <p>Category: <b>${esc(categoryName(p.category_id))}</b> · Low stock alert at <b>${Number(p.low_stock_alert_qty??10)} ${esc(p.unit)}</b></p>
   <h3>Quantity-based wholesale offers</h3>${slabs}
   <div class="row" style="margin-top:18px">
     ${canStock?`<button id="detail-stock-in" class="stock-in">+ Stock In</button><button id="detail-stock-out" class="stock-out">− Stock Out</button>`:''}
@@ -513,7 +539,7 @@ function openEditor(p=null){
  $('editor-subtitle').textContent=p?`#${p.id} · stock is maintained through Inventory Vouchers`:'Create catalogue item and opening stock';
  $('ed-category').innerHTML=categories.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
  $('ed-title').value=p?.title||'';$('ed-category').value=p?.category_id||categories[0].id;$('ed-unit').value=p?.unit||'piece';$('ed-description').value=p?.description||'';
- $('ed-mrp').value=rupeeInput(p?.mrp_paise||0);$('ed-price').value=rupeeInput(p?.price_paise||0);$('ed-min').value=p?.min_qty||1;
+ $('ed-mrp').value=rupeeInput(p?.mrp_paise||0);$('ed-price').value=rupeeInput(p?.price_paise||0);$('ed-alert').value=Number(p?.low_stock_alert_qty??10);
  $('ed-stock-display').textContent=p?`${p.stock} ${p.unit}`:'Opening stock will be recorded in the ledger';$('opening-stock-wrap').hidden=!!p;$('ed-opening-stock').value=0;
  $('stock-help').textContent=p?'Use Stock In / Stock Out to change this quantity so every movement appears in the inventory statement.':'Opening stock will create the first inventory-ledger entry.';
  $('ed-active').checked=p?.active??true;$('reason-wrap').hidden=!p;$('ed-reason').value='';$('editor-error').hidden=true;$('ed-upload').value='';
@@ -532,13 +558,13 @@ $('product-form').onsubmit=async e=>{
   if(!title||!unit)throw Error('Product name and unit are required.');
   const mrp=A.paise($('ed-mrp').value),price=A.paise($('ed-price').value);
   if(price>mrp)throw Error('Wholesale price cannot be greater than MRP.');
-  const min=+$('ed-min').value;
-  if(!Number.isInteger(min)||min<1)throw Error('Minimum quantity must be a positive whole number.');
+  const alertQty=+$('ed-alert').value;
+  if(!Number.isInteger(alertQty)||alertQty<0)throw Error('Low stock alert quantity must be zero or a positive whole number.');
 
   const tiers=[...document.querySelectorAll('.slab-row')].map((row,i)=>{
     const planTitle=row.querySelector('.slab-title').value.trim(),units=+row.querySelector('.slab-qty').value,total=A.paise(row.querySelector('.slab-total').value);
     if(!planTitle)throw Error(`Offer ${i+1}: title is required.`);
-    if(!Number.isInteger(units)||units<min)throw Error(`${planTitle}: units must be a whole number and at least the MOQ (${min}).`);
+    if(!Number.isInteger(units)||units<1)throw Error(`${planTitle}: block quantity must be a positive whole number.`);
     if(total<=0)throw Error(`${planTitle}: total block price must be greater than ₹0.`);
     const standardTotal=price*units,mrpTotal=mrp*units;
     if(total>standardTotal)throw Error(`${planTitle}: total block price cannot be higher than the normal wholesale value ${money(standardTotal)}.`);
@@ -556,7 +582,7 @@ $('product-form').onsubmit=async e=>{
     title,description:$('ed-description').value.trim(),category_id:+$('ed-category').value,unit,
     mrp_paise:mrp,price_paise:price,
     stock:editing?editing.stock:Math.max(0,Math.trunc(+$('ed-opening-stock').value||0)),
-    min_qty:min,qty_step:1,bulk_rules:tiers,images:urls,
+    min_qty:1,qty_step:1,low_stock_alert_qty:alertQty,bulk_rules:tiers,images:urls,
     active:$('ed-active').checked,
     reason:editing?$('ed-reason').value.trim():'Opening product creation'
   };
@@ -702,8 +728,8 @@ async function openProductStatement(id){
 
 function exportProducts(){
  const rows=productRows();
- A.csv('Products',['ID','Product','Category','Unit','MRP INR','Wholesale INR','Stock','MOQ','Wholesale Offers','Active'],
- rows.map(p=>[p.id,p.title,categoryName(p.category_id),p.unit,p.mrp_paise/100,p.price_paise/100,p.stock,p.min_qty,(p.bulk_rules||[]).map((t,i)=>{const x=planData(t,p,i);return `${x.title}: ${x.units} units for ₹${(x.total/100).toFixed(2)} | profit ₹${(x.profit/100).toFixed(2)} (${pctPlan(x.margin)})`}).join(' || '),p.active]),
+ A.csv('Products',['ID','Product','Category','Unit','MRP INR','Wholesale INR','Stock','Low Stock Alert Qty','Wholesale Offers','Active'],
+ rows.map(p=>[p.id,p.title,categoryName(p.category_id),p.unit,p.mrp_paise/100,p.price_paise/100,p.stock,Number(p.low_stock_alert_qty??10),(p.bulk_rules||[]).map((t,i)=>{const x=planData(t,p,i);return `${x.title}: ${x.units} units for ₹${(x.total/100).toFixed(2)} | profit ₹${(x.profit/100).toFixed(2)} (${pctPlan(x.margin)})`}).join(' || '),p.active]),
  'Current product catalogue; filters applied');
 }
 function exportLedger(){
