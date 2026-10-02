@@ -77,6 +77,48 @@ style.textContent=`
 @media(max-width:1100px){.pay-filter-grid{grid-template-columns:minmax(220px,1.5fr) repeat(3,minmax(110px,1fr))}.pay-filter-grid .date-extra{display:none}.pay-table th:nth-child(2){width:18%}.pay-table th:nth-child(7){width:14%}}
 @media(max-width:820px){#view{padding-left:10px!important;padding-right:10px!important}.pay-head{display:block}.pay-actions{margin-top:8px}.pay-summary{display:flex;overflow:auto}.pay-kpi{min-width:130px}.pay-filter-grid{grid-template-columns:1fr 1fr}.pay-filter-grid .search{grid-column:1/-1}.desktop-payments{display:none}.mobile-payments{display:grid}.table-wrap{max-height:none}.pay-footer{flex-direction:column;align-items:stretch}.pager{justify-content:center}.pay-modal{width:100vw;max-width:100vw;margin:auto 0 0;border-radius:16px 16px 0 0;max-height:94vh}.detail-hero{grid-template-columns:1fr}.detail-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.pay-filter-grid{grid-template-columns:1fr}.pay-filter-grid .search{grid-column:auto}.card-grid{grid-template-columns:1fr 1fr}.detail-grid{grid-template-columns:1fr}.time-buttons{grid-template-columns:1fr 1fr}.time-extra{grid-template-columns:1fr}.modal-body{padding:12px}.card-actions{grid-template-columns:1fr 1fr}}
+
+/* Payments Sheet View */
+body.pay-sheet-lock{overflow:hidden}
+.pay-workspace{min-width:0}
+.pay-workspace-bar{display:none;align-items:center;justify-content:space-between;gap:10px;padding:7px 9px;background:#173b32;color:#fff;border-radius:9px 9px 0 0}
+.pay-workspace-title{display:flex;align-items:center;gap:9px;min-width:0}
+.pay-workspace-title strong{font-size:12px}
+.pay-workspace-title span{display:block;font-size:8px;color:#c8dbd2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pay-workspace-actions{display:flex;gap:5px;flex-wrap:wrap}
+.pay-workspace-actions button{min-height:29px;padding:4px 8px;font-size:8px;background:#fff;color:#173b32;border-color:#fff}
+.pay-workspace-actions .exit-sheet{background:#dff2a8;border-color:#dff2a8}
+.pay-workspace.fullscreen-sheet{position:fixed;inset:0;z-index:9999;background:#f4f6f2;padding:8px;display:flex;flex-direction:column;overflow:hidden}
+.pay-workspace.fullscreen-sheet .pay-workspace-bar{display:flex;flex:0 0 auto}
+.pay-workspace.fullscreen-sheet .pay-filters{flex:0 0 auto;margin:0;border-radius:0;padding:6px 0 7px;background:#f4f6f2;border-left:0;border-right:0}
+.pay-workspace.fullscreen-sheet #basis{flex:0 0 auto;margin:4px 2px 5px}
+.pay-workspace.fullscreen-sheet .statement-shell{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;border-radius:0}
+.pay-workspace.fullscreen-sheet .statement-title{flex:0 0 auto}
+.pay-workspace.fullscreen-sheet .table-wrap{flex:1 1 auto;min-height:0;max-height:none;overflow:auto}
+.pay-workspace.fullscreen-sheet .pay-table th{position:sticky;top:0;z-index:7}
+.pay-workspace.fullscreen-sheet .mobile-payments{flex:1 1 auto;min-height:0;overflow:auto}
+.pay-workspace.fullscreen-sheet .pay-footer{flex:0 0 auto;margin-top:5px}
+.pay-workspace.fullscreen-sheet.dense .pay-table th{padding:5px 5px;font-size:7px}
+.pay-workspace.fullscreen-sheet.dense .pay-table td{padding:5px 5px;font-size:8px}
+.pay-workspace.fullscreen-sheet.dense .method-pill,
+.pay-workspace.fullscreen-sheet.dense .status-pill,
+.pay-workspace.fullscreen-sheet.dense .receive-pill{padding:3px 5px;font-size:6px}
+.pay-workspace.fullscreen-sheet.dense .action-cell button{min-height:25px;padding:3px 5px;font-size:7px}
+#paymentWorkspace:fullscreen{background:#f4f6f2;padding:8px;display:flex;flex-direction:column;overflow:hidden}
+#paymentWorkspace:fullscreen .pay-workspace-bar{display:flex}
+#paymentWorkspace:fullscreen .pay-filters{flex:0 0 auto;margin:0;border-radius:0;padding:6px 0 7px;background:#f4f6f2}
+#paymentWorkspace:fullscreen #basis{flex:0 0 auto;margin:4px 2px 5px}
+#paymentWorkspace:fullscreen .statement-shell{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;border-radius:0}
+#paymentWorkspace:fullscreen .table-wrap{flex:1 1 auto;min-height:0;max-height:none}
+#paymentWorkspace:fullscreen .pay-footer{flex:0 0 auto;margin-top:5px}
+@media(max-width:820px){
+ .pay-workspace.fullscreen-sheet{padding:5px}
+ .pay-workspace.fullscreen-sheet .desktop-payments{display:none}
+ .pay-workspace.fullscreen-sheet .mobile-payments{display:grid}
+ .pay-workspace-bar{align-items:flex-start}
+ .pay-workspace-actions{justify-content:flex-end}
+}
+
 `;
 document.head.append(style);
 
@@ -86,7 +128,7 @@ const owner=A.profile?.role==='owner';
 const canView=owner||A.can('finance')||A.can('payments.view');
 if(!canView)throw Error('Payment view permission required.');
 const canCollect=owner||A.can('payments.cod_collect');
-let orders=[],shown=[],page=1,pageSize=50,current=null;
+let orders=[],shown=[],page=1,pageSize=50,current=null,sheetMode=false,denseMode=false,lastLoadedAt=null;
 
 const payLabel=t=>({cash:'Cash',phonepe:'PhonePe',upi:'UPI / QR',bank_transfer:'Bank Transfer',other:'Other',gateway:'Payment Gateway'})[t]||'—';
 const retailer=o=>o.business_name||o.customer_name||`Retailer #${o.user_id}`;
@@ -110,10 +152,16 @@ const date=v=>v?A.date(v):'—';
 $('view').innerHTML=`
 <div class="pay-head">
  <div><h1>Payments</h1><p>Complete payment statement · gateway payments and manual COD collections in one register.</p></div>
- <div class="pay-actions"><button id="refresh">Refresh</button><button id="export">Export CSV</button></div>
+ <div class="pay-actions"><button id="sheet-view" class="primary">⛶ Sheet View</button><button id="refresh">Refresh</button><button id="export">Export CSV</button></div>
 </div>
 
 <div id="summary" class="pay-summary"></div>
+
+<section id="paymentWorkspace" class="pay-workspace">
+ <div class="pay-workspace-bar">
+  <div class="pay-workspace-title"><span style="font-size:17px">▦</span><div><strong>ONeness Payment Statement</strong><span id="sheet-meta">Spreadsheet view · payment reconciliation</span></div></div>
+  <div class="pay-workspace-actions"><button id="sheet-density">Compact rows</button><button id="sheet-refresh">Refresh</button><button id="sheet-export">Export CSV</button><button id="exit-sheet" class="exit-sheet">Exit Sheet View</button></div>
+ </div>
 
 <section class="pay-filters">
  <div class="pay-filter-grid">
@@ -149,6 +197,7 @@ $('view').innerHTML=`
  <span id="page-info"></span>
  <div class="pager"><select id="page-size"><option>25</option><option selected>50</option><option>100</option></select><button id="prev">Previous</button><button id="next">Next</button></div>
 </div>
+</section>
 
 <dialog id="payment-modal" class="pay-modal">
  <div class="modal-head"><div><h2 id="modal-title">Payment</h2><p id="modal-sub"></p></div><button id="modal-x" class="modal-x">×</button></div>
@@ -247,7 +296,7 @@ function render(){
   <div class="card-grid"><div><span>Amount</span><b>${money(o.total_paise)}</b></div><div><span>Order payment</span><b>${esc((o.payment_method||'—').toUpperCase())}</b></div><div><span>Received via</span><b>${esc(recordLabel(o))}</b></div><div><span>Reference</span><b>${esc(o.payment_reference||'—')}</b></div><div><span>Paid / recorded</span><b>${esc(date(recordedAt(o)))}</b></div><div><span>Order status</span><b>${esc(o.status||'—')}</b></div></div>
   <div class="card-actions"><button class="view-btn" data-view="${o.id}">View payment</button>${canCollect&&o.payment_method==='cod'&&o.status!=='cancelled'&&(o.payment_status!=='collected'||!o.payment_record_type)?`<button class="record-btn" data-record="${o.id}">${o.payment_status==='collected'?'Complete record':'Record payment'}</button>`:''}</div>
  </article>`}).join('');
- wireRows();
+ wireRows();updateSheetMeta();
 }
 function wireRows(){
  for(const b of document.querySelectorAll('[data-view]'))b.onclick=()=>openPayment(+b.dataset.view);
@@ -255,8 +304,39 @@ function wireRows(){
 }
 async function load(){
  orders=await A.all('orders.list',{},n=>$('statement-count')&&($('statement-count').textContent=`Loaded ${n} orders…`));
+ lastLoadedAt=new Date();
  render();
+ updateSheetMeta();
 }
+
+function updateSheetMeta(){
+ const el=$('sheet-meta');if(!el)return;
+ const stamp=lastLoadedAt?lastLoadedAt.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}):'—';
+ el.textContent=`${shown.length} matching · ${orders.length} total · updated ${stamp}`;
+}
+function syncSheetButtons(){
+ const top=$('sheet-view');if(top)top.textContent=sheetMode?'⛶ Exit Sheet View':'⛶ Sheet View';
+ const density=$('sheet-density');if(density)density.textContent=denseMode?'Comfortable rows':'Compact rows';
+}
+async function enterSheetMode(){
+ const ws=$('paymentWorkspace');
+ sheetMode=true;ws.classList.add('fullscreen-sheet');document.body.classList.add('pay-sheet-lock');
+ syncSheetButtons();updateSheetMeta();
+ try{if(ws.requestFullscreen&&!document.fullscreenElement)await ws.requestFullscreen()}catch{}
+}
+async function exitSheetMode(){
+ const ws=$('paymentWorkspace');
+ sheetMode=false;ws.classList.remove('fullscreen-sheet');document.body.classList.remove('pay-sheet-lock');
+ syncSheetButtons();
+ try{if(document.fullscreenElement)await document.exitFullscreen()}catch{}
+}
+function toggleSheetMode(){return sheetMode?exitSheetMode():enterSheetMode()}
+function toggleDensity(){
+ denseMode=!denseMode;
+ $('paymentWorkspace').classList.toggle('dense',denseMode);
+ syncSheetButtons();
+}
+
 async function openPayment(id){
  const listOrder=orders.find(x=>+x.id===+id);
  $('modal-title').textContent=`Payment · #ON${id}`;
@@ -378,6 +458,22 @@ $('clear').onclick=()=>{$('search').value='';$('status').value='';$('method').va
 $('prev').onclick=()=>{page--;render()};$('next').onclick=()=>{page++;render()};$('page-size').onchange=()=>{pageSize=+$('page-size').value;page=1;render()};
 $('refresh').onclick=()=>load().catch(A.error);
 $('export').onclick=()=>{try{exportCsv()}catch(e){A.error(e)}};
+$('sheet-view').onclick=()=>toggleSheetMode();
+$('exit-sheet').onclick=()=>exitSheetMode();
+$('sheet-density').onclick=toggleDensity;
+$('sheet-refresh').onclick=()=>load().catch(A.error);
+$('sheet-export').onclick=()=>{try{exportCsv()}catch(e){A.error(e)}};
+document.addEventListener('fullscreenchange',()=>{
+ if(!document.fullscreenElement&&sheetMode){
+  sheetMode=false;
+  $('paymentWorkspace').classList.remove('fullscreen-sheet');
+  document.body.classList.remove('pay-sheet-lock');
+  syncSheetButtons();
+ }
+});
+document.addEventListener('keydown',e=>{
+ if(e.key==='Escape'&&sheetMode&&!$('payment-modal').open&&!$('record-modal').open)exitSheetMode();
+});
 $('modal-x').onclick=()=>$('payment-modal').close();
 $('record-x').onclick=$('record-cancel').onclick=()=>$('record-modal').close();
 
