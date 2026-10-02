@@ -1,8 +1,16 @@
 <!doctype html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#173b32"><meta name="referrer" content="no-referrer"><title>ONeness · Analytics</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2718%27 fill=%27%2317634c%27/%3E%3Ctext x=%2713%27 y=%2748%27 font-size=%2747%27 fill=%27white%27%3EO%3C/text%3E%3C/svg%3E">
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#173b32">
+<meta name="referrer" content="no-referrer">
+<title>ONeness · Analytics</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2718%27 fill=%27%2317634c%27/%3E%3Ctext x=%2713%27 y=%2748%27 font-size=%2747%27 fill=%27white%27%3EO%3C/text%3E%3C/svg%3E">
 <style>body{margin:0;background:#f4f6f2;font-family:system-ui}#boot{padding:30px;color:#426052}</style>
-</head><body>
-<div id="app"><p id="boot">Opening ONeness…</p></div>
+</head>
+<body>
+<div id="app"><p id="boot">Opening ONeness analytics…</p></div>
 <script>
 (async()=>{
 
@@ -13,36 +21,498 @@ for(const id of ['oneness-config','oneness-theme']){
  const node=shared.getElementById(id);if(!node)throw Error('index.html is incomplete.');
  document.head.append(node.cloneNode(true));
 }
-const source=shared.getElementById('oneness-core');if(!source)throw Error('index.html is incomplete.');
-const runtime=document.createElement('script');runtime.textContent=source.textContent;document.body.append(runtime);
-const A=await App.init('analytics',['finance','orders']),{$,esc,money}=A;
-let orders=[],products=[],users=[],coupons=[],rows=[],headers=[],building=false,cancel=false,meta='',reportTitle='';const snapshots=new Map();
-$('view').innerHTML=A.header('Reports & insights','Date-wise reports with clear totals and complete CSV exports.','<button id="export" disabled>Export CSV</button><button id="print" disabled>Print / PDF</button>')+`<div class="filters"><label>Report<select id="report"><option value="orders">Orders</option><option value="sales">Delivered sales</option><option value="collections">Cash collections</option><option value="outstanding">Outstanding · current</option><option value="products">Product sales</option><option value="retailers">Retailer summary</option><option value="coupons">Coupon usage</option><option value="inventory">Inventory · current</option></select></label>${A.dateFields()}<label>Search within report<input id="search" placeholder="ID or name"></label><label id="threshold-field" hidden>Low-stock threshold<input id="threshold" type="number" min="1" value="10"></label><button class="primary" id="generate">Generate report</button><button id="cancel" hidden>Stop</button></div><p class="muted" id="progress">Select a report and generate it.</p><div id="warnings"></div><div id="numbers"></div><div id="chart" class="card" hidden style="margin-bottom:20px"></div><div id="result"></div>`;
-const name=id=>users.find(u=>u.id===id)?.business_name||users.find(u=>u.id===id)?.name||'Retailer #'+id;
-const amount=n=>Number((n/100).toFixed(2));
-function inputChanged(){if(building){cancel=true;}$('export').disabled=true;$('print').disabled=true;$('progress').textContent='Filters changed. Generate the report again.';}
-function delivered(r){return orders.filter(o=>o.status==='delivered'&&((r.start===-Infinity&&r.end===Infinity)||A.inRange(o.delivered_at,r)));}
-async function generate(){if(building)return;building=true;cancel=false;rows=[];$('result').innerHTML='';$('warnings').innerHTML='';$('numbers').innerHTML='';$('chart').hidden=true;$('generate').disabled=true;$('cancel').hidden=false;$('export').disabled=true;$('print').disabled=true;
- try{const type=$('report').value,r=A.range(),q=$('search').value.trim().toLowerCase();orders=await A.all('orders.list',{},n=>$('progress').textContent=`Loaded ${n} order headers…`);if(cancel)throw Error('Report cancelled. No partial export was produced.');if(A.can('users'))users=await A.all('admin.users');if(A.can('coupons'))coupons=await A.all('admin.coupons');const created=orders.filter(o=>A.inRange(o.created_at,r)),sales=delivered(r);let total=null,basis='';
-  if(['sales','products','retailers'].includes(type)){const missing=orders.filter(o=>o.status==='delivered'&&!o.delivered_at).length;if(missing)$('warnings').innerHTML=`<div class="notice">${missing} delivered orders have no recorded delivery timestamp. They are excluded from dated sales reports. “All dates” includes them. Install the reporting SQL to record future delivery timestamps.</div>`;}
-  if(type==='orders'){headers=['Order ID','Retailer','Created IST','Status','Total INR','Discount INR','Payment'];rows=created.map(o=>[o.id,name(o.user_id),A.date(o.created_at),o.status,amount(o.total_paise),amount(o.discount_paise),o.payment_status]);basis='Order creation date; all statuses';total=created.filter(o=>!['syncing','cancelled'].includes(o.status)).reduce((n,o)=>n+o.total_paise,0);}
-  if(type==='sales'){headers=['Order ID','Retailer','Delivered IST','Net order INR','Coupon discount INR','Payment'];rows=sales.map(o=>[o.id,name(o.user_id),A.date(o.delivered_at),amount(o.total_paise),amount(o.discount_paise),o.payment_status]);basis='Delivery date; net total includes delivery charges';total=sales.reduce((n,o)=>n+o.total_paise,0);}
-  if(type==='collections'){const data=orders.filter(o=>o.payment_status==='collected'&&A.inRange(o.collected_at,r));headers=['Order ID','Retailer','Collected IST','Collected INR'];rows=data.map(o=>[o.id,name(o.user_id),A.date(o.collected_at),amount(o.total_paise)]);basis='Cash collection date';total=data.reduce((n,o)=>n+o.total_paise,0);}
-  if(type==='outstanding'){const data=orders.filter(o=>o.status==='delivered'&&o.payment_status==='unpaid');headers=['Order ID','Retailer','Delivered IST','Outstanding INR','Days since delivery'];rows=data.map(o=>[o.id,name(o.user_id),A.date(o.delivered_at),amount(o.total_paise),o.delivered_at?Math.max(0,Math.floor((Date.now()-Date.parse(o.delivered_at))/86400000)):'Unknown']);basis='Current delivered-unpaid snapshot; date range is not applied';total=data.reduce((n,o)=>n+o.total_paise,0);}
-  if(type==='products'){const grouped=new Map();for(let i=0;i<sales.length;i++){if(cancel)throw Error('Report cancelled. No partial export was produced.');const o=sales[i];$('progress').textContent=`Reading saved order items ${i+1} of ${sales.length}…`;let d=snapshots.get(o.id);if(!d){d=(await A.api('order.details',{id:o.id})).details;snapshots.set(o.id,d);}for(const p of d.items){const x=grouped.get(p.product_id)||{id:p.product_id,title:p.title||'Product #'+p.product_id,qty:0,value:0};x.qty+=p.qty;x.value+=p.qty*p.unit_price_paise;grouped.set(p.product_id,x);}}headers=['Product ID','Product','Quantity delivered','Item value INR'];rows=[...grouped.values()].sort((a,b)=>b.value-a.value).map(x=>[x.id,x.title,x.qty,amount(x.value)]);basis='Delivery date; saved item prices before order-level coupons and shipping';total=[...grouped.values()].reduce((n,x)=>n+x.value,0);}
-  if(type==='retailers'){const grouped=new Map();function get(id){if(!grouped.has(id))grouped.set(id,{id,orders:0,sales:0,collected:0,outstanding:0});return grouped.get(id);}for(const o of sales){const x=get(o.user_id);x.orders++;x.sales+=o.total_paise;}for(const o of orders){if(o.payment_status==='collected'&&A.inRange(o.collected_at,r))get(o.user_id).collected+=o.total_paise;if(o.status==='delivered'&&o.payment_status==='unpaid')get(o.user_id).outstanding+=o.total_paise;}headers=['Retailer ID','Retailer','Delivered orders in period','Delivered INR in period','Collected INR in period','Outstanding INR now'];rows=[...grouped.values()].map(x=>[x.id,name(x.id),x.orders,amount(x.sales),amount(x.collected),amount(x.outstanding)]);basis='Sales by delivery date; cash by collection date; outstanding is current';}
-  if(type==='coupons'){headers=['Coupon','Order ID','Retailer','Used IST','Order status','Discount INR','Usage state'];rows=created.filter(o=>o.coupon_id).map(o=>[coupons.find(c=>c.id===o.coupon_id)?.code||'Coupon #'+o.coupon_id,o.id,name(o.user_id),A.date(o.created_at),o.status,amount(o.discount_paise),o.status==='cancelled'?'Released':o.status==='syncing'?'Reserved':'Used']);basis='Order creation date; cancelled uses are released';}
-  if(type==='inventory'){if(!A.can('catalog'))throw Error('Catalogue permission is needed for the complete inventory report.');products=await A.all('products.list');headers=['Product ID','Product','Stock','Unit','Wholesale INR','MRP INR','Wholesale stock value INR','Low stock','Active'];const threshold=Math.max(1,Number($('threshold').value)||10);rows=products.map(p=>[p.id,p.title,p.stock,p.unit,amount(p.price_paise),amount(p.mrp_paise),amount(p.stock*p.price_paise),p.stock<threshold?'Yes':'No',p.active?'Yes':'No']);basis=`Current stock snapshot; threshold ${threshold}; valuation uses wholesale price, not cost`;}
-  if(cancel)throw Error('Report cancelled. No partial export was produced.');rows=rows.filter(row=>row.join(' ').toLowerCase().includes(q));reportTitle=$('report').selectedOptions[0].text;meta=(['outstanding','inventory'].includes(type)?'As of '+A.date(new Date()):r.label)+'; '+basis+'; search='+q;
-  // Money cards are suppressed when text search narrows the report to avoid mismatched totals.
-  const metrics=[['Report rows',rows.length,basis]];if(total!==null&&!q)metrics.push([type==='orders'?'Confirmed order value':'Report value',money(total),type==='orders'?'Excludes syncing and cancelled':'Before any text search']);
-  if(!q&&Number.isFinite(r.start)&&Number.isFinite(r.end)&&['orders','sales','collections'].includes(type)){const previous={start:r.start-(r.end-r.start),end:r.start};const before=type==='orders'?orders.filter(o=>A.inRange(o.created_at,previous)).length:type==='sales'?delivered(previous).reduce((n,o)=>n+o.total_paise,0):orders.filter(o=>o.payment_status==='collected'&&A.inRange(o.collected_at,previous)).reduce((n,o)=>n+o.total_paise,0);metrics.push(['Previous equal period',type==='orders'?before:money(before),'Compared using the same date basis']);}
-  $('numbers').innerHTML=A.cards(metrics);$('result').innerHTML=A.table(headers,rows.slice(0,250).map(row=>row.map(esc)));$('progress').textContent=`${rows.length} matching rows. Displaying ${Math.min(250,rows.length)}; CSV and print include all ${rows.length}. ${basis}.`;$('export').disabled=false;$('print').disabled=false;
-  if(type==='orders'){const counts=new Map();for(const row of rows)counts.set(row[3],(counts.get(row[3])||0)+1);const max=Math.max(1,...counts.values());$('chart').hidden=false;$('chart').innerHTML='<h2>Order status in matching records</h2><div class="bars">'+[...counts].map(([s,n])=>`<div class="bar"><span>${esc(s)}</span><i style="width:${n/max*100}%"></i><b>${n}</b></div>`).join('')+'</div>';}
- }catch(e){$('progress').textContent=A.error(e);rows=[];$('export').disabled=true;$('print').disabled=true;}finally{building=false;$('generate').disabled=false;$('cancel').hidden=true;}
-}
-$('generate').onclick=generate;$('cancel').onclick=()=>{cancel=true;};$('export').onclick=()=>A.csv(reportTitle,headers,rows,meta);$('print').onclick=()=>A.print(reportTitle,`<p>${esc(meta)}</p>`+A.table(headers,rows.map(row=>row.map(esc))));A.wireDates(inputChanged);for(const id of ['search','threshold'])$(id).oninput=inputChanged;$('report').onchange=()=>{const snapshot=['inventory','outstanding'].includes($('report').value);for(const id of ['from','to','period'])$(id).disabled=snapshot;$('threshold-field').hidden=$('report').value!=='inventory';inputChanged();};
+const source=shared.getElementById('oneness-core');
+if(!source)throw Error('index.html is incomplete.');
+const runtime=document.createElement('script');
+runtime.textContent=source.textContent;
+document.body.append(runtime);
 
-})().catch(e=>{if(window.App)App.fail(e);else{document.body.textContent="Could not load ONeness. Serve all HTML files together over HTTP/HTTPS. "+e.message;}});
+const style=document.createElement('style');
+style.textContent=`
+:root{--ink:#14251f;--green:#17634c;--muted:#6d7c74;--line:#dbe4de;--red:#a33b2d;--amber:#90601e;--blue:#4e6292}
+body.analytics-console{overflow:hidden}
+body.analytics-console .main{height:100vh;overflow:hidden}
+body.analytics-console .top{display:none!important}
+body.analytics-console .content{height:100vh;max-width:none!important;margin:0!important;padding:10px 14px 8px!important;overflow:hidden}
+body.analytics-console #view{height:100%;display:flex;flex-direction:column;min-height:0}
+.analytics-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex:0 0 auto;margin-bottom:8px}
+.analytics-head h1{margin:0;font-size:27px;letter-spacing:-.7px}.analytics-head p{margin:4px 0 0;color:var(--muted);font-size:11px}
+.head-actions{display:flex;gap:6px;flex-wrap:wrap}.head-actions button{min-height:35px;padding:6px 10px;font-size:10px}
+.export-excel{background:#eaf5ec!important;color:#17634c!important;border-color:#cde1d2!important}.export-pdf{background:#fff3ef!important;color:#a44736!important;border-color:#e9c7be!important}
+.analytics-workspace{display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
+.analytics-workspace-bar{display:none;align-items:center;justify-content:space-between;gap:10px;padding:7px 9px;background:#173b32;color:#fff;border-radius:9px 9px 0 0}
+.workspace-title{display:flex;align-items:center;gap:9px;min-width:0}.workspace-title strong{font-size:12px}.workspace-title span{display:block;font-size:8px;color:#c8dbd2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.workspace-actions{display:flex;gap:5px;flex-wrap:wrap}.workspace-actions button{min-height:29px;padding:4px 8px;font-size:8px;background:#fff;color:#173b32;border-color:#fff}.workspace-actions .exit-sheet{background:#dff2a8;border-color:#dff2a8}
+.analytics-filters{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px;flex:0 0 auto;margin-bottom:6px}
+.filter-grid{display:grid;grid-template-columns:1.15fr repeat(3,minmax(110px,.72fr)) 1.4fr auto;gap:7px;align-items:end}
+.filter-grid label{margin:0;font-size:9px;color:#53635b}.filter-grid input,.filter-grid select{min-height:36px;padding:6px 8px;font-size:11px;border-radius:7px}
+.filter-actions{display:flex;gap:5px}.filter-actions button{min-height:36px;padding:6px 9px;font-size:9px}
+.report-hint{display:flex;justify-content:space-between;gap:10px;align-items:center;flex:0 0 auto;margin:0 2px 6px;font-size:9px;color:var(--muted)}.report-hint .stale{color:#98621e;font-weight:800}
+.analytics-kpis{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:7px;flex:0 0 auto;margin-bottom:7px}
+.kpi{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 10px;min-height:62px}.kpi span{display:block;font-size:8px;text-transform:uppercase;letter-spacing:.45px;color:var(--muted);font-weight:850}.kpi strong{display:block;font-size:19px;line-height:1;margin-top:5px}.kpi small{display:block;font-size:7px;color:var(--muted);margin-top:3px}
+.kpi.good{background:#eaf5ec;border-color:#d0e4d5}.kpi.warn{background:#fff6e7;border-color:#eadbbc}.kpi.blue{background:#eef3fb;border-color:#dce5f2}
+.analytics-lower{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:7px;flex:1 1 auto;min-height:0}
+.report-shell{background:#fff;border:1px solid #d7e2db;border-radius:10px;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.report-bar{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 9px;background:#173b32;color:#fff;flex:0 0 auto}.report-bar b{font-size:11px}.report-bar span{font-size:8px;color:#c9dbd2}
+.report-table-wrap{overflow:auto;flex:1 1 auto;min-height:0}
+.report-table{width:100%;border-collapse:collapse;table-layout:auto}
+.report-table th{position:sticky;top:0;z-index:5;background:#edf3ef;color:#50635a;font-size:8px;text-transform:uppercase;letter-spacing:.35px;text-align:left;padding:7px 7px;border-bottom:1px solid #d8e2dc;white-space:nowrap;cursor:pointer}
+.report-table th:hover{background:#e5eee8}.report-table th.sort-active{color:#17634c}.sort-mark{font-size:7px;margin-left:3px}
+.report-table td{padding:7px;border-bottom:1px solid #edf1ed;font-size:9px;vertical-align:middle;white-space:normal;overflow-wrap:anywhere}
+.report-table tr:hover td{background:#fbfcfa}.report-table td.numeric{text-align:right;font-variant-numeric:tabular-nums}
+.order-link{font-weight:900;color:#17634c;text-decoration:none}.order-link:hover{text-decoration:underline}
+.table-empty{display:grid;place-items:center;min-height:230px;color:#78877f;font-size:10px}
+.report-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 7px;flex:0 0 auto;border-top:1px solid #edf1ed;color:var(--muted);font-size:8px}.pager{display:flex;align-items:center;gap:5px}.pager button,.pager select{min-height:28px;padding:4px 7px;font-size:8px}
+.insights{display:flex;flex-direction:column;gap:7px;min-height:0}.insight-card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px}.insight-card h3{font-size:10px;margin:0 0 7px}.insight-card p{font-size:8px;color:#66766e;line-height:1.45;margin:0}.insight-main{font-size:17px;font-weight:900;color:#173b32;margin-bottom:3px}.insight-list{display:grid;gap:6px}.insight-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;font-size:8px;padding-bottom:5px;border-bottom:1px solid #eef1ee}.insight-row:last-child{border:0;padding-bottom:0}.insight-row b{white-space:nowrap}
+.chart-card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px}.chart-card h3{font-size:10px;margin:0 0 9px}.mini-bars{display:grid;gap:7px}.mini-bar{display:grid;grid-template-columns:78px 1fr 36px;align-items:center;gap:6px;font-size:8px}.mini-bar span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mini-bar i{display:block;height:8px;border-radius:999px;background:#e3e9e4;overflow:hidden}.mini-bar i:before{content:'';display:block;height:100%;width:var(--w);background:#39815c;border-radius:999px}.mini-bar b{text-align:right}
+.mobile-report{display:none;gap:7px;overflow:auto}.report-card{background:#fff;border:1px solid var(--line);border-radius:11px;padding:10px}.report-card-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.report-card-head b{font-size:10px}.report-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}.report-card-grid div{background:#f7f9f7;border-radius:7px;padding:7px}.report-card-grid span{display:block;font-size:7px;color:var(--muted)}.report-card-grid b{display:block;font-size:9px;margin-top:2px;overflow-wrap:anywhere}
+.admin-bottom-card{display:grid!important;gap:8px}.admin-profile{display:grid;grid-template-columns:42px minmax(0,1fr);gap:9px;align-items:center;padding:9px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.05)}
+.avatar-btn{width:42px;height:42px;min-height:42px;padding:0;border:2px solid rgba(255,255,255,.26);border-radius:50%;overflow:hidden;background:#31594a;color:#fff;font-weight:900;font-size:14px}.avatar-btn img{width:100%;height:100%;object-fit:cover;display:block}.avatar-btn .avatar-initial{display:grid;place-items:center;width:100%;height:100%}
+.admin-profile-copy{min-width:0}.admin-profile-copy b{display:block;font-size:11px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.admin-profile-copy span{display:block;font-size:8px;color:#b9d0c4;text-transform:uppercase;margin-top:1px}.admin-panel-label{font-size:9px;color:#b0cabd;line-height:1.4}.side .bottom #logout{width:100%;min-height:34px;padding:6px 9px;background:transparent;border-color:rgba(255,255,255,.18);color:#fff;font-size:10px}.avatar-uploading{opacity:.55;pointer-events:none}
+.analytics-workspace.fullscreen-sheet{position:fixed;inset:0;z-index:9999;background:#f4f6f2;padding:8px;display:flex;flex-direction:column;overflow:hidden}
+.analytics-workspace.fullscreen-sheet .analytics-workspace-bar{display:flex;flex:0 0 auto}.analytics-workspace.fullscreen-sheet .analytics-filters{margin:0;border-radius:0;padding:6px 0 7px;background:#f4f6f2;border-left:0;border-right:0}.analytics-workspace.fullscreen-sheet .analytics-kpis{margin-top:6px}.analytics-workspace.fullscreen-sheet .analytics-lower{flex:1 1 auto;min-height:0}.analytics-workspace.fullscreen-sheet .report-shell{border-radius:0}.analytics-workspace.fullscreen-sheet.dense .report-table th{padding:5px;font-size:7px}.analytics-workspace.fullscreen-sheet.dense .report-table td{padding:5px;font-size:8px}
+#analyticsWorkspace:fullscreen{background:#f4f6f2;padding:8px;display:flex;flex-direction:column;overflow:hidden}#analyticsWorkspace:fullscreen .analytics-workspace-bar{display:flex}#analyticsWorkspace:fullscreen .analytics-filters{margin:0;border-radius:0;padding:6px 0 7px;background:#f4f6f2}#analyticsWorkspace:fullscreen .analytics-lower{flex:1 1 auto;min-height:0}
+@media(max-width:1180px){.analytics-lower{grid-template-columns:minmax(0,1fr) 220px}.filter-grid{grid-template-columns:1fr 1fr 1fr 1fr}.filter-grid .search{grid-column:1/3}.filter-actions{grid-column:3/5}}
+@media(max-width:850px){
+ body.analytics-console{overflow:auto}body.analytics-console .main{height:auto;overflow:visible}body.analytics-console .content{height:auto;overflow:visible;padding:10px!important}body.analytics-console #view{height:auto}.side .bottom{display:none!important}
+ .analytics-head{display:block}.head-actions{margin-top:8px}.analytics-kpis{display:flex;overflow:auto}.kpi{min-width:135px}.analytics-lower{display:block}.insights{margin-top:7px}.desktop-report{display:none}.mobile-report{display:grid}.filter-grid{grid-template-columns:1fr 1fr}.filter-grid .search{grid-column:1/-1}.filter-actions{grid-column:1/-1}.analytics-workspace.fullscreen-sheet .insights{display:none}.analytics-workspace.fullscreen-sheet .mobile-report{flex:1 1 auto;min-height:0;overflow:auto}.analytics-workspace.fullscreen-sheet .report-shell{display:none}.analytics-workspace-bar{align-items:flex-start}.workspace-actions{justify-content:flex-end}
+}
+@media(max-width:520px){.filter-grid{grid-template-columns:1fr}.filter-grid .search,.filter-actions{grid-column:auto}.report-card-grid{grid-template-columns:1fr 1fr}.analytics-workspace.fullscreen-sheet{padding:5px}}
+`;
+document.head.append(style);
+
+const A=await App.init('analytics',['finance','orders']);
+const {$,esc,money}=A;
+let orders=[],products=[],users=[],coupons=[],baseRows=[],rows=[],headers=[],building=false,cancel=false,meta='',reportTitle='',reportType='',generated=false,lastGeneratedAt=null;
+let page=1,pageSize=50,sortIndex=-1,sortDir=1,sheetMode=false,denseMode=false;
+let metrics=[],insights=[],chartItems=[];
+const snapshots=new Map();
+
+const amount=n=>Number((Number(n||0)/100).toFixed(2));
+const payLabel=t=>({cash:'Cash',phonepe:'PhonePe',upi:'UPI / QR',bank_transfer:'Bank Transfer',other:'Other',gateway:'Payment Gateway'})[t]||'—';
+const effectivePay=o=>o.payment_record_type||((o.payment_method==='online'&&o.payment_status==='collected')?'gateway':o.payment_status==='collected'?'legacy':'pending');
+const receivedLabel=o=>effectivePay(o)==='legacy'?'Legacy collection':effectivePay(o)==='pending'?'Not recorded':payLabel(effectivePay(o));
+const retailerName=id=>{
+ const u=users.find(x=>x.id===id);
+ if(u)return u.business_name||u.name||`Retailer #${id}`;
+ const o=orders.find(x=>x.user_id===id);
+ return o?.business_name||o?.customer_name||`Retailer #${id}`;
+};
+const numberLike=v=>typeof v==='number'||(typeof v==='string'&&v!==''&&!isNaN(Number(v)));
+
+$('view').innerHTML=`
+<div class="analytics-head">
+ <div><h1>Reports & Analytics</h1><p>Smart business reports with live search, sorting, Sheet View and complete exports.</p></div>
+ <div class="head-actions">
+  <button id="sheet-view" class="primary">⛶ Sheet View</button>
+  <button id="excel" class="export-excel" disabled>Excel</button>
+  <button id="pdf" class="export-pdf" disabled>PDF</button>
+  <button id="print" disabled>Print</button>
+  <button id="export" disabled>CSV</button>
+ </div>
+</div>
+
+<section id="analyticsWorkspace" class="analytics-workspace">
+ <div class="analytics-workspace-bar">
+  <div class="workspace-title"><span style="font-size:17px">▦</span><div><strong>ONeness Analytics Sheet</strong><span id="sheet-meta">Generate a report to begin</span></div></div>
+  <div class="workspace-actions"><button id="sheet-density">Compact rows</button><button id="sheet-generate">Regenerate</button><button id="sheet-excel">Excel</button><button id="sheet-pdf">PDF</button><button id="sheet-print">Print</button><button id="sheet-export">CSV</button><button id="exit-sheet" class="exit-sheet">Exit Sheet View</button></div>
+ </div>
+
+ <section class="analytics-filters">
+  <div class="filter-grid">
+   <label>Report
+    <select id="report">
+     <option value="orders">Orders</option>
+     <option value="sales">Delivered sales</option>
+     <option value="collections">Payments collected</option>
+     <option value="outstanding">Outstanding · current</option>
+     <option value="products">Product sales</option>
+     <option value="retailers">Retailer summary</option>
+     <option value="coupons">Coupon usage</option>
+     <option value="inventory">Inventory · current</option>
+    </select>
+   </label>
+   ${A.dateFields()}
+   <label class="search">Search current report<input id="search" placeholder="Search ID, shop, status, payment, product…"></label>
+   <div class="filter-actions"><button class="primary" id="generate">Generate</button><button id="cancel" hidden>Stop</button></div>
+  </div>
+ </section>
+
+ <div class="report-hint"><span id="progress">Select a report and generate it.</span><span id="stale-state"></span></div>
+ <div id="warnings"></div>
+ <div id="numbers" class="analytics-kpis"></div>
+
+ <div class="analytics-lower">
+  <section class="report-shell desktop-report">
+   <div class="report-bar"><b id="report-title">Report</b><span id="report-count">No report generated</span></div>
+   <div class="report-table-wrap"><table class="report-table"><thead id="table-head"></thead><tbody id="table-body"></tbody></table><div id="table-empty" class="table-empty" hidden>No matching rows.</div></div>
+   <div class="report-footer"><span id="page-info"></span><div class="pager"><select id="page-size"><option>25</option><option selected>50</option><option>100</option><option>250</option></select><button id="prev">Previous</button><button id="next">Next</button></div></div>
+  </section>
+  <div id="mobile-report" class="mobile-report"></div>
+  <aside class="insights">
+   <div id="insight-card" class="insight-card"><h3>Smart insight</h3><p>Generate a report to see a useful summary.</p></div>
+   <div id="chart-card" class="chart-card" hidden><h3 id="chart-title">Breakdown</h3><div id="mini-bars" class="mini-bars"></div></div>
+  </aside>
+ </div>
+</section>
+
+<input id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+`;
+
+$('from').value='';$('to').value='';$('period').value='all';
+
+function enhanceAdminShell(){
+ document.body.classList.add('analytics-console');
+ const side=document.querySelector('.side'),bottom=side?.querySelector('.bottom'),logout=document.getElementById('logout');
+ if(!bottom)return;
+ const initial=(A.profile?.name||'A').trim().charAt(0).toUpperCase()||'A';
+ const avatar=A.profile?.avatar_url?`<img src="${esc(A.profile.avatar_url)}" alt="">`:`<span class="avatar-initial">${esc(initial)}</span>`;
+ bottom.className='bottom admin-bottom-card';
+ bottom.innerHTML=`<div class="admin-profile"><button id="avatar-btn" class="avatar-btn" title="Change profile photo">${avatar}</button><div class="admin-profile-copy"><b>${esc(A.profile?.name||'Administrator')}</b><span>${esc(A.profile?.role||'admin')}</span></div></div><div class="admin-panel-label">ONeness admin panel<br>Click photo to update profile image</div>`;
+ if(logout){logout.className='';bottom.append(logout)}
+ $('avatar-btn').onclick=()=>$('avatar-file').click();
+ $('avatar-file').onchange=uploadAvatar;
+}
+async function avatarBase64(file){
+ if(!['image/jpeg','image/png','image/webp'].includes(file.type))throw Error('Use JPG, PNG or WebP for the profile photo.');
+ const src=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)});
+ const img=await new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=src});
+ const size=Math.min(img.naturalWidth,img.naturalHeight),sx=(img.naturalWidth-size)/2,sy=(img.naturalHeight-size)/2;
+ const canvas=document.createElement('canvas');canvas.width=512;canvas.height=512;canvas.getContext('2d').drawImage(img,sx,sy,size,size,0,0,512,512);
+ const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',.86));if(!blob)throw Error('Could not prepare profile photo.');
+ return await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result).split(',')[1]);r.onerror=reject;r.readAsDataURL(blob)});
+}
+async function uploadAvatar(){
+ const file=$('avatar-file').files?.[0];if(!file)return;
+ const btn=$('avatar-btn');btn.classList.add('avatar-uploading');
+ try{
+  const base64=await avatarBase64(file);
+  const {data,error}=await A.client.functions.invoke('admin-avatar-upload',{body:{base64,name:file.name||'avatar.webp'}});
+  if(error||data?.ok!==true)throw Error(data?.error?.message||error?.message||'Profile photo upload failed.');
+  A.profile.avatar_url=data.data.url;btn.innerHTML=`<img src="${esc(data.data.url)}" alt="">`;A.toast('Profile photo updated');
+ }catch(e){A.error(e)}finally{btn.classList.remove('avatar-uploading');$('avatar-file').value=''}
+}
+enhanceAdminShell();
+
+function setExports(enabled){
+ for(const id of ['export','print','excel','pdf'])$(id).disabled=!enabled;
+}
+function markStale(){
+ if(building)cancel=true;
+ if(!generated)return;
+ $('stale-state').textContent='Filters changed · Generate again';
+ $('stale-state').className='stale';
+}
+function delivered(r){
+ return orders.filter(o=>o.status==='delivered'&&((r.start===-Infinity&&r.end===Infinity)||A.inRange(o.delivered_at,r)));
+}
+function currentSearch(){
+ return $('search').value.trim().toLowerCase();
+}
+function applySearch(){
+ const q=currentSearch();
+ rows=!q?[...baseRows]:baseRows.filter(row=>row.map(v=>String(v??'')).join(' ').toLowerCase().includes(q));
+ if(sortIndex>=0)sortRows();
+ page=1;renderCurrent();
+}
+function sortRows(){
+ if(sortIndex<0)return;
+ rows.sort((a,b)=>{
+  const av=a[sortIndex],bv=b[sortIndex];
+  if(numberLike(av)&&numberLike(bv))return (Number(av)-Number(bv))*sortDir;
+  return String(av??'').localeCompare(String(bv??''),undefined,{numeric:true,sensitivity:'base'})*sortDir;
+ });
+}
+function toggleSort(i){
+ if(sortIndex===i)sortDir*=-1;else{sortIndex=i;sortDir=1}
+ sortRows();page=1;renderCurrent();
+}
+function metricHtml(){
+ return metrics.slice(0,4).map((m,i)=>`<div class="kpi ${m[3]||''}"><span>${esc(m[0])}</span><strong>${esc(m[1])}</strong><small>${esc(m[2]||'')}</small></div>`).join('');
+}
+function renderInsights(){
+ if(!insights.length){
+  $('insight-card').innerHTML='<h3>Smart insight</h3><p>No additional insight is available for this report.</p>';
+ }else{
+  const [headline,...rest]=insights;
+  $('insight-card').innerHTML=`<h3>Smart insight</h3><div class="insight-main">${esc(headline[0])}</div><p>${esc(headline[1]||'')}</p>${rest.length?`<div class="insight-list" style="margin-top:9px">${rest.map(x=>`<div class="insight-row"><span>${esc(x[0])}</span><b>${esc(x[1])}</b></div>`).join('')}</div>`:''}`;
+ }
+ if(!chartItems.length){$('chart-card').hidden=true;return}
+ $('chart-card').hidden=false;
+ const max=Math.max(1,...chartItems.map(x=>Number(x[1])||0));
+ $('mini-bars').innerHTML=chartItems.slice(0,8).map(x=>`<div class="mini-bar"><span>${esc(x[0])}</span><i style="--w:${Math.max(2,(Number(x[1])||0)/max*100)}%"></i><b>${esc(x[2]??x[1])}</b></div>`).join('');
+}
+function cellHtml(value,header){
+ const raw=String(value??'');
+ if(header==='Order ID')return `<a class="order-link" href="orders.html?id=${encodeURIComponent(raw)}">#ON${esc(raw)}</a>`;
+ return esc(raw);
+}
+function renderCurrent(){
+ $('numbers').innerHTML=metricHtml();
+ $('report-title').textContent=reportTitle||'Report';
+ $('report-count').textContent=`${rows.length} matching · ${baseRows.length} generated`;
+ const pages=Math.max(1,Math.ceil(rows.length/pageSize));page=Math.max(1,Math.min(page,pages));
+ const visible=rows.slice((page-1)*pageSize,page*pageSize);
+ $('table-head').innerHTML=headers.length?`<tr>${headers.map((h,i)=>`<th class="${sortIndex===i?'sort-active':''}" data-sort="${i}">${esc(h)}${sortIndex===i?`<span class="sort-mark">${sortDir>0?'▲':'▼'}</span>`:''}</th>`).join('')}</tr>`:'';
+ $('table-body').innerHTML=visible.map(row=>`<tr>${row.map((v,i)=>`<td class="${numberLike(v)?'numeric':''}">${cellHtml(v,headers[i])}</td>`).join('')}</tr>`).join('');
+ $('table-empty').hidden=rows.length>0;
+ $('page-info').textContent=`Page ${page} of ${pages} · ${rows.length} rows`;
+ $('prev').disabled=page<=1;$('next').disabled=page>=pages;
+ for(const th of document.querySelectorAll('[data-sort]'))th.onclick=()=>toggleSort(+th.dataset.sort);
+ $('mobile-report').innerHTML=visible.map(row=>`<article class="report-card"><div class="report-card-head"><b>${headers[0]==='Order ID'?`<a class="order-link" href="orders.html?id=${encodeURIComponent(row[0])}">#ON${esc(row[0])}</a>`:esc(row[0]??'')}</b><span>${esc(row[1]??'')}</span></div><div class="report-card-grid">${row.slice(2).map((v,i)=>`<div><span>${esc(headers[i+2]||'')}</span><b>${esc(v??'')}</b></div>`).join('')}</div></article>`).join('');
+ renderInsights();
+ updateSheetMeta();
+}
+function previousRange(r){return {start:r.start-(r.end-r.start),end:r.start}}
+function percentChange(now,before){
+ if(!before)return now?'+100%':'0%';
+ const p=(now-before)*100/before;return `${p>=0?'+':''}${p.toFixed(Math.abs(p)>=10?0:1)}%`;
+}
+async function generate(){
+ if(building)return;
+ building=true;cancel=false;baseRows=[];rows=[];headers=[];metrics=[];insights=[];chartItems=[];sortIndex=-1;sortDir=1;page=1;
+ $('warnings').innerHTML='';$('generate').disabled=true;$('cancel').hidden=false;setExports(false);$('stale-state').textContent='';
+ try{
+  reportType=$('report').value;
+  const r=A.range();
+  orders=await A.all('orders.list',{},n=>$('progress').textContent=`Loaded ${n} order headers…`);
+  if(cancel)throw Error('Report cancelled. No partial export was produced.');
+  if(A.can('users'))users=await A.all('admin.users');
+  if(A.can('coupons'))coupons=await A.all('admin.coupons');
+  const created=orders.filter(o=>A.inRange(o.created_at,r)),sales=delivered(r);
+  let total=null,basis='',metricExtras=[];
+  const allDates=r.start===-Infinity&&r.end===Infinity;
+  if(['sales','products','retailers'].includes(reportType)){
+   const missing=orders.filter(o=>o.status==='delivered'&&!o.delivered_at).length;
+   if(missing&&!allDates)$('warnings').innerHTML=`<div class="notice">${missing} delivered order${missing===1?'':'s'} have no recorded delivery timestamp and are excluded from this dated sales report.</div>`;
+  }
+
+  if(reportType==='orders'){
+   headers=['Order ID','Retailer','Created IST','Status','Total INR','Discount INR','Payment','Method'];
+   baseRows=created.map(o=>[o.id,retailerName(o.user_id),A.date(o.created_at),o.status,amount(o.total_paise),amount(o.discount_paise),o.payment_status,(o.payment_method||'').toUpperCase()]);
+   basis='Order creation date · all statuses';
+   const valid=created.filter(o=>!['syncing','cancelled'].includes(o.status));
+   total=valid.reduce((n,o)=>n+Number(o.total_paise||0),0);
+   const avg=valid.length?total/valid.length:0;
+   metricExtras=[['Average order',money(avg),'Valid orders','blue']];
+   const counts=new Map();for(const o of created)counts.set(o.status,(counts.get(o.status)||0)+1);
+   chartItems=[...counts].sort((a,b)=>b[1]-a[1]);
+   const top=chartItems[0];
+   insights=[[top?`${top[0]} is the largest status`:'No orders',top?`${top[1]} of ${created.length} orders are currently ${top[0]}.`:'No orders match this period.']];
+  }
+
+  if(reportType==='sales'){
+   headers=['Order ID','Retailer','Delivered IST','Net order INR','Coupon discount INR','Payment','Method'];
+   baseRows=sales.map(o=>[o.id,retailerName(o.user_id),A.date(o.delivered_at),amount(o.total_paise),amount(o.discount_paise),o.payment_status,(o.payment_method||'').toUpperCase()]);
+   basis='Delivery date · net order total includes delivery charges';
+   total=sales.reduce((n,o)=>n+Number(o.total_paise||0),0);
+   metricExtras=[['Average sale',money(sales.length?total/sales.length:0),'Per delivered order','blue']];
+   const byShop=new Map();for(const o of sales)byShop.set(retailerName(o.user_id),(byShop.get(retailerName(o.user_id))||0)+Number(o.total_paise||0));
+   const ranked=[...byShop].sort((a,b)=>b[1]-a[1]);chartItems=ranked.slice(0,8).map(x=>[x[0],x[1],money(x[1])]);
+   insights=[[ranked[0]?.[0]||'No delivered sales',ranked[0]?`${money(ranked[0][1])} delivered value in this period.`:'No delivered orders match this period.']];
+  }
+
+  if(reportType==='collections'){
+   const data=orders.filter(o=>o.payment_status==='collected'&&A.inRange(o.payment_recorded_at||o.collected_at,r));
+   headers=['Order ID','Retailer','Paid / Recorded IST','Collected INR','Order Payment','Received Via','Reference','Recorded By'];
+   baseRows=data.map(o=>[o.id,retailerName(o.user_id),A.date(o.payment_recorded_at||o.collected_at),amount(o.total_paise),(o.payment_method||'').toUpperCase(),receivedLabel(o),o.payment_reference||'—',o.payment_recorded_by_name||((o.payment_method==='online')?'Payment Gateway':'—')]);
+   basis='Payment recorded date, falling back to collected date for legacy records';
+   total=data.reduce((n,o)=>n+Number(o.total_paise||0),0);
+   const methods=new Map();for(const o of data){const k=receivedLabel(o);methods.set(k,(methods.get(k)||0)+Number(o.total_paise||0))}
+   const ranked=[...methods].sort((a,b)=>b[1]-a[1]);chartItems=ranked.map(x=>[x[0],x[1],money(x[1])]);
+   insights=[[ranked[0]?.[0]||'No collections',ranked[0]?`${money(ranked[0][1])} collected through ${ranked[0][0]}.`:'No collected payments match this period.']];
+  }
+
+  if(reportType==='outstanding'){
+   const data=orders.filter(o=>o.status==='delivered'&&o.payment_status==='unpaid');
+   headers=['Order ID','Retailer','Delivered IST','Outstanding INR','Days since delivery','Payment Method'];
+   baseRows=data.map(o=>[o.id,retailerName(o.user_id),A.date(o.delivered_at),amount(o.total_paise),o.delivered_at?Math.max(0,Math.floor((Date.now()-Date.parse(o.delivered_at))/86400000)):'Unknown',(o.payment_method||'').toUpperCase()]);
+   basis='Current delivered-unpaid snapshot · date range not applied';
+   total=data.reduce((n,o)=>n+Number(o.total_paise||0),0);
+   const oldest=[...data].filter(o=>o.delivered_at).sort((a,b)=>Date.parse(a.delivered_at)-Date.parse(b.delivered_at))[0];
+   metricExtras=[['Oldest due',oldest?`${Math.max(0,Math.floor((Date.now()-Date.parse(oldest.delivered_at))/86400000))} days`:'—',oldest?retailerName(oldest.user_id):'No outstanding','warn']];
+   insights=[[oldest?retailerName(oldest.user_id):'No outstanding',oldest?`Oldest unpaid delivered order is #ON${oldest.id}.`:'All delivered orders are settled.']];
+  }
+
+  if(reportType==='products'){
+   const grouped=new Map();
+   for(let i=0;i<sales.length;i++){
+    if(cancel)throw Error('Report cancelled. No partial export was produced.');
+    const o=sales[i];$('progress').textContent=`Reading saved order items ${i+1} of ${sales.length}…`;
+    let d=snapshots.get(o.id);
+    if(!d){d=await A.api('order.details',{id:o.id});snapshots.set(o.id,d)}
+    if(!Array.isArray(d?.items))continue;
+    if(d.show_amounts===false)throw Error('Amount visibility permission is required for Product sales analytics.');
+    for(const p of d.items){
+     const id=Number(p.product_id||0),qty=Number(p.qty||0),unit=Number(p.unit_price_paise||0);
+     const x=grouped.get(id)||{id,title:p.title||`Product #${id}`,qty:0,value:0};
+     x.qty+=qty;x.value+=qty*unit;grouped.set(id,x);
+    }
+   }
+   const data=[...grouped.values()].sort((a,b)=>b.value-a.value);
+   headers=['Product ID','Product','Quantity delivered','Item value INR','Average wholesale INR'];
+   baseRows=data.map(x=>[x.id,x.title,x.qty,amount(x.value),amount(x.qty?x.value/x.qty:0)]);
+   basis='Delivery date · saved item prices before order-level coupons and shipping';
+   total=data.reduce((n,x)=>n+x.value,0);
+   chartItems=data.slice(0,8).map(x=>[x.title,x.value,money(x.value)]);
+   insights=[[data[0]?.title||'No product sales',data[0]?`${data[0].qty} units · ${money(data[0].value)} item value.`:'No product sales match this period.']];
+  }
+
+  if(reportType==='retailers'){
+   const grouped=new Map();const get=id=>{if(!grouped.has(id))grouped.set(id,{id,orders:0,sales:0,collected:0,outstanding:0});return grouped.get(id)};
+   for(const o of sales){const x=get(o.user_id);x.orders++;x.sales+=Number(o.total_paise||0)}
+   for(const o of orders){
+    if(o.payment_status==='collected'&&A.inRange(o.payment_recorded_at||o.collected_at,r))get(o.user_id).collected+=Number(o.total_paise||0);
+    if(o.status==='delivered'&&o.payment_status==='unpaid')get(o.user_id).outstanding+=Number(o.total_paise||0);
+   }
+   const data=[...grouped.values()].sort((a,b)=>b.sales-a.sales);
+   headers=['Retailer ID','Retailer','Delivered orders','Delivered INR','Collected INR','Outstanding INR'];
+   baseRows=data.map(x=>[x.id,retailerName(x.id),x.orders,amount(x.sales),amount(x.collected),amount(x.outstanding)]);
+   basis='Sales by delivery date · payments by payment-record/collection date · outstanding current';
+   chartItems=data.slice(0,8).map(x=>[retailerName(x.id),x.sales,money(x.sales)]);
+   insights=[[data[0]?retailerName(data[0].id):'No retailer sales',data[0]?`${money(data[0].sales)} delivered value across ${data[0].orders} orders.`:'No retailer activity matches this period.']];
+  }
+
+  if(reportType==='coupons'){
+   const data=created.filter(o=>o.coupon_id);
+   headers=['Coupon','Order ID','Retailer','Used IST','Order status','Discount INR','Usage state'];
+   baseRows=data.map(o=>[coupons.find(c=>c.id===o.coupon_id)?.code||`Coupon #${o.coupon_id}`,o.id,retailerName(o.user_id),A.date(o.created_at),o.status,amount(o.discount_paise),o.status==='cancelled'?'Released':o.status==='syncing'?'Reserved':'Used']);
+   basis='Order creation date · cancelled uses released';
+   total=data.reduce((n,o)=>n+Number(o.discount_paise||0),0);
+   const byCoupon=new Map();for(const row of baseRows)byCoupon.set(row[0],(byCoupon.get(row[0])||0)+Number(row[5]||0));
+   const ranked=[...byCoupon].sort((a,b)=>b[1]-a[1]);chartItems=ranked.slice(0,8).map(x=>[x[0],x[1],`₹${x[1].toLocaleString('en-IN')}`]);
+   insights=[[ranked[0]?.[0]||'No coupon use',ranked[0]?`₹${ranked[0][1].toLocaleString('en-IN')} discount recorded for this coupon.`:'No coupon usage matches this period.']];
+  }
+
+  if(reportType==='inventory'){
+   if(!(A.profile?.role==='owner'||A.can('products.view')||A.can('catalog')))throw Error('Product catalogue permission is needed for the inventory report.');
+   products=await A.all('products.list');
+   headers=['Product ID','Product','Stock','Unit','Wholesale INR','MRP INR','Wholesale stock value INR','Low stock alert qty','Stock state','Active'];
+   baseRows=products.map(p=>{
+    const alert=Number(p.low_stock_alert_qty??10),state=Number(p.stock)===0?'Out of stock':Number(p.stock)<=alert?'Low stock':'Healthy';
+    return [p.id,p.title,p.stock,p.unit,amount(p.price_paise),amount(p.mrp_paise),amount(Number(p.stock||0)*Number(p.price_paise||0)),alert,state,p.active?'Yes':'No']
+   });
+   basis='Current stock snapshot · low-stock state uses each product alert quantity · valuation uses wholesale price, not cost';
+   total=products.reduce((n,p)=>n+Number(p.stock||0)*Number(p.price_paise||0),0);
+   const low=products.filter(p=>Number(p.stock||0)<=Number(p.low_stock_alert_qty??10));
+   metricExtras=[['Low / out stock',String(low.length),'Using product alert quantities','warn']];
+   chartItems=low.slice(0,8).map(p=>[p.title,Math.max(0,Number(p.low_stock_alert_qty??10)-Number(p.stock||0)+1),`${p.stock}/${p.low_stock_alert_qty??10}`]);
+   insights=[[low.length?`${low.length} product${low.length===1?'':'s'} need attention`:'Stock looks healthy',low.length?'Low-stock state is based on each product’s own alert quantity.':'No product is at or below its low-stock alert quantity.']];
+  }
+
+  if(cancel)throw Error('Report cancelled. No partial export was produced.');
+  reportTitle=$('report').selectedOptions[0].text;
+  meta=(['outstanding','inventory'].includes(reportType)?'As of '+A.date(new Date()):r.label)+'; '+basis;
+
+  const q=currentSearch();
+  rows=!q?[...baseRows]:baseRows.filter(row=>row.map(v=>String(v??'')).join(' ').toLowerCase().includes(q));
+
+  metrics=[['Report rows',String(rows.length),basis,'']];
+  if(total!==null)metrics.push([reportType==='orders'?'Confirmed order value':reportType==='coupons'?'Discount value':'Report value',money(total),reportType==='orders'?'Excludes syncing and cancelled':'Generated report total','good']);
+  metrics.push(...metricExtras);
+
+  if(Number.isFinite(r.start)&&Number.isFinite(r.end)&&['orders','sales','collections'].includes(reportType)){
+   const previous=previousRange(r);
+   let nowValue,beforeValue,label;
+   if(reportType==='orders'){nowValue=created.length;beforeValue=orders.filter(o=>A.inRange(o.created_at,previous)).length;label='Order count'}
+   else if(reportType==='sales'){nowValue=total||0;beforeValue=delivered(previous).reduce((n,o)=>n+Number(o.total_paise||0),0);label='Sales value'}
+   else {nowValue=total||0;beforeValue=orders.filter(o=>o.payment_status==='collected'&&A.inRange(o.payment_recorded_at||o.collected_at,previous)).reduce((n,o)=>n+Number(o.total_paise||0),0);label='Collected value'}
+   metrics.push(['Vs previous period',percentChange(nowValue,beforeValue),`${label} · same-length prior period`,Number(nowValue)>=Number(beforeValue)?'good':'warn']);
+  }
+
+  generated=true;lastGeneratedAt=new Date();$('stale-state').textContent='';$('progress').textContent=`${baseRows.length} generated rows · search, sorting and paging are live. ${basis}.`;setExports(true);renderCurrent();
+ }catch(e){
+  generated=false;baseRows=[];rows=[];headers=[];metrics=[];insights=[];chartItems=[];$('progress').textContent=A.error(e);setExports(false);renderCurrent();
+ }finally{
+  building=false;$('generate').disabled=false;$('cancel').hidden=true;
+ }
+}
+function updateReportMode(){
+ const snapshot=['inventory','outstanding'].includes($('report').value);
+ for(const id of ['from','to','period'])$(id).disabled=snapshot;
+ markStale();
+}
+function updateSheetMeta(){
+ const el=$('sheet-meta');if(!el)return;
+ const stamp=lastGeneratedAt?lastGeneratedAt.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}):'—';
+ el.textContent=generated?`${reportTitle} · ${rows.length} matching · ${baseRows.length} generated · ${stamp}`:'Generate a report to begin';
+}
+function syncSheetButtons(){
+ $('sheet-view').textContent=sheetMode?'⛶ Exit Sheet View':'⛶ Sheet View';
+ $('sheet-density').textContent=denseMode?'Comfortable rows':'Compact rows';
+}
+async function enterSheetMode(){
+ const ws=$('analyticsWorkspace');sheetMode=true;ws.classList.add('fullscreen-sheet');document.body.classList.add('pay-sheet-lock');syncSheetButtons();updateSheetMeta();
+ try{if(ws.requestFullscreen&&!document.fullscreenElement)await ws.requestFullscreen()}catch{}
+}
+async function exitSheetMode(){
+ const ws=$('analyticsWorkspace');sheetMode=false;ws.classList.remove('fullscreen-sheet');document.body.classList.remove('pay-sheet-lock');syncSheetButtons();
+ try{if(document.fullscreenElement)await document.exitFullscreen()}catch{}
+}
+function toggleSheetMode(){return sheetMode?exitSheetMode():enterSheetMode()}
+function toggleDensity(){denseMode=!denseMode;$('analyticsWorkspace').classList.toggle('dense',denseMode);syncSheetButtons()}
+
+const loadExternalScript=src=>new Promise((resolve,reject)=>{
+ const existing=[...document.scripts].find(s=>s.src===src);
+ if(existing){if(existing.dataset.loaded==='1')return resolve();existing.addEventListener('load',resolve,{once:true});existing.addEventListener('error',reject,{once:true});return}
+ const s=document.createElement('script');s.src=src;s.async=true;s.onload=()=>{s.dataset.loaded='1';resolve()};s.onerror=()=>reject(Error('Could not load export library. Check your connection.'));document.head.append(s);
+});
+function exportObjects(){return rows.map(row=>Object.fromEntries(headers.map((h,i)=>[h,row[i]??''])))}
+async function exportExcel(){
+ if(!generated)throw Error('Generate a report first.');
+ await loadExternalScript('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js');
+ if(!window.XLSX)throw Error('Excel export library did not load.');
+ const ws=XLSX.utils.json_to_sheet(exportObjects());ws['!cols']=headers.map(h=>({wch:Math.min(32,Math.max(12,h.length+3))}));
+ const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Analytics');XLSX.writeFile(wb,`oneness-${reportType||'analytics'}-${A.today()}.xlsx`);
+}
+async function exportPdf(){
+ if(!generated)throw Error('Generate a report first.');
+ await loadExternalScript('https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js');
+ const jspdf=window.jspdf;if(!jspdf?.jsPDF)throw Error('PDF export library did not load.');
+ const doc=new jspdf.jsPDF({orientation:'landscape',unit:'pt',format:'a4'}),pageW=doc.internal.pageSize.getWidth(),pageH=doc.internal.pageSize.getHeight(),margin=22;
+ const count=Math.max(1,headers.length),usable=pageW-margin*2,colW=usable/count,rowH=22,headerH=24;
+ function pageHeader(){
+  doc.setFont('helvetica','bold');doc.setFontSize(14);doc.setTextColor(23,99,76);doc.text(`ONeness · ${reportTitle}`,margin,23);
+  doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(90,105,97);doc.text(meta,margin,36,{maxWidth:usable});
+  let x=margin,y=47;doc.setFillColor(23,99,76);doc.rect(margin,y,usable,headerH,'F');doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(6);
+  headers.forEach(h=>{doc.text(doc.splitTextToSize(String(h),Math.max(18,colW-6)).slice(0,2),x+3,y+7);x+=colW});return y+headerH;
+ }
+ let y=pageHeader(),ri=0;
+ for(const row of rows){
+  if(y+rowH>pageH-24){doc.addPage();y=pageHeader()}
+  if(ri%2){doc.setFillColor(248,250,248);doc.rect(margin,y,usable,rowH,'F')}
+  let x=margin;doc.setFont('helvetica','normal');doc.setFontSize(6);doc.setTextColor(31,46,39);
+  row.forEach(v=>{const lines=doc.splitTextToSize(String(v??''),Math.max(16,colW-6));doc.text(lines.slice(0,2),x+3,y+7);x+=colW});
+  doc.setDrawColor(226,231,227);doc.line(margin,y+rowH,pageW-margin,y+rowH);y+=rowH;ri++;
+ }
+ doc.setFontSize(7);doc.setTextColor(100,110,104);doc.text(`Rows: ${rows.length}`,margin,pageH-10);
+ doc.save(`oneness-${reportType||'analytics'}-${A.today()}.pdf`);
+}
+function exportCsv(){
+ if(!generated)throw Error('Generate a report first.');
+ A.csv(reportTitle,headers,rows,meta);
+}
+function printReport(){
+ if(!generated)throw Error('Generate a report first.');
+ A.print(reportTitle,`<p>${esc(meta)}</p>`+A.table(headers,rows.map(row=>row.map(esc))));
+}
+
+$('generate').onclick=generate;
+$('cancel').onclick=()=>{cancel=true};
+$('search').oninput=()=>{if(generated)applySearch()};
+$('report').onchange=updateReportMode;
+A.wireDates(markStale);
+$('prev').onclick=()=>{page--;renderCurrent()};$('next').onclick=()=>{page++;renderCurrent()};$('page-size').onchange=()=>{pageSize=+$('page-size').value;page=1;renderCurrent()};
+$('export').onclick=()=>{try{exportCsv()}catch(e){A.error(e)}};$('print').onclick=()=>{try{printReport()}catch(e){A.error(e)}};
+$('excel').onclick=async()=>{try{await exportExcel()}catch(e){A.error(e)}};$('pdf').onclick=async()=>{try{await exportPdf()}catch(e){A.error(e)}};
+$('sheet-view').onclick=()=>toggleSheetMode();$('exit-sheet').onclick=()=>exitSheetMode();$('sheet-density').onclick=toggleDensity;$('sheet-generate').onclick=generate;
+$('sheet-export').onclick=()=>{try{exportCsv()}catch(e){A.error(e)}};$('sheet-print').onclick=()=>{try{printReport()}catch(e){A.error(e)}};
+$('sheet-excel').onclick=async()=>{try{await exportExcel()}catch(e){A.error(e)}};$('sheet-pdf').onclick=async()=>{try{await exportPdf()}catch(e){A.error(e)}};
+document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&sheetMode){sheetMode=false;$('analyticsWorkspace').classList.remove('fullscreen-sheet');document.body.classList.remove('pay-sheet-lock');syncSheetButtons()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sheetMode)exitSheetMode()});
+updateReportMode();renderCurrent();
+
+})().catch(e=>{if(window.App)App.fail(e);else document.body.textContent='Could not load ONeness analytics. '+(e.message||e)});
 </script>
-</body></html>
+</body>
+</html>
